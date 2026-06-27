@@ -28,3 +28,16 @@
     console.log(`DB2 Connected ${name}`);
     
 })("shiv");
+
+
+
+let val1 = 10
+let val2 = 5
+function addNum(num1,num2){
+    let total = num1+num2
+    return total
+}
+let res = addNum(val1,val2)
+let res2 = addNum(10,2)
+console.log(res);
+console.log(res2);
