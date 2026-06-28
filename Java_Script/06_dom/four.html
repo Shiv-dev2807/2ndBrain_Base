@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM</title>
+</head>
+<body style="background-color: black; color: white;">
+    <ul class="lang">
+        <li>JavaScript</li>
+    </ul>
+</body>
+<script>
+
+    //add
+    function addLang(la) {
+        const li = document.createElement('li')
+        li.innerHTML = `${la}`
+        document.querySelector('.lang').appendChild(li)
+    }
+    addLang("Python")
+
+
+    function opLang(l) {
+        const li = document.createElement('li')
+        li.appendChild(document.createTextNode(l))
+        document.querySelector(".lang").appendChild(li)
+    }
+    opLang("shiv")
+
+
+    //edit
+    const slang = document.querySelector("li:nth-child(2)")
+    //slang.innerHTML="mojo"
+
+    
+    const nli = document.createElement('li')
+    nli.textContent = "moja"
+    slang.replaceWith(nli)
+
+    const flang = document.querySelector("li:first-child")
+    flang.outerHTML="<li>Type</li>"
+
+
+
+    //delete
+    const llang = document.querySelector("li:last-child")
+    llang.remove()
+
+
+    
+
+</script>
+</html>
