@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counter</title>
+    <style>
+        body{
+            background-color: black;
+            color: white;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        h1{
+            font-size: 200px;
+        }
+        button{
+            font-size: 100px;
+            background-color: darksalmon;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="counterText">0</h1>
+    <button class="incree">+</button>
+    <button class="decree">-</button>
+    <button class="reset">Reset</button>
+</body>
+<script>
+    
+    //count.textContent = 
+    const count = document.querySelector(".counterText")
+    //console.log(incre+1);
+    document.querySelector(".incree").addEventListener("click",function(){
+        
+        let num = (Number(count.textContent));
+        count.textContent = num+1;
+    })
+    document.querySelector(".decree").addEventListener("click",function(){
+        //const count = document.querySelector(".counterText")
+        let num = (Number(count.textContent));
+        if(num > 0){
+            count.textContent = num-1;
+        }
+    })
+    document.querySelector(".reset").addEventListener("click", function(){
+        //const count = document.querySelector(".counterText")
+        count.textContent = 0
+    })
+    /*
+    
+    */
+</script>
+</html>
