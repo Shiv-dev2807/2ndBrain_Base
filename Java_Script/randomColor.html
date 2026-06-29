@@ -1,0 +1,58 @@
+<!--
+
+2. Random Color Generator
+
+Features:
+
+Button generates random background color
+Show HEX code
+Copy button
+
+You'll learn:
+
+Math.random()
+strings
+clipboard
+style manipulation
+
+-->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Color Generator</title>
+    <style>
+        body{
+            background-color: black;
+        }
+        button{
+            font-size: 100px;
+        }
+    </style>
+</head>
+<body class="bgc">
+    <button class="change-color">
+        Change Color
+    </button>
+</body>
+
+<script>
+    const hex = '0123456789ABCDEF';
+
+    let body = document.querySelector(".bgc")
+
+    document.querySelector(".change-color").addEventListener("click",function(){
+        let color = '#';
+        for (let index = 0; index < 6; index++) {
+            let ran = Math.floor(Math.random() * hex.length);
+            color = color + hex[ran]
+        }
+        body.style.backgroundColor = color
+    })
+    
+</script>
+
+</html>
