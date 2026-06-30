@@ -50,7 +50,10 @@ style manipulation
     const hex = '0123456789ABCDEF';
     let body = document.querySelector(".bgc")
     let h1 = document.querySelector(".code")
-    document.querySelector(".change-color").addEventListener("click",function(){
+    let button = document.querySelector(".change-color")
+    let copy = document.querySelector(".copy")
+    
+    button.addEventListener("click",function(){
         let color = '#';
         for (let index = 0; index < 6; index++) {
             let ran = Math.floor(Math.random() * hex.length);
@@ -60,8 +63,12 @@ style manipulation
         body.style.backgroundColor = color
     
     })
-    document.querySelector(".copy").addEventListener("click",function(){
-        navigator.clipboard.writeText(h1.textContent)    
+    copy.addEventListener("click",function(){
+        navigator.clipboard.writeText(h1.textContent)
+        copy.textContent = "copied"
+        setTimeout(function(){
+            copy.textContent = "copy"
+        },1000)
     })
 </script>
 
