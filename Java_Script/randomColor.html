@@ -26,33 +26,43 @@ style manipulation
     <title>Random Color Generator</title>
     <style>
         body{
-            background-color: black;
+            background-color: #000000;
         }
         button{
             font-size: 100px;
         }
+        h1{
+            color: white;
+        }
     </style>
 </head>
 <body class="bgc">
+    <h1 class="code">#000000</h1>
     <button class="change-color">
         Change Color
+    </button>
+    <button class="copy">
+        copy
     </button>
 </body>
 
 <script>
     const hex = '0123456789ABCDEF';
-
     let body = document.querySelector(".bgc")
-
+    let h1 = document.querySelector(".code")
     document.querySelector(".change-color").addEventListener("click",function(){
         let color = '#';
         for (let index = 0; index < 6; index++) {
             let ran = Math.floor(Math.random() * hex.length);
             color = color + hex[ran]
         }
+        h1.textContent = color
         body.style.backgroundColor = color
-    })
     
+    })
+    document.querySelector(".copy").addEventListener("click",function(){
+        navigator.clipboard.writeText(h1.textContent)    
+    })
 </script>
 
 </html>
