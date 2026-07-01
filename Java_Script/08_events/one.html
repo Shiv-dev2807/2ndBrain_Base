@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>html Events </title>
+</head>
+<body style="background-color: #414141; color: aliceblue;">
+    <h2>Amazing image</h2>
+    <div >
+        <ul id="images">
+            <li><img width="200px" id="photoshop" src="https://images.pexels.com/photos/3561339/pexels-photo-3561339.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load" alt="photoshop"></li>
+            <li><img width="200px" id="japan" src="https://images.pexels.com/photos/3532553/pexels-photo-3532553.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load" alt=""></li>
+            <li><img width="200px" id="river" src="https://images.pexels.com/photos/3532551/pexels-photo-3532551.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load" alt=""></li>
+            <li><img width="200px" id="owl" src="https://images.pexels.com/photos/3532552/pexels-photo-3532552.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load" alt="" ></li>
+            <li><img width="200px" id="prayer" src="https://images.pexels.com/photos/2522671/pexels-photo-2522671.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load" alt=""></li>
+            <li><a style="color: aliceblue;" href="https://google.com" id="google">Google</a></li>
+        </ul>
+   </div>
+</body>
+<script>
+    //! java script is a sequentially run lang
+    /*
+    //not good featurs
+    document.getElementById('owl').onclick = function(){
+        alert("Hi its shiv")
+    }
+    */
+
+    //attachEvent()
+    //jQuery oneventlistener
+
+    //type, timestamp, defaultPrevented(can stop default behaviour)
+    //target, toElement. *srcElement*, curTarget
+    //clientX, clientY, screenX, screenY
+    //altkey, ctrlkey, shiftkey, keyCode(code of a key,etc what research)
+
+    // document.getElementById('owl').addEventListener('click',function(e){
+    //     console.log(e); //in console everything about event functions
+        
+    // },false)
+
+    //eventpropogation = bubbeling up, down -> top
+    //ex : -
+
+    // document.getElementById('images').addEventListener('click',function(e){
+    //     console.log("images");
+        
+    // },false)
+
+    // document.getElementById('owl').addEventListener('click',function(e){
+    //     console.log("owl");
+    //     e.stopPropagation()//now when clicked on owl = only owl we stopped the propagation
+        
+    // },false)
+
+    //owl then images (when clicked on owl(owl falls under images also)) -> down to top
+
+    //capturing = top to bottom -> with true
+    
+    // document.getElementById('images').addEventListener('click',function(e){
+    //     console.log("images");
+        
+    // },true)
+
+    // document.getElementById('owl').addEventListener('click',function(e){
+    //     console.log("owl");
+        
+    // },true)
+
+    //==============================================
+    //preventDefault = stop default behaviour 
+    // document.getElementById('google').addEventListener('click',function(e){
+    //     console.log("google clicked");
+    //     e.preventDefault()
+    //     e.stopPropagation()
+    // },false)
+    
+
+    document.querySelector('#images').addEventListener('click',function(e){
+        console.log(e.target.parentNode);
+
+        if(e.target.tagName === "IMG"){
+            console.log(e.target.id);
+            let rmvIt = e.target.parentNode
+            rmvIt.remove()
+        }
+        
+        //rmvIt.parentNode.removeChild(rmvIt)
+    })
+
+</script>
+</html>

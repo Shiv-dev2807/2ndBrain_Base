@@ -1,0 +1,806 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Build Log — 184 Days</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F2238;
+    --bg-deep:#0A1A2B;
+    --paper:#EAE7DB;
+    --paper-dim:#DFDBCB;
+    --ink:#1B2027;
+    --ink-soft:#5B6473;
+    --line:#5B9BD5;
+    --line-dim:rgba(91,155,213,0.35);
+    --grid:rgba(91,155,213,0.10);
+    --ember:#FF6B35;
+    --ember-dim:#C9501F;
+    --ok:#3F8F63;
+    --warn:#D9A53B;
+    --display:'Space Grotesk',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+    --body:'Inter',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background-color:var(--bg);
+    background-image:
+      repeating-linear-gradient(0deg, var(--grid) 0 1px, transparent 1px 28px),
+      repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 28px);
+    color:var(--paper);
+    font-family:var(--body);
+    line-height:1.5;
+  }
+  a{color:var(--line);}
+  ::selection{background:var(--ember);color:#fff;}
+  :focus-visible{outline:2px solid var(--ember); outline-offset:2px;}
+  button, select, input, textarea{font-family:inherit; font-size:inherit;}
+
+  .wrap{max-width:920px; margin:0 auto; padding:28px 20px 80px;}
+
+  /* ---------- Hero / Console ---------- */
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:0.16em; text-transform:uppercase;
+    color:var(--ember); margin:0 0 6px;
+  }
+  .hero{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:18px;}
+  .hero h1{
+    font-family:var(--display); font-weight:700; margin:0;
+    font-size:clamp(28px, 6vw, 44px); letter-spacing:-0.01em; color:var(--paper);
+  }
+  .hero .sub{font-family:var(--mono); font-size:13px; color:var(--line); margin-top:6px;}
+  .streak-pill{
+    font-family:var(--mono); font-size:12px; color:var(--paper);
+    border:1px solid var(--line-dim); padding:7px 12px; border-radius:3px;
+    background:rgba(91,155,213,0.07); white-space:nowrap;
+  }
+  .streak-pill b{color:var(--ember); font-size:15px;}
+
+  /* ---------- Ruler ---------- */
+  .ruler-card{
+    background:var(--paper); color:var(--ink); border-radius:3px; padding:20px 22px 16px;
+    margin-bottom:22px; box-shadow:0 8px 24px rgba(0,0,0,0.25);
+  }
+  .ruler-top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px; flex-wrap:wrap; gap:8px;}
+  .ruler-day{font-family:var(--display); font-weight:700; font-size:clamp(30px,7vw,46px); line-height:1;}
+  .ruler-day span{font-size:0.4em; font-weight:600; color:var(--ink-soft); font-family:var(--mono);}
+  .ruler-phase{font-family:var(--mono); font-size:12.5px; color:var(--ink-soft); text-align:right;}
+  .ruler-track{position:relative; height:54px; margin-top:8px;}
+  .ruler-line{position:absolute; top:24px; left:0; right:0; height:2px; background:var(--ink-soft); opacity:0.35;}
+  .ruler-fill{position:absolute; top:24px; left:0; height:2px; background:var(--ember);}
+  .ruler-tick{position:absolute; top:14px; width:1px; height:20px; background:var(--ink-soft); opacity:0.5;}
+  .ruler-label{position:absolute; top:36px; font-family:var(--mono); font-size:10.5px; color:var(--ink-soft); transform:translateX(-50%);}
+  .ruler-today{position:absolute; top:6px; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center;}
+  .ruler-today .flag{width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; border-top:7px solid var(--ember);}
+  .ruler-today .lbl{font-family:var(--mono); font-size:9.5px; color:var(--ember-dim); margin-bottom:2px; white-space:nowrap;}
+
+  /* ---------- Tabs ---------- */
+  .tabs{display:flex; gap:4px; overflow-x:auto; margin-bottom:18px; border-bottom:1px solid rgba(91,155,213,0.25); padding-bottom:0;}
+  .tab-btn{
+    background:transparent; border:none; cursor:pointer; color:var(--paper); opacity:0.55;
+    padding:10px 14px 12px; white-space:nowrap; text-align:left; border-bottom:2px solid transparent;
+  }
+  .tab-btn .code{display:block; font-family:var(--mono); font-size:10px; letter-spacing:0.12em; color:var(--line); opacity:0.9;}
+  .tab-btn .name{display:block; font-family:var(--display); font-weight:600; font-size:14.5px; margin-top:2px;}
+  .tab-btn.active{opacity:1; border-bottom-color:var(--ember);}
+  .tab-btn:hover{opacity:0.85;}
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  /* ---------- Cards ---------- */
+  .card{background:var(--paper); color:var(--ink); border-radius:3px; padding:20px 22px; margin-bottom:16px; box-shadow:0 6px 18px rgba(0,0,0,0.18);}
+  .card h2{font-family:var(--display); font-size:18px; margin:0 0 4px; font-weight:700;}
+  .card .hint{font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); margin:0 0 14px;}
+  .card h3{font-family:var(--display); font-size:14.5px; margin:0 0 10px; font-weight:600; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.04em;}
+
+  .banner{
+    background:rgba(255,107,53,0.12); border:1px solid rgba(255,107,53,0.4); color:var(--paper);
+    border-radius:3px; padding:12px 16px; font-size:13.5px; margin-bottom:18px;
+  }
+  .banner b{color:var(--ember);}
+
+  /* checklist */
+  .checklist{list-style:none; margin:0 0 16px; padding:0; display:flex; flex-direction:column; gap:8px;}
+  .checklist li{display:flex; align-items:flex-start; gap:10px; font-size:14.5px;}
+  .checklist input[type=checkbox]{margin-top:3px; width:16px; height:16px; accent-color:var(--ember); flex:none;}
+  .checklist label.done{text-decoration:line-through; opacity:0.5;}
+
+  .btn{
+    font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; text-transform:uppercase;
+    background:var(--ink); color:var(--paper); border:none; border-radius:3px; padding:10px 16px;
+    cursor:pointer;
+  }
+  .btn:hover{background:#2c333d;}
+  .btn.ember{background:var(--ember);}
+  .btn.ember:hover{background:var(--ember-dim);}
+  .btn.ghost{background:transparent; color:var(--ink); border:1px solid var(--ink-soft);}
+  .btn.small{padding:6px 10px; font-size:11px;}
+  .btn:disabled{opacity:0.4; cursor:not-allowed;}
+
+  /* due redo list */
+  .due-item{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px dashed rgba(27,32,39,0.18); font-size:13.5px;}
+  .due-item:last-child{border-bottom:none;}
+  .tag{font-family:var(--mono); font-size:10px; padding:3px 7px; border-radius:2px; text-transform:uppercase; letter-spacing:0.03em;}
+  .tag.warn{background:rgba(217,165,59,0.25); color:#8a6510;}
+  .tag.bad{background:rgba(217,79,53,0.2); color:#a8401f;}
+  .tag.ok{background:rgba(63,143,99,0.2); color:#236b44;}
+
+  /* timer */
+  .timer{display:flex; align-items:center; gap:18px; flex-wrap:wrap;}
+  .timer-clock{font-family:var(--mono); font-size:34px; font-weight:600; min-width:110px;}
+  .timer-stage{font-family:var(--mono); font-size:11.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); max-width:340px;}
+  .timer-stage b{color:var(--ink); display:block; font-size:13px; margin-bottom:2px;}
+  .timer-btns{display:flex; gap:8px;}
+
+  /* forms */
+  .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;}
+  .form-grid .full{grid-column:1 / -1;}
+  .field label{display:block; font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); margin-bottom:4px;}
+  .field input, .field select, .field textarea{
+    width:100%; padding:9px 10px; border:1px solid rgba(27,32,39,0.25); border-radius:2px;
+    background:#fff; color:var(--ink);
+  }
+  .field textarea{resize:vertical; min-height:54px;}
+
+  /* dsa table */
+  .row-list{display:flex; flex-direction:column;}
+  .prow{display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(27,32,39,0.1); font-size:13.5px;}
+  .prow:last-child{border-bottom:none;}
+  .prow .pname{font-weight:600; flex:1; min-width:120px;}
+  .prow .ptopic{font-family:var(--mono); font-size:11px; color:var(--ink-soft);}
+  .prow .pdate{font-family:var(--mono); font-size:11px; color:var(--ink-soft); white-space:nowrap;}
+  .empty{font-family:var(--mono); font-size:12.5px; color:var(--ink-soft); padding:10px 0;}
+
+  /* stats */
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(120px,1fr)); gap:12px; margin-bottom:8px;}
+  .stat{background:var(--paper-dim); border-radius:3px; padding:12px 14px;}
+  .stat .num{font-family:var(--display); font-weight:700; font-size:24px;}
+  .stat .lbl{font-family:var(--mono); font-size:10px; text-transform:uppercase; color:var(--ink-soft); letter-spacing:0.03em;}
+  .bar-track{height:8px; background:rgba(27,32,39,0.12); border-radius:4px; overflow:hidden; margin-top:6px;}
+  .bar-fill{height:100%; background:var(--ember);}
+
+  /* build log kanban */
+  .kanban{display:grid; grid-template-columns:repeat(4, 1fr); gap:12px;}
+  .kcol h4{font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); margin:0 0 8px; padding-bottom:6px; border-bottom:2px solid var(--ink-soft);}
+  .kcol.stuck h4{color:var(--ember-dim); border-bottom-color:var(--ember);}
+  .pcard{background:var(--paper-dim); border-radius:3px; padding:10px 11px; margin-bottom:8px; font-size:13px;}
+  .pcard .ptitle{font-weight:600; margin-bottom:3px;}
+  .pcard .ptech{font-family:var(--mono); font-size:10.5px; color:var(--ink-soft); margin-bottom:5px;}
+  .pcard .pnote{font-size:12px; color:var(--ink-soft); margin-bottom:6px;}
+  .pcard a{font-size:11.5px;}
+  .pcard-foot{display:flex; justify-content:space-between; align-items:center; gap:6px; margin-top:6px;}
+  .pcard select{font-size:10.5px; padding:3px 4px; border-radius:2px; border:1px solid rgba(27,32,39,0.25);}
+
+  @media (max-width:640px){
+    .form-grid{grid-template-columns:1fr;}
+    .kanban{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:420px){
+    .kanban{grid-template-columns:1fr;}
+  }
+
+  /* Plan tab */
+  details{border:1px solid rgba(27,32,39,0.15); border-radius:3px; margin-bottom:10px; background:var(--paper-dim);}
+  summary{cursor:pointer; padding:12px 14px; font-family:var(--display); font-weight:600; font-size:14.5px; list-style:none;}
+  summary::-webkit-details-marker{display:none;}
+  summary:before{content:"+ "; color:var(--ember-dim); font-family:var(--mono);}
+  details[open] summary:before{content:"– ";}
+  .details-body{padding:0 16px 16px; font-size:13.5px;}
+  .details-body table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  .details-body th, .details-body td{text-align:left; padding:6px 8px; border-bottom:1px solid rgba(27,32,39,0.12); vertical-align:top;}
+  .details-body th{font-family:var(--mono); text-transform:uppercase; font-size:10px; color:var(--ink-soft);}
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .two-col ul{padding-left:18px; margin:0; font-size:13px;}
+  .two-col h4{font-family:var(--mono); font-size:11px; text-transform:uppercase; margin:0 0 6px;}
+  @media (max-width:560px){.two-col{grid-template-columns:1fr;}}
+
+  .footer{text-align:center; margin-top:30px;}
+  .footer button{background:none; border:none; color:var(--ink-soft); text-decoration:underline; cursor:pointer; font-size:11.5px; font-family:var(--mono);}
+
+  .loading{font-family:var(--mono); font-size:13px; color:var(--line); padding:40px 0; text-align:center;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important; animation:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="loading">Loading your log…</div>
+</div>
+
+<script>
+(function(){
+
+  /* ---------------- Data ---------------- */
+  var START_DATE = '2026-07-01';
+  var TOTAL_DAYS = 184;
+
+  var PHASES = [
+    {n:1, period:'Jul 2026', dsa:'Complexity, Arrays, Strings', web:'HTML / CSS / JS fundamentals',
+     dsaTask:'Big-O & recursion basics, Arrays (two pointers, sliding window, prefix sums, Kadane\'s), Strings.',
+     webTask:'HTML, CSS (Flexbox/Grid), JS fundamentals (DOM, events, async/await, fetch).'},
+    {n:2, period:'Aug 2026', dsa:'Hashing, Sorting, Binary Search, Linked Lists', web:'Git/GitHub, React',
+     dsaTask:'Hashing patterns, Sorting & Binary Search variations, Linked Lists — draw every pointer move on paper.',
+     webTask:'Git basics, then React: components, props, state, hooks, forms, react-router.'},
+    {n:3, period:'Sep 2026', dsa:'Stacks/Queues, Recursion/Backtracking, intro Trees', web:'Node/Express/MongoDB',
+     dsaTask:'Stacks & Queues, Recursion/Backtracking (subsets, permutations), start Trees.',
+     webTask:'Node.js + Express, MongoDB/Mongoose CRUD, JWT auth — ship your first full-stack app.'},
+    {n:4, period:'Oct 2026', dsa:'Trees deep dive, Heaps, intro Graphs', web:'Capstone #1 + deploy',
+     dsaTask:'Trees (traversals, BST, LCA, diameter), Heaps, start Graphs (BFS/DFS).',
+     webTask:'Build and deploy Capstone #1, live, with a real README and demo link.'},
+    {n:5, period:'Nov 2026', dsa:'Graphs continued, start DP', web:'Polish + start applying',
+     dsaTask:'Graphs (topo sort, union-find, Dijkstra), start DP (1D, knapsack family).',
+     webTask:'Polish capstone, build resume/LinkedIn/GitHub, start applying to internships.'},
+    {n:6, period:'Dec 2026', dsa:'DP, Greedy, full revision, mocks', web:'Heavy applying + interviews',
+     dsaTask:'DP, Greedy, revise every weak topic, 2x/week timed mock problems — talk out loud.',
+     webTask:'Refine projects from interview feedback, keep applying, run mock interviews.'}
+  ];
+
+  var TOPIC_ORDER = [
+    ['1','Big-O, complexity, basic recursion'], ['2','Arrays — two pointers, sliding window, prefix sums, Kadane\'s'],
+    ['3','Strings — pattern matching, two pointers'], ['4','Hashing — hashmap/hashset, frequency counting'],
+    ['5','Sorting & Binary Search (+ variations)'], ['6','Linked Lists — reversal, fast/slow, cycles'],
+    ['7','Stacks & Queues — monotonic stack'], ['8','Recursion & Backtracking — subsets, permutations, N-Queens'],
+    ['9','Trees — traversals, BST, height, LCA'], ['10','Heaps / Priority Queues'],
+    ['11','Graphs — BFS/DFS, topo sort, union-find, Dijkstra'], ['12','Dynamic Programming — 1D/2D, knapsack, LIS/LCS'],
+    ['13','Greedy algorithms'], ['14','Bonus: Tries, Bit Manipulation']
+  ];
+
+  var TOPIC_OPTIONS = ['Arrays','Strings','Hashing','Sorting/Binary Search','Linked Lists','Stacks/Queues',
+    'Recursion/Backtracking','Trees','Heaps','Graphs','DP','Greedy','Tries/Bit Manip','Other'];
+
+  /* ---------------- Storage helpers ---------------- */
+  async function loadKey(key, fallback){
+    try{
+      var r = await window.storage.get(key, false);
+      if(!r || r.value === undefined) return fallback;
+      return JSON.parse(r.value);
+    }catch(e){ return fallback; }
+  }
+  async function saveKey(key, value){
+    try{ await window.storage.set(key, JSON.stringify(value), false); }
+    catch(e){ console.error('storage save failed', key, e); }
+  }
+
+  /* ---------------- Date helpers ---------------- */
+  function todayDate(){ var d = new Date(); d.setHours(0,0,0,0); return d; }
+  function parseISO(s){ var p = s.split('-'); return new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2])); }
+  function fmtISO(d){
+    var y=d.getFullYear(), m=('0'+(d.getMonth()+1)).slice(-2), day=('0'+d.getDate()).slice(-2);
+    return y+'-'+m+'-'+day;
+  }
+  function addDays(d, n){ var r = new Date(d); r.setDate(r.getDate()+n); return r; }
+  function daysBetween(a,b){ return Math.round((b-a)/86400000); }
+  function fmtPretty(d){
+    var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[d.getMonth()]+' '+d.getDate();
+  }
+
+  /* ---------------- State ---------------- */
+  var state = {
+    meta: { startDate: START_DATE, completedDates: [] },
+    problems: [],
+    projects: [],
+    activeTab: 'today',
+    timer: { running:false, seconds:0, intervalId:null }
+  };
+
+  function uid(){ return 'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+  /* ---------------- Derived ---------------- */
+  function getDayInfo(){
+    var start = parseISO(state.meta.startDate);
+    var t = todayDate();
+    var diff = daysBetween(start, t);
+    var dayNum = diff + 1;
+    var monthsDiff = (t.getFullYear()-start.getFullYear())*12 + (t.getMonth()-start.getMonth());
+    if(diff < 0) monthsDiff = -1;
+    var phaseIdx = Math.min(Math.max(monthsDiff,0), PHASES.length-1);
+    return { dayNum: dayNum, diff: diff, phaseIdx: phaseIdx, started: diff >= 0 };
+  }
+
+  function calcStreak(){
+    var set = {}; state.meta.completedDates.forEach(function(d){ set[d]=true; });
+    var t = todayDate();
+    var cursor = set[fmtISO(t)] ? t : addDays(t,-1);
+    var streak = 0;
+    while(set[fmtISO(cursor)]){ streak++; cursor = addDays(cursor,-1); }
+    return streak;
+  }
+
+  function dueRedos(){
+    var t = fmtISO(todayDate());
+    var due = [];
+    state.problems.forEach(function(p){
+      if(!p.redo3Done && p.redo3 <= t) due.push({p:p, kind:'redo3', label:'3-day redo'});
+      else if(p.redo3Done && !p.redo10Done && p.redo10 <= t) due.push({p:p, kind:'redo10', label:'10-day redo'});
+    });
+    return due;
+  }
+
+  function monthSolvedCount(){
+    var t = todayDate();
+    return state.problems.filter(function(p){
+      var pd = parseISO(p.dateSolved);
+      return pd.getFullYear()===t.getFullYear() && pd.getMonth()===t.getMonth();
+    }).length;
+  }
+
+  /* ---------------- Render: shell ---------------- */
+  function render(){
+    var di = getDayInfo();
+    var phase = PHASES[di.phaseIdx];
+    var streak = calcStreak();
+    var pct = Math.min(Math.max(di.diff,0)/TOTAL_DAYS*100, 100);
+
+    var ticks = '';
+    var cum = 0;
+    var monthDays = [31,31,30,31,30,31]; // Jul..Dec
+    var labels = ['JUL','AUG','SEP','OCT','NOV','DEC'];
+    for(var i=0;i<6;i++){
+      var leftPct = cum/TOTAL_DAYS*100;
+      ticks += '<div class="ruler-tick" style="left:'+leftPct+'%"></div>';
+      ticks += '<div class="ruler-label" style="left:'+leftPct+'%">'+labels[i]+'</div>';
+      cum += monthDays[i];
+    }
+    ticks += '<div class="ruler-tick" style="left:100%"></div>';
+
+    var todayLeft = Math.min(Math.max(pct,0),100);
+    var todayMarker = di.started ?
+      '<div class="ruler-today" style="left:'+todayLeft+'%"><span class="lbl">TODAY</span><div class="flag"></div></div>' : '';
+
+    var dayLabel = di.started ? 'DAY <span>'+di.dayNum+' / '+TOTAL_DAYS+'</span>' : 'STARTS IN <span>'+Math.abs(di.diff)+'d</span>';
+
+    document.getElementById('app').innerHTML =
+      '<div class="hero">'+
+        '<div>'+
+          '<p class="eyebrow">Build Log · DSA + Full-Stack</p>'+
+          '<h1>'+dayLabel+'</h1>'+
+          '<p class="sub">'+fmtPretty(todayDate())+' — Phase '+phase.n+' of 6</p>'+
+        '</div>'+
+        '<div class="streak-pill"><b>'+streak+'</b> day streak</div>'+
+      '</div>'+
+
+      '<div class="ruler-card">'+
+        '<div class="ruler-top">'+
+          '<div></div>'+
+          '<div class="ruler-phase">'+phase.period+' &nbsp;·&nbsp; '+phase.dsa+' / '+phase.web+'</div>'+
+        '</div>'+
+        '<div class="ruler-track">'+
+          '<div class="ruler-line"></div>'+
+          '<div class="ruler-fill" style="width:'+todayLeft+'%"></div>'+
+          ticks + todayMarker +
+        '</div>'+
+      '</div>'+
+
+      '<div class="tabs" id="tabs"></div>'+
+      '<div class="panel active" id="panel-today"></div>'+
+      '<div class="panel" id="panel-dsa"></div>'+
+      '<div class="panel" id="panel-build"></div>'+
+      '<div class="panel" id="panel-plan"></div>'+
+
+      '<div class="footer"><button id="resetBtn">Reset all saved data</button></div>';
+
+    renderTabs();
+    renderToday();
+    renderDsa();
+    renderBuild();
+    renderPlan();
+    showTab(state.activeTab);
+
+    document.getElementById('resetBtn').onclick = async function(){
+      if(!confirm('This clears your streak, DSA log, and build log on this device. Continue?')) return;
+      state.meta = { startDate: START_DATE, completedDates: [] };
+      state.problems = [];
+      state.projects = [];
+      await saveKey('app-meta', state.meta);
+      await saveKey('dsa-problems', state.problems);
+      await saveKey('build-projects', state.projects);
+      render();
+    };
+  }
+
+  function renderTabs(){
+    var tabs = [
+      {id:'today', code:'SHEET A', name:'Today'},
+      {id:'dsa', code:'SHEET B', name:'DSA Log'},
+      {id:'build', code:'SHEET C', name:'Build Log'},
+      {id:'plan', code:'SHEET D', name:'The Plan'}
+    ];
+    var html = tabs.map(function(t){
+      return '<button class="tab-btn'+(state.activeTab===t.id?' active':'')+'" data-tab="'+t.id+'">'+
+        '<span class="code">'+t.code+'</span><span class="name">'+t.name+'</span></button>';
+    }).join('');
+    document.getElementById('tabs').innerHTML = html;
+    document.querySelectorAll('.tab-btn').forEach(function(btn){
+      btn.onclick = function(){ showTab(btn.getAttribute('data-tab')); };
+    });
+  }
+
+  function showTab(id){
+    state.activeTab = id;
+    document.querySelectorAll('.tab-btn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-tab')===id);
+    });
+    ['today','dsa','build','plan'].forEach(function(t){
+      document.getElementById('panel-'+t).classList.toggle('active', t===id);
+    });
+  }
+
+  /* ---------------- Today panel ---------------- */
+  function renderToday(){
+    var di = getDayInfo();
+    var phase = PHASES[di.phaseIdx];
+    var t = fmtISO(todayDate());
+    var dayDone = state.meta.completedDates.indexOf(t) !== -1;
+    var due = dueRedos();
+
+    var checklistItems = [
+      'Solve 1 new DSA problem — full Struggle Protocol, no shortcuts',
+      'Clear your redo queue below (3-day / 10-day rule)',
+      '20 min theory — ' + phase.dsaTask,
+      '90 min web dev — ' + phase.webTask,
+      '90 min building on your current project',
+      'Update this log before you stop for the day'
+    ];
+
+    var checklistHtml = checklistItems.map(function(item, idx){
+      return '<li><input type="checkbox" id="chk'+idx+'"><label for="chk'+idx+'">'+item+'</label></li>';
+    }).join('');
+
+    var dueHtml = due.length ? due.map(function(d){
+      var tagClass = d.kind==='redo3' ? 'bad' : 'warn';
+      return '<div class="due-item"><span>'+escapeHtml(d.p.name)+' <span class="tag '+tagClass+'">'+d.label+'</span></span>'+
+        '<button class="btn small ghost" data-redo="'+d.p.id+'" data-kind="'+d.kind+'">Mark redone</button></div>';
+    }).join('') : '<p class="empty">Nothing due today — clean queue.</p>';
+
+    var applyBanner = di.phaseIdx >= 2 ?
+      '<div class="banner"><b>Heads up —</b> from Phase 3 onward, the moment you have one deployed full-stack project, start applying. Don\'t wait to feel ready.</div>' : '';
+
+    document.getElementById('panel-today').innerHTML =
+      applyBanner +
+      '<div class="card">'+
+        '<h2>Today\'s checklist</h2>'+
+        '<p class="hint">Phase '+phase.n+' — '+phase.dsa+' / '+phase.web+'</p>'+
+        '<ul class="checklist">'+checklistHtml+'</ul>'+
+        '<button class="btn ember" id="markDoneBtn"'+(dayDone?' disabled':'')+'>'+(dayDone?'Day marked complete':'Mark today complete')+'</button>'+
+      '</div>'+
+
+      '<div class="card">'+
+        '<h2>Due for redo</h2>'+
+        '<p class="hint">Problems you needed help on, due for a cold re-attempt today</p>'+
+        dueHtml +
+      '</div>'+
+
+      '<div class="card">'+
+        '<h2>Struggle Protocol timer</h2>'+
+        '<p class="hint">Run this on every new DSA problem. No AI, no Google, until the stage tells you otherwise.</p>'+
+        '<div class="timer">'+
+          '<div class="timer-clock" id="timerClock">00:00</div>'+
+          '<div class="timer-stage" id="timerStage"><b>Stage 1 — Struggle alone</b>0–25 min: no AI, no hints. Write your thinking as you go.</div>'+
+          '<div class="timer-btns">'+
+            '<button class="btn" id="timerStart">Start</button>'+
+            '<button class="btn ghost" id="timerPause">Pause</button>'+
+            '<button class="btn ghost" id="timerReset">Reset</button>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+
+    document.getElementById('markDoneBtn').onclick = async function(){
+      if(state.meta.completedDates.indexOf(t)===-1) state.meta.completedDates.push(t);
+      await saveKey('app-meta', state.meta);
+      render();
+    };
+
+    document.querySelectorAll('[data-redo]').forEach(function(btn){
+      btn.onclick = async function(){
+        var id = btn.getAttribute('data-redo'), kind = btn.getAttribute('data-kind');
+        var p = state.problems.find(function(x){ return x.id===id; });
+        if(p){ if(kind==='redo3') p.redo3Done = true; else p.redo10Done = true; }
+        await saveKey('dsa-problems', state.problems);
+        renderToday();
+      };
+    });
+
+    wireTimer();
+  }
+
+  function wireTimer(){
+    var clockEl = document.getElementById('timerClock');
+    var stageEl = document.getElementById('timerStage');
+    function fmtClock(s){
+      var m = Math.floor(s/60), sec = s%60;
+      return ('0'+m).slice(-2)+':'+('0'+sec).slice(-2);
+    }
+    function stageFor(min){
+      if(min < 25) return '<b>Stage 1 — Struggle alone</b>0–25 min: no AI, no hints. Write your thinking as you go.';
+      if(min < 35) return '<b>Stage 2 — Pattern only</b>25–35 min: look up only the category/tag, not the approach.';
+      if(min < 50) return '<b>Stage 3 — Read the approach</b>35–50 min: read the explanation in words, then implement it yourself.';
+      return '<b>Stage 4 — Last resort</b>50+ min: study the code, close it, rewrite it from scratch.';
+    }
+    function tick(){
+      state.timer.seconds++;
+      clockEl.textContent = fmtClock(state.timer.seconds);
+      stageEl.innerHTML = stageFor(Math.floor(state.timer.seconds/60));
+    }
+    document.getElementById('timerStart').onclick = function(){
+      if(state.timer.running) return;
+      state.timer.running = true;
+      state.timer.intervalId = setInterval(tick, 1000);
+    };
+    document.getElementById('timerPause').onclick = function(){
+      state.timer.running = false;
+      clearInterval(state.timer.intervalId);
+    };
+    document.getElementById('timerReset').onclick = function(){
+      state.timer.running = false;
+      clearInterval(state.timer.intervalId);
+      state.timer.seconds = 0;
+      clockEl.textContent = '00:00';
+      stageEl.innerHTML = stageFor(0);
+    };
+  }
+
+  /* ---------------- DSA panel ---------------- */
+  function renderDsa(){
+    var solved = state.problems.length;
+    var alone = state.problems.filter(function(p){return p.status==='alone';}).length;
+    var hint = state.problems.filter(function(p){return p.status==='hint';}).length;
+    var solutionUsed = state.problems.filter(function(p){return p.status==='solution';}).length;
+    var monthCount = monthSolvedCount();
+    var monthPct = Math.min(monthCount/50*100, 100);
+
+    var topicOpts = TOPIC_OPTIONS.map(function(t){ return '<option value="'+t+'">'+t+'</option>'; }).join('');
+
+    var rows = state.problems.slice().reverse().map(function(p){
+      var statusTag = p.status==='alone' ? '<span class="tag ok">solo</span>' :
+                      p.status==='hint' ? '<span class="tag warn">hint</span>' : '<span class="tag bad">solution</span>';
+      return '<div class="prow">'+
+        '<span class="pname">'+escapeHtml(p.name)+'</span>'+
+        '<span class="ptopic">'+escapeHtml(p.topic)+'</span>'+
+        statusTag+
+        '<span class="pdate">'+p.dateSolved+'</span>'+
+        '<button class="btn small ghost" data-del-problem="'+p.id+'">Delete</button>'+
+      '</div>';
+    }).join('');
+
+    document.getElementById('panel-dsa').innerHTML =
+      '<div class="card">'+
+        '<h2>Log a problem</h2>'+
+        '<p class="hint">Be honest about the status — that\'s what makes the redo queue actually work</p>'+
+        '<div class="form-grid">'+
+          '<div class="field"><label>Problem name</label><input id="pName" type="text" placeholder="e.g. Two Sum"></div>'+
+          '<div class="field"><label>Topic</label><select id="pTopic">'+topicOpts+'</select></div>'+
+          '<div class="field"><label>Status</label><select id="pStatus">'+
+            '<option value="alone">Solved alone</option>'+
+            '<option value="hint">Needed a hint</option>'+
+            '<option value="solution">Needed the solution</option>'+
+          '</select></div>'+
+          '<div class="field"><label>Date solved</label><input id="pDate" type="date"></div>'+
+        '</div>'+
+        '<button class="btn ember" id="addProblemBtn">Add problem</button>'+
+      '</div>'+
+
+      '<div class="card">'+
+        '<h2>Progress</h2>'+
+        '<div class="stat-grid">'+
+          '<div class="stat"><div class="num">'+solved+'</div><div class="lbl">Total solved</div></div>'+
+          '<div class="stat"><div class="num">'+alone+'</div><div class="lbl">Solved alone</div></div>'+
+          '<div class="stat"><div class="num">'+hint+'</div><div class="lbl">Needed hint</div></div>'+
+          '<div class="stat"><div class="num">'+solutionUsed+'</div><div class="lbl">Needed solution</div></div>'+
+        '</div>'+
+        '<p class="hint" style="margin-bottom:4px;">This month: '+monthCount+' / 50 target</p>'+
+        '<div class="bar-track"><div class="bar-fill" style="width:'+monthPct+'%"></div></div>'+
+      '</div>'+
+
+      '<div class="card">'+
+        '<h2>Log</h2>'+
+        '<div class="row-list">'+(rows || '<p class="empty">No problems logged yet. Add your first one above.</p>')+'</div>'+
+      '</div>';
+
+    document.getElementById('pDate').value = fmtISO(todayDate());
+
+    document.getElementById('addProblemBtn').onclick = async function(){
+      var name = document.getElementById('pName').value.trim();
+      if(!name){ document.getElementById('pName').focus(); return; }
+      var topic = document.getElementById('pTopic').value;
+      var status = document.getElementById('pStatus').value;
+      var dateVal = document.getElementById('pDate').value || fmtISO(todayDate());
+      var dateObj = parseISO(dateVal);
+      var p = {
+        id: uid(), name: name, topic: topic, status: status, dateSolved: dateVal,
+        redo3: fmtISO(addDays(dateObj,3)), redo10: fmtISO(addDays(dateObj,10)),
+        redo3Done: status==='alone', redo10Done: status==='alone'
+      };
+      state.problems.push(p);
+      await saveKey('dsa-problems', state.problems);
+      renderDsa();
+      renderToday();
+    };
+
+    document.querySelectorAll('[data-del-problem]').forEach(function(btn){
+      btn.onclick = async function(){
+        var id = btn.getAttribute('data-del-problem');
+        state.problems = state.problems.filter(function(p){ return p.id!==id; });
+        await saveKey('dsa-problems', state.problems);
+        renderDsa();
+        renderToday();
+      };
+    });
+  }
+
+  /* ---------------- Build panel ---------------- */
+  function renderBuild(){
+    var cols = [
+      {key:'planning', label:'Planning'}, {key:'building', label:'Building'},
+      {key:'stuck', label:'Stuck'}, {key:'shipped', label:'Shipped'}
+    ];
+    var colsHtml = cols.map(function(c){
+      var items = state.projects.filter(function(p){ return p.status===c.key; });
+      var cardsHtml = items.map(function(p){
+        var link = p.link ? '<a href="'+escapeAttr(p.link)+'" target="_blank" rel="noopener">View live →</a>' : '';
+        var note = p.note ? '<div class="pnote">'+escapeHtml(p.note)+'</div>' : '';
+        var statusSelect = '<select data-move="'+p.id+'">'+cols.map(function(c2){
+          return '<option value="'+c2.key+'"'+(c2.key===p.status?' selected':'')+'>'+c2.label+'</option>';
+        }).join('')+'</select>';
+        return '<div class="pcard">'+
+          '<div class="ptitle">'+escapeHtml(p.name)+'</div>'+
+          '<div class="ptech">'+escapeHtml(p.tech)+'</div>'+
+          note + link +
+          '<div class="pcard-foot">'+statusSelect+'<button class="btn small ghost" data-del-project="'+p.id+'">Del</button></div>'+
+        '</div>';
+      }).join('');
+      return '<div class="kcol'+(c.key==='stuck'?' stuck':'')+'"><h4>'+c.label+' ('+items.length+')</h4>'+
+        (cardsHtml || '<p class="empty">—</p>')+'</div>';
+    }).join('');
+
+    document.getElementById('panel-build').innerHTML =
+      '<div class="card">'+
+        '<h2>Log a project</h2>'+
+        '<div class="form-grid">'+
+          '<div class="field"><label>Project name</label><input id="bName" type="text" placeholder="e.g. Expense tracker"></div>'+
+          '<div class="field"><label>Tech stack</label><input id="bTech" type="text" placeholder="e.g. React, Node, MongoDB"></div>'+
+          '<div class="field"><label>Status</label><select id="bStatus">'+
+            '<option value="planning">Planning</option><option value="building">Building</option>'+
+            '<option value="stuck">Stuck</option><option value="shipped">Shipped</option>'+
+          '</select></div>'+
+          '<div class="field"><label>Live link (optional)</label><input id="bLink" type="text" placeholder="https://..."></div>'+
+          '<div class="field full"><label>Stuck note / what broke</label><textarea id="bNote" placeholder="What you\'re stuck on, or how you fixed it"></textarea></div>'+
+        '</div>'+
+        '<button class="btn ember" id="addProjectBtn">Add project</button>'+
+      '</div>'+
+
+      '<div class="card">'+
+        '<h2>Build board</h2>'+
+        '<div class="kanban">'+colsHtml+'</div>'+
+      '</div>';
+
+    document.getElementById('addProjectBtn').onclick = async function(){
+      var name = document.getElementById('bName').value.trim();
+      if(!name){ document.getElementById('bName').focus(); return; }
+      var proj = {
+        id: uid(), name: name,
+        tech: document.getElementById('bTech').value.trim(),
+        status: document.getElementById('bStatus').value,
+        link: document.getElementById('bLink').value.trim(),
+        note: document.getElementById('bNote').value.trim()
+      };
+      state.projects.push(proj);
+      await saveKey('build-projects', state.projects);
+      renderBuild();
+    };
+
+    document.querySelectorAll('[data-move]').forEach(function(sel){
+      sel.onchange = async function(){
+        var id = sel.getAttribute('data-move');
+        var proj = state.projects.find(function(p){ return p.id===id; });
+        if(proj) proj.status = sel.value;
+        await saveKey('build-projects', state.projects);
+        renderBuild();
+      };
+    });
+    document.querySelectorAll('[data-del-project]').forEach(function(btn){
+      btn.onclick = async function(){
+        var id = btn.getAttribute('data-del-project');
+        state.projects = state.projects.filter(function(p){ return p.id!==id; });
+        await saveKey('build-projects', state.projects);
+        renderBuild();
+      };
+    });
+  }
+
+  /* ---------------- Plan panel ---------------- */
+  function renderPlan(){
+    var topicRows = TOPIC_ORDER.map(function(t){ return '<tr><td>'+t[0]+'</td><td>'+t[1]+'</td></tr>'; }).join('');
+    var calRows = PHASES.map(function(p){ return '<tr><td>'+p.period+'</td><td>'+p.dsa+'</td><td>'+p.web+'</td></tr>'; }).join('');
+
+    document.getElementById('panel-plan').innerHTML =
+      '<div class="card">'+
+        '<h2>Reference</h2>'+
+        '<p class="hint">The full plan, condensed. Open whatever you need.</p>'+
+
+        '<details open><summary>Operating rules</summary><div class="details-body">'+
+          '<p><b>Struggle Protocol</b> — 0–25 min alone, no help. 25–35 min: pattern/tag only. 35–50 min: read the approach in words, then implement. Only after that, look at code — then close it and rewrite from scratch. Redo cold after 3 days, then again after 10 days.</p>'+
+          '<p><b>Debugging Protocol</b> — write a one-page spec before coding. Read the full error message. Google the exact error + framework name. Check docs and GitHub issues. Only after 30–45 min of real debugging, ask AI to explain why it broke, not to fix it. Ship ugly before perfect.</p>'+
+        '</div></details>'+
+
+        '<details><summary>DSA topic order</summary><div class="details-body"><table><tr><th>#</th><th>Topic</th></tr>'+topicRows+'</table></div></details>'+
+
+        '<details><summary>DSA resources</summary><div class="details-body"><ul>'+
+          '<li>Striver\'s A2Z DSA Course — takeUforward.org (theory, free, in order)</li>'+
+          '<li>NeetCode 150 — neetcode.io (pattern-based practice)</li>'+
+          '<li>LeetCode — volume practice, filter by topic then mixed</li>'+
+          '<li>visualgo.net — visualize pointer/algorithm movement when stuck</li>'+
+          '<li>GeeksforGeeks — quick concept lookups only</li>'+
+        '</ul></div></details>'+
+
+        '<details><summary>Web dev resources</summary><div class="details-body"><ul>'+
+          '<li>Stack: HTML/CSS/JS → React → Node/Express → MongoDB → Git → Vercel + Render/Railway + Atlas</li>'+
+          '<li>freeCodeCamp — structured curriculum with certificates</li>'+
+          '<li>The Odin Project — more project-heavy alternative</li>'+
+          '<li>javascript.info — JS deep-dive reference</li>'+
+          '<li>react.dev — official React tutorial</li>'+
+          '<li>MDN (developer.mozilla.org) — first stop for any web API question</li>'+
+          '<li>roadmap.sh/frontend and /backend — big-picture orientation</li>'+
+        '</ul></div></details>'+
+
+        '<details><summary>6-month calendar</summary><div class="details-body"><table><tr><th>Month</th><th>DSA</th><th>Web dev</th></tr>'+calRows+'</table></div></details>'+
+
+        '<details><summary>Internship hunt</summary><div class="details-body">'+
+          '<p>Start applying month 3–4, the moment you have one deployed project. Ramp up hard months 5–6.</p>'+
+          '<p><b>Where:</b> LinkedIn, Internshala, Unstop, Wellfound, Instahyre, Cuvette, direct company pages, referrals, open-source "good first issue" tickets.</p>'+
+          '<p><b>Resume/GitHub:</b> one page, quantified impact, linked projects, tailored keywords, reviewed by 2–3 people. Pin best repos, clean READMEs with screenshots and live links.</p>'+
+          '<p><b>Mocks:</b> 4–6 timed mock interviews in month 6, talking through your approach out loud.</p>'+
+        '</div></details>'+
+
+        '<details><summary>Do\'s and don\'ts</summary><div class="details-body"><div class="two-col">'+
+          '<div><h4>Do</h4><ul>'+
+            '<li>Struggle the full timer before help</li>'+
+            '<li>Say your approach out loud</li>'+
+            '<li>Redo flagged problems at 3 and 10 days</li>'+
+            '<li>Ship ugly projects</li>'+
+            '<li>Track every stuck point</li>'+
+            '<li>Take your weekly rest day</li>'+
+          '</ul></div>'+
+          '<div><h4>Don\'t</h4><ul>'+
+            '<li>Watch tutorials without coding along</li>'+
+            '<li>Ask for full code solutions</li>'+
+            '<li>Skip the cold redo, assuming you\'ll remember</li>'+
+            '<li>Grind 7 days a week with no rest</li>'+
+            '<li>Wait to "feel ready" before applying</li>'+
+            '<li>Switch topics the moment you hit a wall</li>'+
+          '</ul></div>'+
+        '</div></div></details>'+
+      '</div>';
+  }
+
+  /* ---------------- utils ---------------- */
+  function escapeHtml(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function escapeAttr(s){ return escapeHtml(s); }
+
+  /* ---------------- init ---------------- */
+  async function init(){
+    state.meta = await loadKey('app-meta', { startDate: START_DATE, completedDates: [] });
+    state.problems = await loadKey('dsa-problems', []);
+    state.projects = await loadKey('build-projects', []);
+    render();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
