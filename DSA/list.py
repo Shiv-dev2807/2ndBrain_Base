@@ -114,3 +114,13 @@ but bad for:
 
 frequent middle insert/delete
 """
+
+"""
+!Must know patterns:
+Two pointers
+Sliding window
+Prefix sum
+Sorting + searching
+Stack usage
+Frequency counting
+"""
