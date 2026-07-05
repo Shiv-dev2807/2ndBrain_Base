@@ -163,3 +163,35 @@ for k in d.keys():
     print(v)
 
 d2 = {0:'shiv',1:'shivvvv'}"""
+"""
+#! strings
+name = "shiv"
+print(f"hi {name}")
+
+#cant str + int
+#! everything is an object in python
+#! f"{h}" #also object classes can be used in fstring
+
+print("Hello its {0}".format(name))
+
+for c in "shiv":
+    print(c)
+
+#help(str)
+
+print("I am shiv".split(" "))
+
+print("shiv".isnumeric())#false
+print("123".isnumeric())#true
+print("ab1".isnumeric())#false
+
+print("SHIV".lower())
+print("gtgrtgrtgrtg".upper())
+
+s = "hell"
+print(s[0])#h
+print(len(s)) #4
+
+#! strings are immutable = not changeable
+"""
+
