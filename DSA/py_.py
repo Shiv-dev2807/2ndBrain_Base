@@ -114,10 +114,52 @@ h.older_younger_than(5)"""
 
 #!docstring | func | classes also,etc
 
-def mulab(a,b):
-    """
-    Hello this is doc string
-    """
-    return a,b
+# def mulab(a,b):
+#     """
+#     Hello this is doc string
+#     """
+#     return a,b
 
-(help(mulab))
+# (help(mulab))
+
+#! list
+"""l = [1,2,3]
+l.append(4)
+l.insert(0,5)
+print(l) 
+print(l.count(4))
+print(l.count(45)) # not there so 0
+l.reverse() # actually reverses the original list
+print(l)
+l.remove(5)
+print(l)"""
+
+#! slicing = l[1:2] | l[:3] | l[3:] | l[::-1] | l[0:9:2]
+#! copy list = a = [:]
+
+#! dictionaries
+"""#key value
+d = {'apple':'its a fruit',
+     'banana':'hell'}
+print(d)
+print(d['apple'])
+d['banana'] = 'shiv'
+print(d['banana'])
+del d['banana']
+print()
+d['cucumber'] = 'shhhh'
+print(d)
+
+print()
+for k in d.keys():
+    print(k)
+
+print()
+for v in d.values():
+    print(v)
+
+for k in d.keys():
+    v = d[k]
+    print(v)
+
+d2 = {0:'shiv',1:'shivvvv'}"""
