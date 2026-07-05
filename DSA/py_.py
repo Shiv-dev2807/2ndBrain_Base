@@ -67,18 +67,57 @@ with open('new_file.txt''w') as f:
 with open('new_file.txt','a') as f:
     f.write("\nhi")"""
 
+
+
+
+
+
+"""
 #! OBJECT
 #? AND
 #! CLASSES
 
+#==================================================================
 
 class Human: #factory makes things 
-    def __init__(self,age,name):
+    def __init__(self,age,name): #constructur of the class
         self.age = age
         self.name = name
     
     def __str__(self):
         return "A human " + self.name + "." + " humans age " + str(self.age) + "."
-h = Human(4,"shiv")
+    
+    #! own method
 
-print(h)
+    def older_younger_than(self,age):
+        if self.age > age:
+            print("Our age is bigger than there age")
+        elif self.age == age:
+            print("Both age are equal")
+        else:
+            print("Our age is smaller than there age")
+
+
+h = Human(4,"shiv") #object
+
+#print(h)
+
+print(h.age)
+print(h.name)
+print(h.__str__())
+h.older_younger_than(5)"""
+
+#====================================================================
+
+#! help(print)
+
+
+#!docstring | func | classes also,etc
+
+def mulab(a,b):
+    """
+    Hello this is doc string
+    """
+    return a,b
+
+(help(mulab))
