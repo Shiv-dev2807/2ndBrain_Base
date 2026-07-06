@@ -195,3 +195,18 @@ print(len(s)) #4
 #! strings are immutable = not changeable
 """
 
+
+"""#!tuple
+t = (5,4)
+print(t)
+print(t[0])
+for item in t:
+    print(item)
+
+#similar to list but tuples are immutable
+
+#! sorted
+print(sorted([2,9,5]))"""
+
+
+#!sets
