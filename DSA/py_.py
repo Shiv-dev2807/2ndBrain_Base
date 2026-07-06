@@ -330,4 +330,48 @@ print(f_temp)"""
 
 
 #! filter takes function, collection returns all elements that passes a condition
+#normal func or lambda
 
+"""def is_passing(v):
+    return v >= 60"""
+"""grades = [92,43,32,90,85,73,64]
+passgrade = list(filter(lambda x : x>=60,grades))"""
+
+"""for g in passgrade:
+    print(g)"""
+
+#print(passgrade)
+
+
+#! Reduce function = reduces element in a collections to a single value
+"""from functools import reduce"""
+
+"""def add(x,y):
+    return x + y"""
+
+"""
+price = [19.99, 1.00, 5.75, 12.99, 10.99]
+
+total = reduce(lambda x,y:x+y,price)
+print(total)"""
+
+
+#! modules
+#from copy import deepcopy #module = copy, function = deepcopy
+"""import copy as cp 
+
+a = [1,2,3]
+b = cp.deepcopy(a)
+print(a)
+print(a is b)"""
+
+#built in libraries, hidden inside , installed default accessed using import
+
+#import numpy as np
+
+#! if want to list all the modules installed, use pip = it is a package manager 
+#! !pip list | terminal = pip3 list
+
+#! scripts = .py files
+#! if want to import class or any another file = from human import Human
+#? reuse multiple times the same file 
