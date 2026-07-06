@@ -221,3 +221,33 @@ print(set("I am trying to master dsa"))
 
 print(type({}))
 print(type(set()))"""
+
+"""#! errors/try/except
+
+t = (1,2,3)
+try:
+    t[0] = 2
+except:
+    print("Caught it")
+
+#try this if error do this"""
+"""
+#! get more specific
+
+t = (1,2,3)
+try:
+    t[0] = 2
+except TypeError: #wont work for syntaxerror if we try that
+    print("caught it")"""
+
+
+"""#!input
+
+res = input("Hey please give us a number: ")
+print(res) #only string
+print(type(res))
+ress = int(input("Enter only num: "))
+print(ress)
+print(type(ress))
+#can also do
+print(res.isnumeric())"""
