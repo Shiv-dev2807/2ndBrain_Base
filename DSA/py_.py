@@ -251,3 +251,83 @@ print(ress)
 print(type(ress))
 #can also do
 print(res.isnumeric())"""
+
+#! list comprehension
+
+"""l = [x for x in range(5)]
+print(l)"""
+""""n = [1,2,3,4,5]
+l = [x**2 for x in n]
+print(l)
+"""
+
+"""l = [x for x in range(21) if x%2==0]
+print(l)
+
+#!with else condition
+
+l1 = [x if x%2==0 else 5 for x in range(5)]
+print(l1)"""
+
+"""
+print([0]*5)
+
+print([1,2]+[5,4,7])"""
+
+"""#! zip
+
+for a,b in zip(range(3),range(4,7)):
+    print(a,b)# 0,4 | 1,5 | 2,6
+
+
+print([(a,b) for a,b in zip(range(3),range(4,7))])
+
+print({a:b for a,b in zip(range(3),range(4,7))})"""
+
+
+#!ascii 
+"""print(chr(65)) #A
+print(chr(97)) #a
+print(ord('A')) #65
+print(ord('a')) #97"""
+
+"""print({k:chr(k+64) for k in range(1,27)})
+
+print()
+
+print({k:chr(k+96) for k in range(1,27)})
+"""
+
+#!lambda function
+#one time use throw them away mostly used in higher order functions like sort() map() filter() reduce()
+"""double = lambda x:x*2
+
+print(double(2))
+
+max_value = lambda x,y: x if x>y else y
+print(max_value(7,6))"""
+
+
+#! map
+"""def c(temp):
+    return (temp * 9/5) +32
+
+cle_temp = [0.0,10.0,20.0,30.0]
+
+fer_temp = (map(c,cle_temp))
+
+for i in fer_temp:
+    print(i)
+
+f_temp = list(map(c,cle_temp))
+print(f_temp)"""
+
+#! map takes function, collection we can take lambdafunction insted of main function
+
+"""cle_temp = [0.0,10.0,20.0,30.0]
+f_temp = list(map(lambda x:(x*9/5)+32,cle_temp))
+print(f_temp)"""
+
+
+#! filter takes function, collection returns all elements that passes a condition
+
