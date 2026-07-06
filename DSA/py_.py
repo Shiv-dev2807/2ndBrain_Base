@@ -209,4 +209,15 @@ for item in t:
 print(sorted([2,9,5]))"""
 
 
-#!sets
+"""#!sets
+#? unorderd, no duplicates
+
+s = {1,1,2,-4,1,2,9,9}
+print(s)
+
+#remove duplicates
+set("I am trying to master dsa")
+print(set("I am trying to master dsa"))
+
+print(type({}))
+print(type(set()))"""
