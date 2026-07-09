@@ -1,11 +1,23 @@
-#pre storing and fetching
-freq = {}
-arr = [1,2,1,3,2]
 
-for num in arr:
-    if num in freq:
-        freq[num] += 1
-    else:
-        freq[num] = 1
+#! to put smtg into hash table = we have to hash it
 
-print(freq.get(1,0))# if key exist returns the value, else returns 0
+"""
+
+!greg hashfun str -> index(gotta be num 0 to 4)
+
+0
+1
+2
+3
+4
+
+hash functions are lots infinite number of the
+one which is simple = alphabet ordering =
+g = 7
+r = 18
+e = 5
+
+
+greg = 7 18 5 7 = sum(37%5(size)) = 0 through 4 = we get 2 
+put greg in 2
+"""
