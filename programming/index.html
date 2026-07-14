@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE ASCENT — Operator Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#15140f;
+    --bg-elev:#1c1b14;
+    --bg-elev-2:#221f17;
+    --ink:#edeae1;
+    --ink-dim:#a39c8c;
+    --ink-faint:#6e6858;
+    --line:#332f24;
+    --line-soft:#26241b;
+    --camp:#e8a33d;
+    --ridge:#6e93a8;
+    --summit:#9c6b8c;
+    --good:#7fa37a;
+    --radius:4px;
+    --serif:'Fraunces', Georgia, serif;
+    --sans:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono:'JetBrains Mono', 'SF Mono', Consolas, monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:80px;
+  }
+  a{color:inherit;}
+  ::selection{background:var(--camp); color:#15140f;}
+  :focus-visible{outline:2px solid var(--camp); outline-offset:2px;}
+
+  .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
+
+  /* ---------- HERO ---------- */
+  header.hero{
+    padding:56px 0 32px;
+    border-bottom:1px solid var(--line);
+    background:
+      radial-gradient(ellipse 700px 300px at 15% -10%, rgba(232,163,61,0.08), transparent 60%);
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .eyebrow .dot{width:6px; height:6px; border-radius:50%; background:var(--camp); box-shadow:0 0 8px var(--camp);}
+  h1.title{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:clamp(38px, 7vw, 64px);
+    line-height:1.02;
+    letter-spacing:-0.01em;
+  }
+  h1.title em{font-style:italic; font-weight:500; color:var(--camp);}
+  .subhead{
+    margin-top:14px;
+    max-width:520px;
+    color:var(--ink-dim);
+    font-size:15px;
+  }
+  .subhead b{color:var(--ink); font-weight:600;}
+
+  /* stat row */
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    margin-top:32px;
+    overflow:hidden;
+  }
+  .stat{background:var(--bg-elev); padding:16px 18px;}
+  .stat .n{
+    font-family:var(--mono);
+    font-size:26px;
+    font-weight:700;
+    color:var(--ink);
+  }
+  .stat .n.camp{color:var(--camp);}
+  .stat .l{
+    font-size:10.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    margin-top:4px;
+  }
+
+  /* ascent svg */
+  .ascent-graphic{margin-top:34px; position:relative;}
+  .ascent-graphic svg{width:100%; height:auto; display:block;}
+  .ascent-labels{
+    display:flex; justify-content:space-between;
+    font-family:var(--mono); font-size:10.5px; letter-spacing:0.06em;
+    text-transform:uppercase; color:var(--ink-faint); margin-top:8px;
+  }
+  .ascent-labels span:nth-child(1){color:var(--camp);}
+  .ascent-labels span:nth-child(2){color:var(--ridge);}
+  .ascent-labels span:nth-child(3){color:var(--summit);}
+
+  /* ---------- NAV ---------- */
+  nav.tabs{
+    position:sticky; top:0; z-index:30;
+    background:rgba(21,20,15,0.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  nav.tabs .wrap{display:flex; gap:4px; padding-top:0; padding-bottom:0;}
+  nav.tabs button{
+    appearance:none; border:none; background:transparent;
+    font-family:var(--mono); font-size:12px; letter-spacing:0.05em;
+    text-transform:uppercase; color:var(--ink-faint);
+    padding:16px 4px; margin-right:28px;
+    cursor:pointer; border-bottom:2px solid transparent;
+    transition:color .15s ease, border-color .15s ease;
+  }
+  nav.tabs button:hover{color:var(--ink-dim);}
+  nav.tabs button.active{color:var(--camp); border-bottom-color:var(--camp);}
+
+  main{padding-top:40px;}
+  section.panel{display:none;}
+  section.panel.active{display:block; animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+  h2.section-title{
+    font-family:var(--serif); font-weight:600; font-size:26px; margin-bottom:6px;
+  }
+  p.section-desc{color:var(--ink-dim); font-size:14px; margin-bottom:28px; max-width:560px;}
+
+  /* ---------- TODAY ---------- */
+  .today-head{
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:16px; margin-bottom:28px;
+  }
+  .toggle-group{
+    display:inline-flex; background:var(--bg-elev); border:1px solid var(--line);
+    border-radius:var(--radius); overflow:hidden;
+  }
+  .toggle-group button{
+    appearance:none; border:none; background:transparent; color:var(--ink-dim);
+    font-family:var(--mono); font-size:12px; padding:9px 16px; cursor:pointer;
+    letter-spacing:0.03em;
+  }
+  .toggle-group button.on{background:var(--camp); color:#15140f; font-weight:700;}
+
+  .progress-bar{
+    width:100%; height:6px; background:var(--bg-elev-2); border-radius:3px; overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .progress-bar > i{display:block; height:100%; background:var(--camp); transition:width .3s ease;}
+
+  .blocklist{border-top:1px solid var(--line);}
+  .block{
+    display:flex; gap:16px; align-items:flex-start;
+    padding:16px 0; border-bottom:1px solid var(--line-soft);
+  }
+  .block .time{
+    font-family:var(--mono); font-size:12px; color:var(--ink-faint);
+    width:104px; flex:none; padding-top:2px; letter-spacing:0.02em;
+  }
+  .block .chk{
+    flex:none; width:20px; height:20px; margin-top:1px;
+    border:1px solid var(--ink-faint); border-radius:4px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    background:transparent; transition:all .15s ease;
+  }
+  .block .chk.done{background:var(--good); border-color:var(--good);}
+  .block .chk.done::after{content:"✓"; font-size:12px; color:#15140f; font-weight:700;}
+  .block .body{flex:1;}
+  .block .btitle{font-weight:600; font-size:14.5px;}
+  .block .bdetail{color:var(--ink-dim); font-size:13px; margin-top:2px;}
+  .block.done .btitle{color:var(--ink-faint); text-decoration:line-through; text-decoration-color:var(--line);}
+  .block.done .bdetail{color:var(--ink-faint);}
+
+  /* ---------- ROADMAP ---------- */
+  .tier{
+    border:1px solid var(--line); border-radius:var(--radius);
+    margin-bottom:16px; overflow:hidden; background:var(--bg-elev);
+  }
+  .tier-head{
+    display:flex; align-items:center; gap:16px; padding:18px 20px; cursor:pointer;
+    user-select:none;
+  }
+  .tier-head .badge{
+    font-family:var(--mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase;
+    padding:4px 9px; border-radius:20px; border:1px solid; flex:none;
+  }
+  .tier1 .badge{color:var(--camp); border-color:var(--camp);}
+  .tier2 .badge{color:var(--ridge); border-color:var(--ridge);}
+  .tier3 .badge{color:var(--summit); border-color:var(--summit);}
+  .tier-head .ttext{flex:1; min-width:0;}
+  .tier-head .ttitle{font-family:var(--serif); font-weight:600; font-size:19px;}
+  .tier-head .tsub{color:var(--ink-faint); font-size:12.5px; margin-top:2px;}
+  .tier-head .tpct{font-family:var(--mono); font-size:13px; color:var(--ink-dim); flex:none;}
+  .tier-head .chev{flex:none; color:var(--ink-faint); transition:transform .2s ease; font-size:12px;}
+  .tier.open .chev{transform:rotate(90deg);}
+  .tier-bar{height:2px; background:var(--line-soft);}
+  .tier-bar > i{display:block; height:100%;}
+  .tier1 .tier-bar > i{background:var(--camp);}
+  .tier2 .tier-bar > i{background:var(--ridge);}
+  .tier3 .tier-bar > i{background:var(--summit);}
+
+  .tier-body{display:none; padding:4px 20px 20px;}
+  .tier.open .tier-body{display:block;}
+  .group{margin-top:16px;}
+  .group h4{
+    font-family:var(--mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase;
+    color:var(--ink-faint); margin-bottom:8px;
+  }
+  .group ul{list-style:none;}
+  .group li{
+    display:flex; align-items:center; gap:10px; padding:6px 0; font-size:13.5px;
+    color:var(--ink-dim); cursor:pointer;
+  }
+  .group li .chk{
+    width:16px; height:16px; flex:none; border:1px solid var(--ink-faint); border-radius:3px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .group li.done .chk{background:var(--good); border-color:var(--good);}
+  .group li.done .chk::after{content:"✓"; font-size:10px; color:#15140f; font-weight:700;}
+  .group li.done{color:var(--ink-faint); text-decoration:line-through; text-decoration-color:var(--line);}
+
+  /* ---------- REFERENCE ---------- */
+  .ref-grid{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  .ref-card{border:1px solid var(--line); border-radius:var(--radius); background:var(--bg-elev); padding:20px;}
+  .ref-card h3{font-family:var(--serif); font-size:17px; font-weight:600; margin-bottom:14px;}
+  .ref-card .rline{display:flex; gap:12px; padding:7px 0; border-bottom:1px solid var(--line-soft); font-size:13px;}
+  .ref-card .rline .rt{font-family:var(--mono); color:var(--ink-faint); width:96px; flex:none;}
+  .ref-card .rline .rd{color:var(--ink-dim);}
+  .note{
+    margin-top:24px; border:1px dashed var(--line); border-radius:var(--radius);
+    padding:16px 18px; color:var(--ink-dim); font-size:13.5px;
+  }
+  .note b{color:var(--ink);}
+
+  /* ---------- RESOURCES ---------- */
+  .res-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .res-card{border:1px solid var(--line); border-radius:var(--radius); background:var(--bg-elev); padding:18px 20px;}
+  .res-card .rtier{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase;
+    margin-bottom:4px;
+  }
+  .res-card.t1 .rtier{color:var(--camp);}
+  .res-card.t2 .rtier{color:var(--ridge);}
+  .res-card.t3 .rtier{color:var(--summit);}
+  .res-card h3{font-family:var(--serif); font-size:16.5px; font-weight:600; margin-bottom:10px;}
+  .res-card ul{list-style:none;}
+  .res-card li{padding:8px 0; border-top:1px solid var(--line-soft);}
+  .res-card li:first-child{border-top:none;}
+  .res-card li a{
+    font-size:13.5px; font-weight:600; color:var(--ink); text-decoration:none; border-bottom:1px solid var(--line);
+  }
+  .res-card li a:hover{border-bottom-color:var(--camp); color:var(--camp);}
+  .res-card li p{color:var(--ink-faint); font-size:12.5px; margin-top:3px;}
+
+  @media (max-width:640px){
+    .res-grid{grid-template-columns:1fr;}
+  }
+
+  footer{margin-top:60px; padding-top:20px; border-top:1px solid var(--line); text-align:center;}
+  footer button{
+    background:none; border:none; color:var(--ink-faint); font-family:var(--mono);
+    font-size:11px; cursor:pointer; letter-spacing:0.04em; text-decoration:underline;
+    text-underline-offset:3px;
+  }
+
+  @media (max-width:640px){
+    .stats{grid-template-columns:repeat(2,1fr);}
+    .ref-grid{grid-template-columns:1fr;}
+    .block .time{width:74px; font-size:10.5px;}
+    nav.tabs .wrap{gap:0;}
+    nav.tabs button{margin-right:18px; padding:14px 2px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><span class="dot"></span> OPERATOR LOG — SP · STARTED 14 JUL 2026</div>
+    <h1 class="title">The <em>Ascent.</em></h1>
+    <p class="subhead">One deadline, <b>31 Dec 2026</b>, one internship to earn. Everything below is the route — Base Camp gets you there, the Ridge and the Summit are the climb after.</p>
+
+    <div class="stats">
+      <div class="stat"><div class="n camp" id="statDays">—</div><div class="l">Days to deadline</div></div>
+      <div class="stat"><div class="n" id="statOverall">0%</div><div class="l">Route complete</div></div>
+      <div class="stat"><div class="n" id="statToday">0%</div><div class="l">Today's blocks</div></div>
+      <div class="stat"><div class="n" id="statStreak">0</div><div class="l">Day streak</div></div>
+    </div>
+
+    <div class="ascent-graphic">
+      <svg viewBox="0 0 800 200" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0,150 Q100,115 200,140 T400,130 T600,150 T800,120 L800,200 L0,200 Z" fill="#221f17"/>
+        <path d="M0,170 Q150,130 300,158 T600,138 T800,165 L800,200 L0,200 Z" fill="#1c1b14"/>
+        <path d="M0,190 L150,110 L250,155 L380,55 L480,130 L600,82 L700,140 L800,100 L800,200 L0,200 Z" fill="#15140f" stroke="#332f24" stroke-width="1"/>
+        <path id="trailPath" d="M50,187 Q220,132 380,68" fill="none" stroke="#6e6858" stroke-width="1.5" stroke-dasharray="3,5"/>
+        <circle cx="50" cy="187" r="4" fill="#e8a33d"/>
+        <circle cx="220" cy="132" r="4" fill="#6e93a8"/>
+        <circle cx="380" cy="68" r="4" fill="#9c6b8c"/>
+        <circle id="marker" cx="50" cy="187" r="6" fill="#edeae1" stroke="#15140f" stroke-width="2"/>
+      </svg>
+      <div class="ascent-labels"><span>Base Camp</span><span>The Ridge</span><span>The Summit</span></div>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="wrap">
+    <button data-tab="today" class="active">Today</button>
+    <button data-tab="roadmap">Roadmap</button>
+    <button data-tab="reference">Reference</button>
+    <button data-tab="resources">Resources</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- TODAY -->
+  <section class="panel active" id="panel-today">
+    <div class="today-head">
+      <div>
+        <h2 class="section-title">Today's block</h2>
+        <p class="section-desc" style="margin-bottom:0;">Check off blocks as you close them out. Resets at midnight.</p>
+      </div>
+      <div class="toggle-group" id="dayToggle">
+        <button data-mode="college">College day</button>
+        <button data-mode="noncollege">Non-college day</button>
+      </div>
+    </div>
+    <div class="progress-bar" style="margin-bottom:24px;"><i id="todayBar" style="width:0%"></i></div>
+    <div class="blocklist" id="todayList"></div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section class="panel" id="panel-roadmap">
+    <h2 class="section-title">The Route</h2>
+    <p class="section-desc">Three tiers. Base Camp is what gets you the internship by December. The Ridge and Summit are the long game — start them once Base Camp is solid, not before.</p>
+    <div id="tiers"></div>
+  </section>
+
+  <!-- REFERENCE -->
+  <section class="panel" id="panel-reference">
+    <h2 class="section-title">Reference</h2>
+    <p class="section-desc">Both templates side by side for planning ahead.</p>
+    <div class="ref-grid" id="refGrid"></div>
+    <div class="note"><b>Note:</b> skipped college days convert straight into extra non-college study days — same targets, more of them. Don't skip sleep to fund extra hours; the schedule already assumes a tight but real 6–7h.</div>
+  </section>
+
+  <!-- RESOURCES -->
+  <section class="panel" id="panel-resources">
+    <h2 class="section-title">The Kit</h2>
+    <p class="section-desc">One genuinely good, mostly free resource per area — not fifty mediocre ones. Go deep on these before adding more.</p>
+    <div class="res-grid" id="resGrid"></div>
+  </section>
+
+</main>
+
+<footer>
+  <button id="resetBtn">Reset all progress</button>
+</footer>
+
+<script>
+/* ---------------- DATA ---------------- */
+
+const DEADLINE = new Date('2026-12-31T23:59:59');
+
+const SCHEDULE = {
+  college: [
+    ['4:30–5:00','Wake + reset','Hydrate, quick stretch, no phone.'],
+    ['5:00–7:45','DSA / CP deep block','Peak-focus window. New problems, not review.'],
+    ['7:45–8:00','Recap + flashcards','Quick pass over yesterday\'s weak spots.'],
+    ['8:00–9:00','Get ready + walk in','Podcast/audio review on the walk if useful.'],
+    ['9:00–16:30','College','Passive review in gaps — flashcards, not new material.'],
+    ['16:30–17:15','Reset','Food, rest, no screens for a bit.'],
+    ['17:15–19:00','Core CS subject','OS / DBMS / CN — doubles as GATE prep.'],
+    ['19:00–19:45','Dinner','—'],
+    ['19:45–21:30','Build block','Project work, language depth, or system design — rotate.'],
+    ['21:30–22:00','Log + plan','Update this tracker. Set tomorrow\'s first task.'],
+  ],
+  noncollege: [
+    ['5:00–5:30','Wake + reset','Hydrate, quick stretch.'],
+    ['5:30–8:30','DSA / CP deep block','3h. Contest or fresh problem set.'],
+    ['8:30–9:00','Breakfast','—'],
+    ['9:00–12:00','Core CS subjects','GATE-aligned deep dive — OS/DBMS/CN/CO rotation.'],
+    ['12:00–13:00','Lunch + break','—'],
+    ['13:00–16:00','Build block','End-to-end project work, one clean session.'],
+    ['16:00–16:30','Break','Walk, food, air.'],
+    ['16:30–18:30','System design / DevOps','Tier 2 rotation — depth track.'],
+    ['18:30–19:15','Dinner','—'],
+    ['19:15–21:00','Reading / Tier 3','Source code, papers, RFCs, or a Summit-track item.'],
+    ['21:00–21:30','Weekly review + plan','Update tracker, set next day.'],
+  ]
+};
+
+const ROADMAP = [
+  {
+    id:'tier1', cls:'tier1', badge:'Base Camp', title:'The Internship Track',
+    sub:'Now → 31 Dec 2026 — this is the critical path',
+    groups:[
+      {name:'Fundamentals & Paradigms', items:['Problem-solving & computational thinking','Big-O: time & space complexity','Recursion vs iteration','OOP: encapsulation, inheritance, polymorphism, abstraction','Functional programming basics','Clean code, SOLID, DRY/KISS/YAGNI']},
+      {name:'Core Languages', items:['C++ or Java — deep DSA fluency (pick one primary)','Python — scripting & tooling','JavaScript / TypeScript — web fundamentals','SQL — query fluency']},
+      {name:'Data Structures', items:['Arrays & strings','Linked lists, stacks, queues, deques','Hash maps & sets','Trees, BST, heaps / priority queues','Graphs — adjacency list & matrix','Tries']},
+      {name:'Algorithms', items:['Sorting & searching, binary search','Two pointers, sliding window, prefix sums','Greedy','Backtracking','Dynamic programming — 1D/2D, knapsack family','BFS, DFS, topological sort','Dijkstra, Bellman-Ford','Union-Find / DSU','Bit manipulation basics']},
+      {name:'Core CS Subjects (GATE-aligned)', items:['Operating Systems — processes, threads, scheduling, memory, deadlocks','DBMS — normalization, transactions, indexing, ACID','Computer Networks — OSI/TCP-IP, HTTP, DNS, routing basics','Computer Organization & Architecture','Theory of Computation basics']},
+      {name:'Git & Linux', items:['Commits, branches, merge vs rebase','Pull requests & conflict resolution','Shell scripting basics','File permissions & processes']},
+      {name:'Databases in Practice', items:['PostgreSQL or MySQL fundamentals','Indexing & query optimization basics','One NoSQL store — MongoDB or Redis']},
+      {name:'Backend Development', items:['REST API design','Authentication — JWT, sessions, OAuth basics','Input validation & error handling','Caching fundamentals']},
+      {name:'Frontend Development', items:['HTML/CSS fundamentals, responsive design','JavaScript DOM & async/fetch','React fundamentals','Basic state management']},
+      {name:'System Design Basics', items:['Client-server model, load balancers, CDN','Caching strategies','SQL vs NoSQL tradeoffs','CAP theorem — conceptual']},
+      {name:'Projects & Portfolio', items:['Ship 3–4 complete, deployed full-stack projects','Polish READMEs, live demos, clean commit history','One project with auth + DB + deployed API']},
+      {name:'Testing & Engineering Practice', items:['Unit testing basics — pytest/JUnit/Jest','Code review habits','Core design patterns — Singleton, Factory, Observer, Strategy']},
+      {name:'Communication & Interview Prep', items:['Resume + GitHub + LinkedIn polish','Mock DSA interviews','Explaining projects clearly — STAR method','Basic system design interview patterns']},
+    ]
+  },
+  {
+    id:'tier2', cls:'tier2', badge:'The Ridge', title:'Depth & Competitive Edge',
+    sub:'Jan 2027 onward — once Base Camp is solid',
+    groups:[
+      {name:'Competitive Programming', items:['Codeforces rating climb — regular contests','Advanced DP — bitmask, digit DP, tree DP','Advanced graphs — SCC (Tarjan/Kosaraju), MST (Prim/Kruskal), max flow','String algorithms — KMP, Z-function, Rabin-Karp','Segment trees, Fenwick trees, sparse tables','Number theory — modular arithmetic, sieve, fast exponentiation']},
+      {name:'System Design Depth', items:['Microservices vs monolith tradeoffs','Message queues & event-driven architecture','Distributed caching & consistency models','API gateway, service discovery','Event sourcing & CQRS']},
+      {name:'DevOps & Cloud', items:['Docker & Docker Compose','Kubernetes fundamentals','CI/CD pipelines — GitHub Actions','One cloud platform — AWS or GCP core services','Infrastructure as code — Terraform basics','Monitoring — Prometheus + Grafana']},
+      {name:'Security', items:['OWASP Top 10','SQLi, XSS, CSRF, SSRF — causes & defenses','Secrets management','HTTPS/TLS fundamentals']},
+      {name:'Databases Depth', items:['Replication & sharding','Query optimization & explain plans','Distributed databases — Cassandra/DynamoDB concepts']},
+      {name:'Architecture & Patterns', items:['Full design pattern catalogue — structural/behavioral/creational','Clean / Hexagonal architecture','MVC vs MVVM tradeoffs']},
+      {name:'Observability', items:['Structured logging','Metrics & tracing','OpenTelemetry basics']},
+      {name:'AI & Modern Tooling', items:['LLM APIs & prompt engineering','Embeddings & vector databases','RAG pipelines','AI agents & MCP basics']},
+    ]
+  },
+  {
+    id:'tier3', cls:'tier3', badge:'The Summit', title:'The 0.01% Track',
+    sub:'Ongoing, lifetime — no deadline, just depth',
+    groups:[
+      {name:'Systems Internals', items:['OS internals & Linux kernel basics','CPU architecture & assembly — x86/ARM','Memory management internals, garbage collectors']},
+      {name:'Languages & Compilers', items:['Compiler design — lexer, parser, codegen','Build a toy language / interpreter','Virtual machine implementation']},
+      {name:'High-Performance Computing', items:['Concurrency & parallelism internals','GPU programming & CUDA basics','Systems-level performance profiling']},
+      {name:'Distributed Systems Internals', items:['Consensus algorithms — implement Raft or Paxos','Build a toy distributed key-value store']},
+      {name:'Security Deep Dive', items:['Reverse engineering fundamentals','Binary exploitation basics','Applied cryptography']},
+      {name:'Build-From-Scratch Track', items:['Build a small database engine','Build an HTTP server from raw sockets','Build a toy browser rendering engine','Contribute to a real open-source project']},
+      {name:'Engineering Mindset', items:['Read source of major OSS projects regularly','Read CS papers & RFCs','Maintain a public build log / technical writing']},
+    ]
+  }
+];
+
+const RESOURCES = [
+  { tier:'t1', title:'DSA & Problem Solving', links:[
+    {name:'NeetCode', url:'https://neetcode.io', d:'Curated pattern-based problem lists (NeetCode 150/250) with clear video explanations.'},
+    {name:'LeetCode', url:'https://leetcode.com', d:'The volume — daily problems, company tags, mock interview mode.'},
+    {name:'CSES Problem Set', url:'https://cses.fi/problemset', d:'Clean, well-scoped problems that force real understanding, not pattern memorization.'},
+  ]},
+  { tier:'t1', title:'Core CS Subjects', links:[
+    {name:'OSTEP', url:'https://ostep.org', d:'Operating Systems: Three Easy Pieces — free, excellent, the standard for OS fundamentals.'},
+    {name:'NPTEL', url:'https://nptel.ac.in', d:'Free GATE-aligned lecture courses for OS, DBMS, CN, CO straight from IIT faculty.'},
+    {name:'CS50', url:'https://cs50.harvard.edu', d:'Harvard\u2019s intro to CS — the best single course for tying fundamentals together.'},
+  ]},
+  { tier:'t1', title:'Git', links:[
+    {name:'Learn Git Branching', url:'https://learngitbranching.js.org', d:'Interactive visual sandbox — actually builds intuition for merge/rebase instead of memorized commands.'},
+  ]},
+  { tier:'t1', title:'Web Development', links:[
+    {name:'The Odin Project', url:'https://theodinproject.com', d:'Full free curriculum, project-heavy, HTML/CSS/JS through full-stack.'},
+    {name:'Full Stack Open', url:'https://fullstackopen.com', d:'University of Helsinki\u2019s deep dive into React, Node, and modern backend practice.'},
+    {name:'MDN Web Docs', url:'https://developer.mozilla.org', d:'The reference — go here whenever you need the real answer, not a tutorial\u2019s paraphrase.'},
+  ]},
+  { tier:'t1', title:'Databases', links:[
+    {name:'PostgreSQL Docs', url:'https://www.postgresql.org/docs/', d:'Official docs are genuinely readable — start with the tutorial section.'},
+    {name:'Use The Index, Luke', url:'https://use-the-index-luke.com', d:'Short, sharp guide to indexing and query performance that actually sticks.'},
+  ]},
+  { tier:'t1', title:'System Design (Basics)', links:[
+    {name:'roadmap.sh', url:'https://roadmap.sh', d:'Visual, up-to-date roadmaps for almost every track on this site — good for a second opinion on sequencing.'},
+  ]},
+  { tier:'t2', title:'Competitive Programming', links:[
+    {name:'Codeforces', url:'https://codeforces.com', d:'Regular contests, huge editorial archive, the rating climb that actually signals something.'},
+    {name:'cp-algorithms', url:'https://cp-algorithms.com', d:'Rigorous writeups of every CP algorithm you\u2019ll need past the basics.'},
+  ]},
+  { tier:'t2', title:'System Design (Depth)', links:[
+    {name:'System Design Primer', url:'https://github.com/donnemartin/system-design-primer', d:'The most cited free resource for this — case studies, trade-off breakdowns, interview Qs.'},
+  ]},
+  { tier:'t2', title:'DevOps & Cloud', links:[
+    {name:'Docker Docs', url:'https://docs.docker.com', d:'Official docs double as the best tutorial for containers and Compose.'},
+    {name:'Kubernetes Docs', url:'https://kubernetes.io/docs/home/', d:'Start with Concepts + Tutorials before touching a real cluster.'},
+    {name:'AWS Free Tier', url:'https://aws.amazon.com/free/', d:'Enough real infra to practice EC2/S3/Lambda/IAM without spending money if you watch usage.'},
+  ]},
+  { tier:'t2', title:'Security', links:[
+    {name:'OWASP Top 10', url:'https://owasp.org/www-project-top-ten/', d:'The canonical list of what actually goes wrong in production apps, with causes and fixes.'},
+  ]},
+  { tier:'t3', title:'Systems Internals', links:[
+    {name:'Nand2Tetris', url:'https://www.nand2tetris.org', d:'Build a computer from logic gates up to a working OS — the deepest possible intuition.'},
+    {name:'CS:APP', url:'https://csapp.cs.cmu.edu', d:'Computer Systems: A Programmer\u2019s Perspective — the standard for how a program really executes.'},
+  ]},
+  { tier:'t3', title:'Languages & Compilers', links:[
+    {name:'Crafting Interpreters', url:'https://craftinginterpreters.com', d:'Free, brilliantly written, build two real interpreters from scratch.'},
+  ]},
+];
+
+function renderResources(){
+  const grid = document.getElementById('resGrid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  const tierLabel = {t1:'Base Camp', t2:'The Ridge', t3:'The Summit'};
+  RESOURCES.forEach(card=>{
+    const el = document.createElement('div');
+    el.className = 'res-card '+card.tier;
+    el.innerHTML = `
+      <div class="rtier">${tierLabel[card.tier]}</div>
+      <h3>${card.title}</h3>
+      <ul>${card.links.map(l=>`<li><a href="${l.url}" target="_blank" rel="noopener">${l.name}</a><p>${l.d}</p></li>`).join('')}</ul>
+    `;
+    grid.appendChild(el);
+  });
+}
+
+/* ---------------- STORAGE ---------------- */
+const LS_ROADMAP='ascent-roadmap-v1';
+const LS_DAILY='ascent-daily-v1';
+
+function loadJSON(key, fallback){
+  try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch(e){ return fallback; }
+}
+function saveJSON(key, val){
+  try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+}
+function todayKey(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+let roadmapState = loadJSON(LS_ROADMAP, {});
+let dailyState = loadJSON(LS_DAILY, {}); // { '2026-07-14': { mode:'college', blocks:{0:true,...} } }
+
+/* ---------------- TABS ---------------- */
+document.querySelectorAll('nav.tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('section.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ---------------- TODAY RENDER ---------------- */
+function getTodayRecord(){
+  const k = todayKey();
+  if(!dailyState[k]) dailyState[k] = { mode:'college', blocks:{} };
+  return dailyState[k];
+}
+
+function renderToday(){
+  const rec = getTodayRecord();
+  document.querySelectorAll('#dayToggle button').forEach(b=>{
+    b.classList.toggle('on', b.dataset.mode===rec.mode);
+  });
+  const list = SCHEDULE[rec.mode];
+  const container = document.getElementById('todayList');
+  container.innerHTML = '';
+  list.forEach((row,i)=>{
+    const done = !!rec.blocks[i];
+    const el = document.createElement('div');
+    el.className = 'block' + (done?' done':'');
+    el.innerHTML = `
+      <div class="time">${row[0]}</div>
+      <div class="chk ${done?'done':''}" data-i="${i}"></div>
+      <div class="body">
+        <div class="btitle">${row[1]}</div>
+        <div class="bdetail">${row[2]}</div>
+      </div>`;
+    el.querySelector('.chk').addEventListener('click', ()=>{
+      rec.blocks[i] = !rec.blocks[i];
+      saveJSON(LS_DAILY, dailyState);
+      renderToday();
+      renderStats();
+    });
+    container.appendChild(el);
+  });
+  const doneCount = list.filter((_,i)=>rec.blocks[i]).length;
+  const pct = Math.round((doneCount/list.length)*100);
+  document.getElementById('todayBar').style.width = pct+'%';
+  document.getElementById('statToday').textContent = pct+'%';
+}
+
+document.getElementById('dayToggle').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  const rec = getTodayRecord();
+  rec.mode = btn.dataset.mode;
+  saveJSON(LS_DAILY, dailyState);
+  renderToday();
+});
+
+/* ---------------- ROADMAP RENDER ---------------- */
+function itemId(tierId, gi, ii){ return tierId+'-'+gi+'-'+ii; }
+
+function tierProgress(tier){
+  let total=0, done=0;
+  tier.groups.forEach((g,gi)=>g.items.forEach((_,ii)=>{
+    total++;
+    if(roadmapState[itemId(tier.id,gi,ii)]) done++;
+  }));
+  return {total, done, pct: total? Math.round(done/total*100):0};
+}
+
+function overallProgress(){
+  let total=0, done=0;
+  ROADMAP.forEach(t=>{ const p=tierProgress(t); total+=p.total; done+=p.done; });
+  return total? Math.round(done/total*100):0;
+}
+
+function renderRoadmap(){
+  const container = document.getElementById('tiers');
+  container.innerHTML = '';
+  ROADMAP.forEach(tier=>{
+    const p = tierProgress(tier);
+    const tEl = document.createElement('div');
+    tEl.className = 'tier '+tier.cls;
+    tEl.innerHTML = `
+      <div class="tier-head">
+        <div class="badge">${tier.badge}</div>
+        <div class="ttext">
+          <div class="ttitle">${tier.title}</div>
+          <div class="tsub">${tier.sub}</div>
+        </div>
+        <div class="tpct">${p.done}/${p.total} · ${p.pct}%</div>
+        <div class="chev">▸</div>
+      </div>
+      <div class="tier-bar"><i style="width:${p.pct}%"></i></div>
+      <div class="tier-body"></div>
+    `;
+    const body = tEl.querySelector('.tier-body');
+    tier.groups.forEach((g, gi)=>{
+      const gEl = document.createElement('div');
+      gEl.className = 'group';
+      const ul = document.createElement('ul');
+      g.items.forEach((item, ii)=>{
+        const id = itemId(tier.id, gi, ii);
+        const done = !!roadmapState[id];
+        const li = document.createElement('li');
+        li.className = done ? 'done':'';
+        li.innerHTML = `<span class="chk"></span><span>${item}</span>`;
+        li.addEventListener('click', ()=>{
+          roadmapState[id] = !roadmapState[id];
+          saveJSON(LS_ROADMAP, roadmapState);
+          renderRoadmap();
+          renderStats();
+          // preserve open state
+          tEl.classList.add('open');
+        });
+        ul.appendChild(li);
+      });
+      gEl.innerHTML = `<h4>${g.name}</h4>`;
+      gEl.appendChild(ul);
+      body.appendChild(gEl);
+    });
+    tEl.querySelector('.tier-head').addEventListener('click', ()=>{
+      tEl.classList.toggle('open');
+    });
+    container.appendChild(tEl);
+  });
+}
+
+/* ---------------- REFERENCE RENDER ---------------- */
+function renderReference(){
+  const grid = document.getElementById('refGrid');
+  grid.innerHTML = '';
+  [['College day', SCHEDULE.college],['Non-college day', SCHEDULE.noncollege]].forEach(([label, rows])=>{
+    const card = document.createElement('div');
+    card.className = 'ref-card';
+    card.innerHTML = `<h3>${label}</h3>` + rows.map(r=>
+      `<div class="rline"><div class="rt">${r[0]}</div><div class="rd">${r[1]}</div></div>`
+    ).join('');
+    grid.appendChild(card);
+  });
+}
+
+/* ---------------- STATS + STREAK ---------------- */
+function computeStreak(){
+  let streak = 0;
+  let d = new Date();
+  // if today isn't complete yet, start counting from yesterday so an in-progress day doesn't break the streak
+  const todayRec = dailyState[todayKey()];
+  const todayList = todayRec ? SCHEDULE[todayRec.mode] : null;
+  const todayComplete = todayRec && todayList && todayList.every((_,i)=>todayRec.blocks[i]);
+  if(!todayComplete) d.setDate(d.getDate()-1);
+  while(true){
+    const k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const rec = dailyState[k];
+    if(!rec) break;
+    const list = SCHEDULE[rec.mode];
+    const complete = list.every((_,i)=>rec.blocks[i]);
+    if(!complete) break;
+    streak++;
+    d.setDate(d.getDate()-1);
+  }
+  return streak;
+}
+
+function renderStats(){
+  const now = new Date();
+  const diffMs = DEADLINE - now;
+  const days = Math.max(0, Math.ceil(diffMs / 86400000));
+  document.getElementById('statDays').textContent = days;
+  document.getElementById('statOverall').textContent = overallProgress()+'%';
+  document.getElementById('statStreak').textContent = computeStreak();
+
+  // move ascent marker
+  try{
+    const path = document.getElementById('trailPath');
+    const marker = document.getElementById('marker');
+    if(path && marker && path.getTotalLength){
+      const len = path.getTotalLength();
+      const t = Math.min(1, Math.max(0, overallProgress()/100));
+      const pt = path.getPointAtLength(len*t);
+      marker.setAttribute('cx', pt.x);
+      marker.setAttribute('cy', pt.y);
+    }
+  }catch(e){ /* SVG geometry APIs unsupported in this context — non-critical, skip */ }
+}
+
+/* ---------------- RESET ---------------- */
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(!confirm('Reset all roadmap and daily progress? This cannot be undone.')) return;
+  roadmapState = {}; dailyState = {};
+  saveJSON(LS_ROADMAP, roadmapState);
+  saveJSON(LS_DAILY, dailyState);
+  renderToday(); renderRoadmap(); renderStats();
+});
+
+/* ---------------- INIT ---------------- */
+renderToday();
+renderRoadmap();
+renderReference();
+renderResources();
+renderStats();
+</script>
+</body>
+</html>

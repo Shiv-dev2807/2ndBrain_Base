@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ascend — Personal Productivity OS</title>
+<meta name="description" content="An all-in-one personal productivity, study, coding and life-tracking dashboard." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⌂</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div id="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="mark">A</div>
+      <span>Ascend</span>
+    </div>
+    <nav class="nav-scroll" id="nav-scroll"></nav>
+    <div class="sidebar-foot">
+      <button class="nav-item" data-view="settings" onclick="goToView('settings')">
+        <span class="ic">⚙</span><span class="nav-label">Settings</span>
+      </button>
+      <button class="collapse-btn" id="collapse-btn" onclick="toggleSidebar()">« Collapse</button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN COLUMN ============ -->
+  <div class="main-col">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn" id="mobile-nav-btn" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')">☰</button>
+        <h2 id="topbar-title">Dashboard</h2>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-sm" onclick="openQuickAdd()">+ Quick Add</button>
+        <div class="xp-pill" onclick="goToView('levelup')" title="Level up progress">
+          <div class="lvl-badge"><span id="topbar-level">1</span></div>
+          <div class="xp-bar-mini"><div id="topbar-xp-fill" style="width:0%"></div></div>
+          <span class="streak" id="topbar-streak">🔥 0</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="content" id="main-scroll">
+
+      <section class="view active" id="view-dashboard"></section>
+      <section class="view" id="view-main-section"></section>
+      <section class="view" id="view-analytics"></section>
+      <section class="view" id="view-habits"></section>
+      <section class="view" id="view-todos"></section>
+      <section class="view" id="view-pomodoro"></section>
+      <section class="view" id="view-timers"></section>
+      <section class="view" id="view-calendar"></section>
+      <section class="view" id="view-notes"></section>
+      <section class="view" id="view-goals"></section>
+      <section class="view" id="view-programming"></section>
+      <section class="view" id="view-gate"></section>
+      <section class="view" id="view-health"></section>
+      <section class="view" id="view-levelup"></section>
+      <section class="view" id="view-settings"></section>
+
+    </main>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+<div id="toast-host"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+
+<script src="js/storage.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/habits.js"></script>
+<script src="js/todos.js"></script>
+<script src="js/pomodoro.js"></script>
+<script src="js/timers.js"></script>
+<script src="js/calendar.js"></script>
+<script src="js/notes.js"></script>
+<script src="js/goals.js"></script>
+<script src="js/programming.js"></script>
+<script src="js/gate.js"></script>
+<script src="js/main-section.js"></script>
+<script src="js/health.js"></script>
+<script src="js/gamification.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/quickadd.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

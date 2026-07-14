@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GODMODE // 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0c0a11;
+    --surface:#151020;
+    --surface-2:#1c1628;
+    --surface-3:#251e33;
+    --plum:#9a67ae;
+    --plum-dim:#4a3a55;
+    --amber:#e8a33d;
+    --amber-dim:#4a3a20;
+    --amber-glow:rgba(232,163,61,0.14);
+    --peri:#98a8f7;
+    --peri-dim:#302f52;
+    --peri-glow:rgba(152,168,247,0.14);
+    --paper:#f4f0f8;
+    --ash:#a99fbe;
+    --ash-dim:#6d647f;
+    --border:#2b2438;
+    --good:#8ad9a8;
+    --coral:#e8735d;
+    --coral-dim:#4a2e28;
+    --coral-glow:rgba(232,115,93,0.14);
+    --font-display:'Space Grotesk',sans-serif;
+    --font-body:'Inter',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:var(--font-body);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(154,103,174,0.10), transparent 45%),
+      radial-gradient(circle at 85% 90%, rgba(152,168,247,0.08), transparent 45%);
+    pointer-events:none;
+    z-index:0;
+  }
+  h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;letter-spacing:-0.01em;color:var(--paper);}
+  a{color:var(--peri);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  ::selection{background:var(--plum);color:var(--paper);}
+  .mono{font-family:var(--font-mono);}
+
+  /* ===== APP SHELL ===== */
+  .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh;position:relative;z-index:1;}
+
+  /* ===== RAIL ===== */
+  .rail{
+    background:var(--surface);
+    border-right:1px solid var(--border);
+    padding:28px 22px;
+    display:flex;flex-direction:column;gap:26px;
+    position:sticky;top:0;height:100vh;overflow-y:auto;
+  }
+  .brand{display:flex;flex-direction:column;gap:4px;}
+  .brand-mark{font-family:var(--font-display);font-size:1.15rem;font-weight:700;letter-spacing:0.02em;}
+  .brand-mark span{color:var(--amber);}
+  .brand-sub{font-family:var(--font-mono);font-size:0.68rem;color:var(--ash-dim);text-transform:uppercase;letter-spacing:0.08em;}
+
+  .rail-block{border-top:1px solid var(--border);padding-top:18px;}
+  .rail-label{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ash-dim);margin-bottom:10px;}
+
+  .ticker-item{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px dashed var(--border);}
+  .ticker-item:last-child{border-bottom:none;}
+  .ticker-name{font-size:0.72rem;color:var(--ash);text-transform:uppercase;letter-spacing:0.04em;}
+  .ticker-val{font-family:var(--font-mono);font-size:0.92rem;font-weight:600;}
+  .ticker-val.amber{color:var(--amber);}
+  .ticker-val.peri{color:var(--peri);}
+
+  .sector-mini{display:flex;height:8px;border-radius:4px;overflow:hidden;margin-bottom:8px;background:var(--surface-3);}
+  .sector-mini-seg{position:relative;border-right:1px solid var(--ink);}
+  .sector-mini-seg:last-child{border-right:none;}
+  .sector-now-label{font-family:var(--font-mono);font-size:0.68rem;color:var(--paper);}
+  .sector-now-label .dim{color:var(--ash-dim);}
+
+  .nav{display:flex;flex-direction:column;gap:2px;}
+  .nav-item{
+    display:flex;align-items:baseline;gap:10px;
+    padding:9px 10px;border-radius:8px;cursor:pointer;
+    font-size:0.84rem;color:var(--ash);
+    transition:background 0.15s, color 0.15s;
+    border:1px solid transparent;
+  }
+  .nav-item .num{font-family:var(--font-mono);font-size:0.68rem;color:var(--ash-dim);}
+  .nav-item:hover{background:var(--surface-2);color:var(--paper);}
+  .nav-item.active{background:var(--surface-2);color:var(--paper);border-color:var(--border);}
+  .nav-item.active .num{color:var(--amber);}
+
+  .rail-footer{margin-top:auto;font-family:var(--font-mono);font-size:0.65rem;color:var(--ash-dim);padding-top:16px;border-top:1px solid var(--border);}
+
+  /* mobile top bar */
+  .mobile-bar{display:none;}
+
+  /* ===== MAIN ===== */
+  .main{padding:52px 56px 100px;max-width:980px;}
+  .section{display:none;animation:fadeIn 0.25s ease;}
+  .section.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .eyebrow{font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ash-dim);margin-bottom:10px;}
+  .section h2.title{font-size:2rem;margin-bottom:14px;}
+  .lede{font-size:1.05rem;color:var(--ash);max-width:640px;margin-bottom:34px;}
+
+  /* Hero */
+  .hero{padding-bottom:38px;border-bottom:1px solid var(--border);margin-bottom:38px;}
+  .hero h1{font-size:2.6rem;line-height:1.08;max-width:680px;margin-bottom:16px;}
+  .hero h1 .amber{color:var(--amber);}
+  .hero h1 .peri{color:var(--peri);}
+  .hero-sub{font-size:1.05rem;color:var(--ash);max-width:600px;margin-bottom:34px;}
+
+  .clock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:38px;}
+  .clock-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 20px;}
+  .clock-card .clabel{font-family:var(--font-mono);font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--ash-dim);margin-bottom:10px;}
+  .clock-card .cval{font-family:var(--font-mono);font-size:2.1rem;font-weight:700;line-height:1;}
+  .clock-card .csub{font-family:var(--font-mono);font-size:0.72rem;color:var(--ash-dim);margin-top:8px;}
+  .clock-card.gate{border-color:var(--amber-dim);}
+  .clock-card.gate .cval{color:var(--amber);}
+  .clock-card.intern{border-color:var(--peri-dim);}
+  .clock-card.intern .cval{color:var(--peri);}
+
+  /* sector map full */
+  .sector-full{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:26px;margin-bottom:38px;}
+  .sector-full-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+  .sector-full-head .now{font-family:var(--font-mono);font-size:0.85rem;color:var(--paper);}
+  .sector-full-head .now .dim{color:var(--ash-dim);}
+  .sector-bar{display:flex;height:34px;border-radius:8px;overflow:hidden;position:relative;background:var(--surface-3);margin-bottom:12px;}
+  .sector-seg{display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.04em;text-transform:uppercase;border-right:2px solid var(--ink);position:relative;}
+  .sector-seg:last-child{border-right:none;}
+  .sector-marker{position:absolute;top:-6px;width:2px;height:46px;background:var(--paper);}
+  .sector-marker::after{content:"▲";position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:var(--paper);}
+  .sector-legend{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--font-mono);font-size:0.7rem;color:var(--ash);}
+  .sector-legend span.dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;}
+
+  /* Cards / grids */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;}
+  .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:34px;}
+  .card h3{font-size:1rem;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .card p, .card li{font-size:0.9rem;color:var(--ash);}
+  .card ul{padding-left:18px;margin-top:8px;}
+  .card li{margin-bottom:6px;}
+
+  /* Tags */
+  .tag{display:inline-block;font-family:var(--font-mono);font-size:0.64rem;text-transform:uppercase;letter-spacing:0.05em;padding:3px 8px;border-radius:20px;border:1px solid;}
+  .tag-gate{color:var(--amber);border-color:var(--amber-dim);background:var(--amber-glow);}
+  .tag-prog{color:var(--peri);border-color:var(--peri-dim);background:var(--peri-glow);}
+  .tag-shared{color:var(--plum);border-color:var(--plum-dim);background:rgba(154,103,174,0.14);}
+
+  /* Tables */
+  table{width:100%;border-collapse:collapse;margin-bottom:8px;}
+  th{text-align:left;font-family:var(--font-mono);font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--ash-dim);padding:0 14px 10px;border-bottom:1px solid var(--border);font-weight:500;}
+  td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:0.87rem;vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  .tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:30px;}
+  .tbl-wrap table{margin-bottom:0;}
+  .tbl-wrap th:first-child, .tbl-wrap td:first-child{padding-left:20px;}
+  .col-time{font-family:var(--font-mono);color:var(--ash);white-space:nowrap;font-size:0.8rem;}
+  .col-strong{color:var(--paper);font-weight:500;}
+
+  /* Timeline (schedule) specific */
+  .timeline-row td{border-bottom:1px solid var(--border);}
+  .block-title{color:var(--paper);font-weight:600;margin-bottom:3px;}
+  .block-desc{color:var(--ash);font-size:0.83rem;}
+
+  /* Callout */
+  .callout{border-left:3px solid var(--amber);background:var(--amber-glow);border-radius:0 12px 12px 0;padding:16px 20px;margin:24px 0;font-size:0.88rem;color:var(--paper);}
+  .callout.peri{border-left-color:var(--peri);background:var(--peri-glow);}
+  .callout.plum{border-left-color:var(--plum);background:rgba(154,103,174,0.12);}
+  .callout b{color:inherit;}
+
+  /* Phase blocks (GATE / Programmer plans) */
+  .phase-block{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:18px;}
+  .phase-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+  .phase-head h3{font-size:1.15rem;}
+  .phase-dates{font-family:var(--font-mono);font-size:0.72rem;color:var(--ash-dim);}
+  .phase-body{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+  .phase-col-label{font-family:var(--font-mono);font-size:0.64rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--ash-dim);margin-bottom:8px;}
+  .phase-col ul{padding-left:16px;}
+  .phase-col li{font-size:0.87rem;color:var(--ash);margin-bottom:5px;}
+  .phase-col li b{color:var(--paper);font-weight:500;}
+  .res-line{font-size:0.83rem;color:var(--ash);margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);}
+  .res-line a{color:var(--peri);}
+
+  /* Milestones */
+  .milestone-list{display:flex;flex-direction:column;gap:2px;}
+  .milestone-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;cursor:pointer;transition:background 0.15s;}
+  .milestone-item:hover{background:var(--surface-2);}
+  .milestone-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--ash-dim);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.7rem;transition:all 0.15s;}
+  .milestone-item.done .milestone-check{background:var(--good);border-color:var(--good);color:var(--ink);}
+  .milestone-item.done .mlabel{color:var(--ash-dim);text-decoration:line-through;}
+  .mlabel{font-size:0.88rem;color:var(--paper);flex:1;}
+  .mcat{font-family:var(--font-mono);font-size:0.6rem;text-transform:uppercase;color:var(--ash-dim);}
+
+  /* Resource arsenal */
+  .res-cat{margin-bottom:26px;}
+  .res-cat h4{font-family:var(--font-mono);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--ash-dim);margin-bottom:10px;}
+  .res-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;background:var(--surface);}
+  .res-item .rname{font-size:0.88rem;color:var(--paper);font-weight:500;}
+  .res-item .rdesc{font-size:0.78rem;color:var(--ash-dim);margin-top:2px;}
+  .res-item a{font-family:var(--font-mono);font-size:0.74rem;white-space:nowrap;margin-left:16px;}
+
+  footer.credits{margin-top:60px;padding-top:20px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:0.7rem;color:var(--ash-dim);}
+
+  /* Scrollbar */
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-track{background:var(--ink);}
+  ::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:5px;}
+
+  @media (max-width:900px){
+    .app{grid-template-columns:1fr;}
+    .rail{display:none;}
+    .mobile-bar{
+      display:flex;position:sticky;top:0;z-index:5;background:var(--surface);
+      border-bottom:1px solid var(--border);padding:14px 16px;gap:14px;
+      align-items:center;overflow-x:auto;white-space:nowrap;
+    }
+    .mobile-bar .brand-mark{font-size:0.95rem;flex-shrink:0;}
+    .mobile-nav-item{font-family:var(--font-mono);font-size:0.7rem;color:var(--ash);padding:6px 10px;border-radius:20px;border:1px solid var(--border);flex-shrink:0;cursor:pointer;}
+    .mobile-nav-item.active{color:var(--ink);background:var(--amber);border-color:var(--amber);}
+    .main{padding:32px 20px 80px;}
+    .hero h1{font-size:1.9rem;}
+    .clock-grid{grid-template-columns:1fr;}
+    .card-grid{grid-template-columns:1fr;}
+    .phase-body{grid-template-columns:1fr;}
+    table, thead, tbody, th, td, tr{display:block;}
+    .tbl-wrap thead{display:none;}
+    .tbl-wrap tr{padding:14px 16px;border-bottom:1px solid var(--border);}
+    .tbl-wrap td{border:none;padding:3px 0;}
+  }
+</style>
+</head>
+<body>
+
+<div class="mobile-bar" id="mobileBar">
+  <span class="brand-mark">GM<span style="color:var(--amber)">//</span>27</span>
+  <div id="mobileNavList" style="display:flex;gap:8px;"></div>
+</div>
+
+<div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <div class="brand-mark">GODMODE <span>// 2027</span></div>
+      <div class="brand-sub">AIR 1 + Elite SDE Target</div>
+    </div>
+
+    <div class="rail-block">
+      <div class="rail-label">Live Clocks</div>
+      <div class="ticker-item">
+        <span class="ticker-name">Top SDE Role</span>
+        <span class="ticker-val peri mono" id="tickIntern">—</span>
+      </div>
+      <div class="ticker-item">
+        <span class="ticker-name">GATE Exam</span>
+        <span class="ticker-val amber mono" id="tickGate">—</span>
+      </div>
+    </div>
+
+    <div class="rail-block">
+      <div class="rail-label">Sector Map</div>
+      <div class="sector-mini" id="sectorMini"></div>
+      <div class="sector-now-label" id="sectorNowLabel">—</div>
+    </div>
+
+    <div class="rail-block" style="flex:1;">
+      <div class="rail-label">Navigate</div>
+      <nav class="nav" id="navList">
+        <div class="nav-item" data-target="dashboard"><span class="num">01</span> Command Center</div>
+        <div class="nav-item" data-target="convergence"><span class="num">02</span> The Convergence</div>
+        <div class="nav-item" data-target="college-day"><span class="num">03</span> College-Day Protocol</div>
+        <div class="nav-item" data-target="non-college-day"><span class="num">04</span> Non-College Protocol</div>
+        <div class="nav-item" data-target="gate-plan"><span class="num">05</span> GATE Battle Plan</div>
+        <div class="nav-item" data-target="programmer-plan"><span class="num">06</span> Programmer Ascension</div>
+        <div class="nav-item" data-target="internship-plan"><span class="num">07</span> Elite Placement Assault</div>
+        <div class="nav-item" data-target="resources"><span class="num">08</span> Resource Arsenal</div>
+      </nav>
+    </div>
+
+    <div class="rail-footer">TODAY // <span id="todayMono"></span></div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ============ 01 DASHBOARD ============ -->
+    <section class="section active" id="sec-dashboard">
+      <div class="hero">
+        <div class="eyebrow">Command Center</div>
+        <h1>Programming God <span class="peri">Target</span>.<br>GATE AIR 1 <span class="amber">Baseline</span>.</h1>
+        <p class="hero-sub">Hitting AIR 1 in February while preparing for an elite SDE 1 role (like Trilogy) requires brutal efficiency. The plan is rewired: execute all Programming/Systems-heavy GATE subjects *first*. Every hour spent on DSA, OS, DBMS, and CN pays both the GATE examiner and the technical interviewer. We stack goals, we don't split them.</p>
+
+        <div class="clock-grid">
+          <div class="clock-card intern">
+            <div class="clabel">Top SDE Prep Peak · 31 Dec 2026</div>
+            <div class="cval mono" id="cdIntern">—</div>
+            <div class="csub">days left to lock advanced CP / Dev skills</div>
+          </div>
+          <div class="clock-card gate">
+            <div class="clabel">GATE Exam Window · Early Feb 2027</div>
+            <div class="cval mono" id="cdGate">—</div>
+            <div class="csub">days left · dates are tentative, IIT Madras confirms ~Aug 2026</div>
+          </div>
+          <div class="clock-card">
+            <div class="clabel">GATE Prep Lock · 31 Jan 2027</div>
+            <div class="cval mono" id="cdGatePrep">—</div>
+            <div class="csub">days of new content left before pure revision</div>
+          </div>
+        </div>
+
+        <div class="sector-full">
+          <div class="sector-full-head">
+            <h3 style="font-size:1rem;">The Lap — 13 Jul 2026 → 06 Feb 2027</h3>
+            <div class="now" id="sectorFullNow">—</div>
+          </div>
+          <div class="sector-bar" id="sectorBar"></div>
+          <div class="sector-legend" id="sectorLegend"></div>
+        </div>
+      </div>
+
+      <h2 class="title">Mission Briefing</h2>
+      <p class="lede">Read this once. It's the whole strategy in four moves.</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <h3><span class="tag tag-shared">01</span> Programming-First Syllabus</h3>
+          <p>The subject order is completely rigged. You will master Programming & DS, Algorithms, DBMS, OS, and Networks *first*. By September, you will have finished 80% of what high-paying product companies test, while simultaneously knocking out the highest-weight GATE subjects.</p>
+        </div>
+        <div class="card">
+          <h3><span class="tag tag-shared">02</span> The Add-on Protocol</h3>
+          <p>Once you finish a GATE subject block, apply the "Add-on". Finished GATE Algorithms? The add-on is LeetCode Hard/Codeforces DP, BFS, and B-Trees. Finished GATE DBMS? The add-on is designing an IPL Data Analytics database schema.</p>
+        </div>
+        <div class="card">
+          <h3><span class="tag tag-shared">03</span> AIR 1 Precision</h3>
+          <p>Once the programming foundation is locked, we pivot hard to pure theoretical/hardware GATE subjects (Discrete Math, TOC, Compilers, Digital Logic). AIR 1 leaves zero gaps. You master the hardware logic that drives IoT microcontrollers (like Arduino) just as deeply as you master Python.</p>
+        </div>
+        <div class="card">
+          <h3><span class="tag tag-shared">04</span> Protect the machine</h3>
+          <p>7 hours of sleep isn't rest, it's a performance setting. The cognitive load of switching between advanced dynamic programming and GATE theory requires deep consolidation. Sleep is non-negotiable.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <b>The Struggle Protocol:</b> Every CP problem (N-Queens, Graph theory, etc.) gets a 40-minute struggle window. Do not look at the editorial. The struggle wires the neural pathways required to crack both Trilogy SDE assessments and 2-mark GATE NATs.
+      </div>
+
+      <h2 class="title" style="margin-top:50px;">Milestone Tracker</h2>
+      <p class="lede">Tap to mark complete. Saved automatically to this browser — <span id="milestoneProgress" class="mono" style="color:var(--paper);">0/0 done</span>. <a href="#" id="resetProgress" style="font-size:0.82rem;">Reset progress</a></p>
+      <div class="card" style="padding:8px 8px;">
+        <div class="milestone-list" id="milestoneList"></div>
+      </div>
+    </section>
+
+    <!-- ============ 02 CONVERGENCE ============ -->
+    <section class="section" id="sec-convergence">
+      <div class="eyebrow">02 · Strategy</div>
+      <h2 class="title">The Convergence (Programming Core)</h2>
+      <p class="lede">GATE CS and Elite Backend Engineering are the exact same list, just viewed from two different angles. We leverage this 100%.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:22%">GATE Subject</th><th>The Programming God Add-on</th><th style="width:14%">GATE Weight</th></tr></thead>
+          <tbody id="convergenceTable"></tbody>
+        </table>
+      </div>
+
+      <div class="callout peri">
+        <b>The Divergence Layer:</b> Pure CP (Competitive Programming on Codeforces), building a Solo Startup MVP (in Go/Python), and hardware integration (Arduino projects) are the extra 20% that make you a "Programming God". These get protected blocks in the Programmer Ascension track.
+      </div>
+    </section>
+
+    <!-- ============ 03 COLLEGE DAY ============ -->
+    <section class="section" id="sec-college-day">
+      <div class="eyebrow">03 · Weekday Protocol</div>
+      <h2 class="title">College-Day Protocol</h2>
+      <p class="lede">Up at 4:30. ~7 hours of deep, structured work fit around a full college day. 6.5 of those hours run through GATE syllabus that doubles as Elite SDE prep.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:14%">Time</th><th style="width:10%">Track</th><th>Block</th></tr></thead>
+          <tbody id="collegeTimeline"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 04 NON-COLLEGE DAY ============ -->
+    <section class="section" id="sec-non-college-day">
+      <div class="eyebrow">04 · Full-Send Protocol</div>
+      <h2 class="title">Non-College-Day Protocol</h2>
+      <p class="lede">The full day is yours. ~12.75 hours of structured deep work. The morning is heavily biased toward competitive programming and complex GATE subjects.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:14%">Time</th><th style="width:10%">Track</th><th>Block</th></tr></thead>
+          <tbody id="nonCollegeTimeline"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 05 GATE PLAN ============ -->
+    <section class="section" id="sec-gate-plan">
+      <div class="eyebrow">05 · Goal 1</div>
+      <h2 class="title">GATE AIR 1 Battle Plan</h2>
+      <p class="lede">GATE CS/IT 2027. 100 marks, 65 questions, 3 hours. To get AIR 1, you complete the programming-heavy subjects first to align with your dev goals, then brutally execute the mathematical/hardware theory.</p>
+
+      <h3 style="margin:36px 0 14px;font-size:1.1rem;">The Rewired Subject Order (Programming-First)</h3>
+      <p class="lede" style="margin-bottom:20px;">Do not follow standard batch schedules. Follow this exact sequence to front-load all programming, systems, and logic. You become hireable months before GATE even happens.</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:6%">#</th><th style="width:20%">Subject</th><th>Why This Position</th><th style="width:12%">Speed</th><th style="width:14%">SDE Payoff</th></tr></thead>
+          <tbody id="subjectOrderTable"></tbody>
+        </table>
+      </div>
+
+      <div id="gatePhases"></div>
+    </section>
+
+    <!-- ============ 06 PROGRAMMER PLAN ============ -->
+    <section class="section" id="sec-programmer-plan">
+      <div class="eyebrow">06 · The God-Tier Layer</div>
+      <h2 class="title">Programmer Ascension</h2>
+      <p class="lede">This is the "Add-on" layer. While GATE handles the fundamentals, this track handles the execution: Advanced CP, Go/Python backends, System Design, and Hardware integrations (like Arduino inverters).</p>
+      <div id="progTracks"></div>
+    </section>
+
+    <!-- ============ 07 INTERNSHIP PLAN ============ -->
+    <section class="section" id="sec-internship-plan">
+      <div class="eyebrow">07 · Goal 2</div>
+      <h2 class="title">Elite Placement Assault</h2>
+      <p class="lede">Targeting companies like Trilogy Innovations requires clearing massive OA (Online Assessment) hurdles. Your DSA + GATE Algorithms prep handles the theory; this timeline handles the execution.</p>
+
+      <div id="internTimeline"></div>
+    </section>
+
+    <!-- ============ 08 RESOURCES ============ -->
+    <section class="section" id="sec-resources">
+      <div class="eyebrow">08 · Arsenal</div>
+      <h2 class="title">Resource Arsenal</h2>
+      <p class="lede">Everything referenced above, in one place.</p>
+      <div id="resourceCats"></div>
+
+      <footer class="credits">GODMODE // 2027 — built 13 Jul 2026 · data lives only in this browser (window.storage) · re-wired for AIR 1 + SDE Mastery</footer>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const LAP_START   = new Date(2026,6,13);
+const LAP_END      = new Date(2027,1,6);
+const INTERN_DEADLINE = new Date(2026,11,31);
+const GATE_PREP_LOCK  = new Date(2027,0,31);
+const GATE_EXAM_START = new Date(2027,1,6);
+
+const PHASES = [
+  { key:'foundation',    label:'Foundation',     short:'PROG CORE',  start:new Date(2026,6,13), end:new Date(2026,7,31),  color:'var(--peri)',  dim:'var(--peri-dim)' },
+  { key:'completion',    label:'Completion',     short:'THEORY',     start:new Date(2026,8,1),  end:new Date(2026,9,15),  color:'var(--plum)',  dim:'var(--plum-dim)' },
+  { key:'consolidation', label:'Consolidation',  short:'CNSLD',      start:new Date(2026,9,16), end:new Date(2026,11,20), color:'var(--amber)', dim:'var(--amber-dim)' },
+  { key:'sharpening',    label:'Sharpening',     short:'SHARP',      start:new Date(2026,11,21),end:new Date(2027,1,6),   color:'var(--coral)', dim:'var(--coral-dim)' },
+];
+
+const MILESTONES = [
+  { id:'m01', cat:'DSA',   tag:'tag-shared', label:"N-Queens, BFS, and B-Trees coded flawlessly from scratch", due:'31 Aug 2026' },
+  { id:'m02', cat:'GATE',  tag:'tag-gate',   label:'Programming Core (DS, Algo, DBMS, OS, CN) 100% complete', due:'15 Sep 2026' },
+  { id:'m03', cat:'PROG',  tag:'tag-prog',   label:"Solo Startup MVP Backend built in Python or Go", due:'30 Sep 2026' },
+  { id:'m04', cat:'PROG',  tag:'tag-prog',   label:"IPL Data Analytics schema modelled in pure SQL", due:'15 Oct 2026' },
+  { id:'m05', cat:'GATE',  tag:'tag-gate',   label:'Theoretical Core (Math, TOC, CD, DL, COA) 100% complete', due:'31 Oct 2026' },
+  { id:'m06', cat:'PROG',  tag:'tag-prog',   label:'Arduino/IoT Hardware project integrated with a software backend', due:'15 Nov 2026' },
+  { id:'m07', cat:'INTERN',tag:'tag-prog',   label:'Elite SDE (Trilogy-level) Mock Assessment cleared', due:'30 Nov 2026' },
+  { id:'m08', cat:'GATE',  tag:'tag-gate',   label:'50+ Gate Overflow PYQ sets logged in the error log', due:'15 Dec 2026' },
+  { id:'m09', cat:'GATE',  tag:'tag-gate',   label:'All sectional mock tests attempted at least once', due:'31 Dec 2026' },
+  { id:'m10', cat:'GATE',  tag:'tag-gate',   label:'First full-length timed mock, run at real exam-session timing', due:'5 Jan 2027' },
+  { id:'m11', cat:'GATE',  tag:'tag-gate',   label:'Formula / short-notes sheet finalized for all 11 subjects', due:'25 Jan 2027' },
+  { id:'m12', cat:'GATE',  tag:'tag-gate',   label:'GATE CS/IT paper — sat and submitted for AIR 1', due:'6-7 Feb 2027' },
+];
+
+const CONVERGENCE = [
+  ['Programming & Data Structures','Direct foundation for Competitive Programming. Add-on: Implement segment trees and advanced recursion.','~7%'],
+  ['Algorithms','The absolute core of SDE prep. Add-on: Codeforces DP, Graph Traversals (BFS/DFS), and Backtracking (N-Queens).','~8%'],
+  ['Databases','Daily backend work. Add-on: Build an IPL team/player ranking analytics engine using raw SQL.','~7%'],
+  ['Operating Systems','Crucial for Go concurrency and Python multiprocessing. Add-on: Write a multithreaded web scraper.','~8%'],
+  ['Computer Networks','Understanding APIs, TCP/IP, Sockets. Add-on: Build a raw HTTP server from scratch.','~7%'],
+  ['Digital Logic & COA','Baseline hardware literacy. Add-on: Map this directly to your Arduino Uno / Automatic Inverter pin setups.','~13%'],
+  ['Discrete & Engg Math','Probability and Combinatorics. Add-on: ML/Data Science prerequisites in R or Python.','~26%'],
+];
+
+const COLLEGE_TIMELINE = [
+  ['04:30','SHARED','Wake up','Water, focus.'],
+  ['04:45 – 06:45','GATE','Deep Work Block 1 — GATE Core Subject','Executing the Programming-First subject order.'],
+  ['06:45 – 08:00','DSA','Deep Work Block 2 — Elite Competitive Programming','Hard DP, B-Trees, and Advanced Graphs. Do not look at solutions.'],
+  ['08:00 – 09:00','SHARED','Get ready + commute','Audio layer.'],
+  ['09:00 – 16:00','SHARED','College','Flashcard reviews during breaks.'],
+  ['16:00 – 16:45','SHARED','Commute + Break','Reset.'],
+  ['16:45 – 19:00','GATE','Deep Work Block 3 — PYQ Practice','Gate Overflow timed sets.'],
+  ['19:00 – 19:30','SHARED','Dinner','Away from desk.'],
+  ['19:30 – 20:15','PROG','Deep Work Block 4 — Programmer Ascension Add-ons','Python/Go Dev, IPL Analytics, or Hardware/Arduino tinkering.'],
+  ['20:15 – 21:15','GATE','Deep Work Block 5 — Revision','Flashcards, error-log review.'],
+  ['21:15 – 21:30','SHARED','Wind-down','Screens off.'],
+  ['21:30','SHARED','Sleep','7 hours. Critical for brain plasticity.'],
+];
+
+const NONCOLLEGE_TIMELINE = [
+  ['04:30','SHARED','Wake up','Body clock maintenance.'],
+  ['04:45 – 07:00','DSA','Deep Work Block 1 — CP Struggle Window','Hardest algorithm problems (DP/Graphs). 40 mins per problem strictly.'],
+  ['07:00 – 07:30','SHARED','Breakfast',''],
+  ['07:30 – 11:00','GATE','Deep Work Block 2 — Core Subject','Full concept + PYQ pass.'],
+  ['11:00 – 11:15','SHARED','Break','Walk.'],
+  ['11:15 – 13:00','GATE','Deep Work Block 3 — Gate Overflow Sets','Timed PYQs.'],
+  ['13:00 – 14:00','SHARED','Lunch + rest','Zero screens.'],
+  ['14:00 – 16:00','GATE','Deep Work Block 4 — Second Subject / Math','Engg Math/Discrete Threading.'],
+  ['16:00 – 16:15','SHARED','Break',''],
+  ['16:15 – 18:00','PROG','Deep Work Block 5 — Programmer Ascension','Solo Startup dev (Go/Python), System Design, or Hardware.'],
+  ['18:00 – 18:45','SHARED','Dinner',''],
+  ['18:45 – 20:15','GATE','Deep Work Block 6 — Mocks','Sharpening phase requires full-length mocks here.'],
+  ['20:15 – 21:00','SHARED','Review','Error log updates.'],
+  ['21:00 – 21:30','SHARED','Free time','Build-in-public posts.'],
+  ['21:30','SHARED','Sleep','7 hours.'],
+];
+
+const SUBJECT_ORDER = [
+  ['Programming & Data Structures','Foundation for all coding and CP. Start immediately.','Fast','Extreme'],
+  ['Algorithms','Master DP, Graphs, Greedy. Direct overlap with elite company OAs.','Medium','Extreme'],
+  ['Databases','High GATE weight + essential for building any Solo Startup MVP.','Medium','High'],
+  ['Operating Systems','Concurrency & Processes. Deepens understanding of modern languages like Go.','Medium','High'],
+  ['Computer Networks','Sockets, TCP/IP. Essential for backend API development.','Medium','High'],
+  ['Discrete Mathematics','Shift to theory. Powers advanced algorithmic thinking.','Medium','Medium'],
+  ['Theory of Computation','Regex, parsers. Theoretical but necessary for compilers.','Medium','Low'],
+  ['Compiler Design','Quick, low weight, logically follows TOC.','Fast','Low'],
+  ['Digital Logic','Hardware logic. Connects directly to IoT / Arduino microcontroller work.','Fast','Low'],
+  ['Computer Organization & Architecture','Memory and caching. The hardware side of "why code runs slow".','Medium','Medium'],
+  ['Engineering Mathematics','Linear Algebra, Calculus. High weight, thread throughout the remaining prep.','Medium','Low'],
+  ['General Aptitude','Fixed 15%. Do a 12-day sprint at the very end.','Fast','None'],
+];
+
+const GATE_PHASES = [
+  { idx:0, title:'The Programming Core', gate:[
+      'Execute subjects 1 through 5 in order (DS, Algo, DBMS, OS, CN).',
+      'This guarantees that by Sept, your software engineering fundamentals are flawless.',
+      'Log all mistakes in Gate Overflow error tracker.'
+    ], prog:[
+      'Start aggressive CP: LeetCode Hard and Codeforces.',
+      'Build backend systems in Go/Python utilizing OS/DBMS concepts simultaneously.',
+    ]},
+  { idx:1, title:'The Theoretical & Hardware Shift', gate:[
+      'Pivot to Math, TOC, CD, DL, COA.',
+      'Treat Digital Logic and COA as understanding the metal beneath your code (and your Arduino).',
+      'First full syllabus revision pass complete by the end of this phase.',
+    ], prog:[
+      'Take a breather from new framework learning. Focus on HLD/LLD writeups.',
+      'Implement an IoT script linking your Arduino to a Python local server.',
+    ]},
+  { idx:2, title:'AIR 1 Volume Drill', gate:[
+      'Massive PYQ volume on Gate Overflow.',
+      'Identify weak theory areas (usually Math or COA) and drill ruthlessly.',
+      'Tier 1 subjects get first claim on every revision hour.',
+    ], prog:[
+      'Solve previous OA questions from top-tier product companies.',
+      'Maintain Solo Startup MVP; fix bugs, no new massive features.',
+    ]},
+  { idx:3, title:'Pure Sharpening', gate:[
+      'No new content. Pure mock test execution.',
+      'Align mock timings exactly with expected Feb exam slots.',
+      '12-day General Aptitude sprint.',
+    ], prog:[
+      'All dev pauses. Maintenance only.',
+      'Keep CP to 1 problem a day just to keep logic sharp.',
+    ]},
+];
+
+const PROG_TRACKS = [
+  { name:'Track A — Elite CP (The SDE 1 target)', tag:'tag-shared',
+    phases:['Focus: DP, N-Queens, BFS/DFS, B-Trees. Timebox strictly.',
+            'Move to timed contests. Codeforces rating push.',
+            'Solve company-specific archives (Trilogy, FAANG).',
+            'Spaced repetition of CP error log.'] },
+  { name:'Track B — Solo Startup & Dev', tag:'tag-prog',
+    phases:['Architect Solo Startup MVP in Go or Python.',
+            'Launch V1. Build in public.',
+            'Add DB analytics (e.g., IPL data processing).',
+            'Maintenance mode only.'] },
+  { name:'Track C — System Design', tag:'tag-prog',
+    phases:['Read fundamentals on caching, load balancing.',
+            'Write HLD for your Solo Startup.',
+            'Mock LLD interview focusing on relational schema design.',
+            'Review design docs lightly.'] },
+  { name:'Track D — Hardware & Infra', tag:'tag-prog',
+    phases:['Linux + Git daily driver.',
+            'Dockerize backend. Tinker with Arduino analog pins (A0/A3) for data read.',
+            'Ingest Arduino voltage/inverter data into a Python/Go script.',
+            'Pause hardware tinkering for GATE revision.'] },
+];
+
+const INTERN_TIMELINE = [
+  ['Sep 2026','Programming core complete. Resume highlights Python/Go backends and advanced CP rating.'],
+  ['Oct 2026','Apply to elite SDE 1 roles/internships. OAs will test exactly the DP/Graph algorithms you just mastered.'],
+  ['Nov 2026','Technical interview rounds. They will ask OS, DBMS, and CN — you are already at GATE AIR 1 level for these.'],
+  ['Dec 2026','Pipeline closes. Ultimate goal achieved.'],
+];
+
+const RESOURCES = [
+  { cat:'GATE — Core', items:[
+      ['GO Classes 2027 CSE Batch','Primary structured course.','https://www.goclasses.in/'],
+      ['GATE Overflow','The single best PYQ platform.','https://gateoverflow.in/'],
+    ]},
+  { cat:'Competitive Programming (Add-on)', items:[
+      ['Codeforces','For DP, Math, and Graph theory.','https://codeforces.com/'],
+      ['CSES Problem Set','Classic algorithm implementations (N-Queens, paths).','https://cses.fi/problemset/'],
+    ]},
+  { cat:'System Design & Engineering', items:[
+      ['Go Documentation','For backend dev add-ons.','https://go.dev/doc/'],
+      ['Arduino Docs','For the IoT/Inverter project integration.','https://docs.arduino.cc/'],
+      ['ByteByteGo','Production system design.','https://bytebytego.com/'],
+    ]}
+];
+
+// ============================================================
+// STORAGE
+// ============================================================
+const STORE_KEY = 'godmode2027_progress_v2';
+
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){
+    return window.__godmodeMemFallback || {};
+  }
+}
+function saveProgress(state){
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+  }catch(e){
+    window.__godmodeMemFallback = state;
+  }
+}
+
+// ============================================================
+// UTIL
+// ============================================================
+function pad(n){ return n<10 ? '0'+n : ''+n; }
+function fmtDate(d){
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
+}
+function daysBetween(a,b){
+  const MS=86400000;
+  const A=new Date(a.getFullYear(),a.getMonth(),a.getDate());
+  const B=new Date(b.getFullYear(),b.getMonth(),b.getDate());
+  return Math.round((B-A)/MS);
+}
+function clamp(v,lo,hi){ return Math.max(lo,Math.min(hi,v)); }
+function currentPhase(now){
+  for(const p of PHASES){ if(now>=p.start && now<=p.end) return p; }
+  if(now < PHASES[0].start) return PHASES[0];
+  return PHASES[PHASES.length-1];
+}
+
+// ============================================================
+// RENDER: clocks & countdowns
+// ============================================================
+function renderClocks(){
+  const now = new Date();
+  document.getElementById('todayMono').textContent = fmtDate(now).toUpperCase();
+
+  const dIntern = daysBetween(now, INTERN_DEADLINE);
+  const dGate   = daysBetween(now, GATE_EXAM_START);
+  const dPrep   = daysBetween(now, GATE_PREP_LOCK);
+
+  const internTxt = dIntern>=0 ? dIntern+'d' : 'DUE';
+  const gateTxt    = dGate>=0 ? dGate+'d' : 'LIVE';
+  const prepTxt    = dPrep>=0 ? dPrep+'d' : 'LOCKED';
+
+  document.getElementById('tickIntern').textContent = internTxt;
+  document.getElementById('tickGate').textContent = gateTxt;
+  document.getElementById('cdIntern').textContent = internTxt;
+  document.getElementById('cdGate').textContent = gateTxt;
+  document.getElementById('cdGatePrep').textContent = prepTxt;
+}
+
+// ============================================================
+// RENDER: sector map (mini + full)
+// ============================================================
+function renderSectorMap(){
+  const now = new Date();
+  const totalDays = daysBetween(LAP_START, LAP_END);
+  const elapsed = clamp(daysBetween(LAP_START, now), 0, totalDays);
+  const pct = totalDays>0 ? (elapsed/totalDays*100) : 0;
+  const phase = currentPhase(now);
+
+  // mini (rail)
+  const mini = document.getElementById('sectorMini');
+  mini.innerHTML = PHASES.map(p=>{
+    const w = (daysBetween(p.start,p.end)+1)/ (totalDays+1) * 100;
+    return '<div class="sector-mini-seg" style="width:'+w+'%;background:'+p.dim+';"></div>';
+  }).join('');
+  document.getElementById('sectorNowLabel').innerHTML =
+    phase.short+' <span class="dim">· '+fmtDate(now)+'</span>';
+
+  // full (dashboard)
+  const bar = document.getElementById('sectorBar');
+  bar.innerHTML = PHASES.map(p=>{
+    const w = (daysBetween(p.start,p.end)+1)/ (totalDays+1) * 100;
+    const active = p.key===phase.key ? ' style="width:'+w+'%;background:'+p.dim+';box-shadow:inset 0 0 0 2px '+p.color+';"' : ' style="width:'+w+'%;background:'+p.dim+';"';
+    return '<div class="sector-seg"'+active+'>'+p.short+'</div>';
+  }).join('') + '<div class="sector-marker" style="left:'+pct+'%;"></div>';
+
+  document.getElementById('sectorLegend').innerHTML = PHASES.map(p=>
+    '<span><span class="dot" style="background:'+p.color+';"></span>'+p.label+' — '+fmtDate(p.start)+' to '+fmtDate(p.end)+'</span>'
+  ).join('');
+
+  document.getElementById('sectorFullNow').innerHTML =
+    '<span class="dim">Day</span> '+ (elapsed+1) +' <span class="dim">of</span> '+ (totalDays+1) +' <span class="dim">·</span> '+phase.label;
+}
+
+// ============================================================
+// RENDER: milestones
+// ============================================================
+function renderMilestones(){
+  const state = loadProgress();
+  const list = document.getElementById('milestoneList');
+  list.innerHTML = MILESTONES.map(m=>{
+    const done = !!state[m.id];
+    return '<div class="milestone-item'+(done?' done':'')+'" data-id="'+m.id+'">'
+      + '<div class="milestone-check">'+(done?'✓':'')+'</div>'
+      + '<div class="mlabel">'+m.label+'</div>'
+      + '<div class="mcat"><span class="tag '+m.tag+'" style="margin-right:8px;">'+m.cat+'</span>'+m.due+'</div>'
+      + '</div>';
+  }).join('');
+
+  list.querySelectorAll('.milestone-item').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const id = el.getAttribute('data-id');
+      const s = loadProgress();
+      s[id] = !s[id];
+      saveProgress(s);
+      renderMilestones();
+      updateProgressCounter();
+    });
+  });
+  updateProgressCounter();
+}
+function updateProgressCounter(){
+  const state = loadProgress();
+  const done = MILESTONES.filter(m=>state[m.id]).length;
+  document.getElementById('milestoneProgress').textContent = done+'/'+MILESTONES.length+' done';
+}
+
+// ============================================================
+// RENDER: convergence table
+// ============================================================
+function renderConvergence(){
+  document.getElementById('convergenceTable').innerHTML = CONVERGENCE.map(row=>
+    '<tr><td class="col-strong">'+row[0]+'</td><td>'+row[1]+'</td><td class="col-time">'+row[2]+'</td></tr>'
+  ).join('');
+}
+
+// ============================================================
+// RENDER: timelines (college / non-college)
+// ============================================================
+function tagFor(track){
+  if(track==='GATE') return 'tag-gate';
+  if(track==='PROG') return 'tag-prog';
+  if(track==='DSA') return 'tag-shared';
+  return 'tag-shared';
+}
+function renderTimeline(elId, rows){
+  document.getElementById(elId).innerHTML = rows.map(r=>{
+    const [time,track,title,desc] = r;
+    const tag = track==='SHARED' ? '<span class="tag tag-shared">—</span>' : '<span class="tag '+tagFor(track)+'">'+track+'</span>';
+    return '<tr class="timeline-row"><td class="col-time">'+time+'</td><td>'+tag+'</td>'
+      + '<td><div class="block-title">'+title+'</div>'+(desc?'<div class="block-desc">'+desc+'</div>':'')+'</td></tr>';
+  }).join('');
+}
+
+// ============================================================
+// RENDER: GATE phases + weightage
+// ============================================================
+function renderSubjectOrder(){
+  document.getElementById('subjectOrderTable').innerHTML = SUBJECT_ORDER.map((row,i)=>{
+    const [subj,why,speed,payoff] = row;
+    return '<tr><td class="col-time col-strong">'+(i+1)+'</td><td class="col-strong">'+subj+'</td><td>'+why+'</td><td>'+speed+'</td><td>'+payoff+'</td></tr>';
+  }).join('');
+}
+
+function renderGatePhases(){
+  document.getElementById('gatePhases').innerHTML = GATE_PHASES.map(gp=>{
+    const p = PHASES[gp.idx];
+    return '<div class="phase-block">'
+      + '<div class="phase-head"><h3><span class="tag tag-shared" style="margin-right:8px;">Phase '+(gp.idx+1)+'</span>'+p.label+' — '+gp.title+'</h3>'
+      + '<div class="phase-dates">'+fmtDate(p.start)+' → '+fmtDate(p.end)+'</div></div>'
+      + '<div class="phase-body">'
+      + '<div class="phase-col"><div class="phase-col-label">GATE Focus</div><ul>'+gp.gate.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>'
+      + '<div class="phase-col"><div class="phase-col-label">Programmer Focus</div><ul>'+gp.prog.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>'
+      + '</div></div>';
+  }).join('');
+}
+
+// ============================================================
+// RENDER: programmer tracks
+// ============================================================
+function renderProgTracks(){
+  document.getElementById('progTracks').innerHTML = PROG_TRACKS.map(t=>{
+    return '<div class="phase-block">'
+      + '<div class="phase-head"><h3><span class="tag '+t.tag+'" style="margin-right:8px;">Track</span>'+t.name+'</h3></div>'
+      + '<div class="phase-body">'
+      + PHASES.map((p,i)=>'<div class="phase-col"><div class="phase-col-label">'+p.label+'</div><ul><li>'+t.phases[i]+'</li></ul></div>').join('')
+      + '</div></div>';
+  }).join('');
+}
+
+// ============================================================
+// RENDER: internship timeline + platforms
+// ============================================================
+function renderInternTimeline(){
+  document.getElementById('internTimeline').innerHTML =
+    '<div class="tbl-wrap"><table><thead><tr><th style="width:20%">When</th><th>Action</th></tr></thead><tbody>'
+    + INTERN_TIMELINE.map(r=>'<tr><td class="col-time col-strong">'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('')
+    + '</tbody></table></div>';
+}
+
+// ============================================================
+// RENDER: resources
+// ============================================================
+function renderResources(){
+  document.getElementById('resourceCats').innerHTML = RESOURCES.map(cat=>{
+    return '<div class="res-cat"><h4>'+cat.cat+'</h4>'
+      + cat.items.map(it=>{
+          const [name,desc,url]=it;
+          const link = url ? '<a href="'+url+'" target="_blank" rel="noopener">Open ↗</a>' : '<span class="mono" style="color:var(--ash-dim);font-size:0.74rem;">Book</span>';
+          return '<div class="res-item"><div><div class="rname">'+name+'</div><div class="rdesc">'+desc+'</div></div>'+link+'</div>';
+        }).join('')
+      + '</div>';
+  }).join('');
+}
+
+// ============================================================
+// NAV
+// ============================================================
+const NAV_ITEMS = [
+  {t:'dashboard', n:'01', label:'Command Center'},
+  {t:'convergence', n:'02', label:'The Convergence'},
+  {t:'college-day', n:'03', label:'College-Day Protocol'},
+  {t:'non-college-day', n:'04', label:'Non-College Protocol'},
+  {t:'gate-plan', n:'05', label:'GATE Battle Plan'},
+  {t:'programmer-plan', n:'06', label:'Programmer Ascension'},
+  {t:'internship-plan', n:'07', label:'Elite Placement Assault'},
+  {t:'resources', n:'08', label:'Resource Arsenal'},
+];
+
+function setActiveSection(target){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+target).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.classList.toggle('active', el.getAttribute('data-target')===target);
+  });
+  document.querySelectorAll('.mobile-nav-item').forEach(el=>{
+    el.classList.toggle('active', el.getAttribute('data-target')===target);
+  });
+  window.scrollTo({top:0,behavior:'instant' in window ? 'instant' : 'auto'});
+}
+
+function initNav(){
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.addEventListener('click', ()=> setActiveSection(el.getAttribute('data-target')));
+  });
+  const mobileNav = document.getElementById('mobileNavList');
+  mobileNav.innerHTML = NAV_ITEMS.map(it=>
+    '<div class="mobile-nav-item'+(it.t==='dashboard'?' active':'')+'" data-target="'+it.t+'">'+it.n+' '+it.label+'</div>'
+  ).join('');
+  mobileNav.querySelectorAll('.mobile-nav-item').forEach(el=>{
+    el.addEventListener('click', ()=> setActiveSection(el.getAttribute('data-target')));
+  });
+  setActiveSection('dashboard');
+}
+
+function initResetButton(){
+  document.getElementById('resetProgress').addEventListener('click', (e)=>{
+    e.preventDefault();
+    if(confirm('Clear all saved milestone progress? This cannot be undone.')){
+      saveProgress({});
+      renderMilestones();
+    }
+  });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function init(){
+  renderClocks();
+  renderSectorMap();
+  renderMilestones();
+  renderConvergence();
+  renderTimeline('collegeTimeline', COLLEGE_TIMELINE);
+  renderTimeline('nonCollegeTimeline', NONCOLLEGE_TIMELINE);
+  renderSubjectOrder();
+  renderGatePhases();
+  renderProgTracks();
+  renderInternTimeline();
+  renderResources();
+  initNav();
+  initResetButton();
+
+  setInterval(()=>{ renderClocks(); renderSectorMap(); }, 60*1000);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+</script>
+</body>
+</html>

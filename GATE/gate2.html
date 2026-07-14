@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GODMODE // 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0c0a11;
+    --surface:#151020;
+    --surface-2:#1c1628;
+    --surface-3:#251e33;
+    --plum:#9a67ae;
+    --plum-dim:#4a3a55;
+    --amber:#e8a33d;
+    --amber-dim:#4a3a20;
+    --amber-glow:rgba(232,163,61,0.14);
+    --peri:#98a8f7;
+    --peri-dim:#302f52;
+    --peri-glow:rgba(152,168,247,0.14);
+    --paper:#f4f0f8;
+    --ash:#a99fbe;
+    --ash-dim:#6d647f;
+    --border:#2b2438;
+    --good:#8ad9a8;
+    --coral:#e8735d;
+    --coral-dim:#4a2e28;
+    --coral-glow:rgba(232,115,93,0.14);
+    --font-display:'Space Grotesk',sans-serif;
+    --font-body:'Inter',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:var(--font-body);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(154,103,174,0.10), transparent 45%),
+      radial-gradient(circle at 85% 90%, rgba(152,168,247,0.08), transparent 45%);
+    pointer-events:none;
+    z-index:0;
+  }
+  h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;letter-spacing:-0.01em;color:var(--paper);}
+  a{color:var(--peri);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  ::selection{background:var(--plum);color:var(--paper);}
+  .mono{font-family:var(--font-mono);}
+
+  /* ===== APP SHELL ===== */
+  .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh;position:relative;z-index:1;}
+
+  /* ===== RAIL ===== */
+  .rail{
+    background:var(--surface);
+    border-right:1px solid var(--border);
+    padding:28px 22px;
+    display:flex;flex-direction:column;gap:26px;
+    position:sticky;top:0;height:100vh;overflow-y:auto;
+  }
+  .brand{display:flex;flex-direction:column;gap:4px;}
+  .brand-mark{font-family:var(--font-display);font-size:1.15rem;font-weight:700;letter-spacing:0.02em;}
+  .brand-mark span{color:var(--amber);}
+  .brand-sub{font-family:var(--font-mono);font-size:0.68rem;color:var(--ash-dim);text-transform:uppercase;letter-spacing:0.08em;}
+
+  .rail-block{border-top:1px solid var(--border);padding-top:18px;}
+  .rail-label{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ash-dim);margin-bottom:10px;}
+
+  .ticker-item{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px dashed var(--border);}
+  .ticker-item:last-child{border-bottom:none;}
+  .ticker-name{font-size:0.72rem;color:var(--ash);text-transform:uppercase;letter-spacing:0.04em;}
+  .ticker-val{font-family:var(--font-mono);font-size:0.92rem;font-weight:600;}
+  .ticker-val.amber{color:var(--amber);}
+  .ticker-val.peri{color:var(--peri);}
+
+  .sector-mini{display:flex;height:8px;border-radius:4px;overflow:hidden;margin-bottom:8px;background:var(--surface-3);}
+  .sector-mini-seg{position:relative;border-right:1px solid var(--ink);}
+  .sector-mini-seg:last-child{border-right:none;}
+  .sector-now-label{font-family:var(--font-mono);font-size:0.68rem;color:var(--paper);}
+  .sector-now-label .dim{color:var(--ash-dim);}
+
+  .nav{display:flex;flex-direction:column;gap:2px;}
+  .nav-item{
+    display:flex;align-items:baseline;gap:10px;
+    padding:9px 10px;border-radius:8px;cursor:pointer;
+    font-size:0.84rem;color:var(--ash);
+    transition:background 0.15s, color 0.15s;
+    border:1px solid transparent;
+  }
+  .nav-item .num{font-family:var(--font-mono);font-size:0.68rem;color:var(--ash-dim);}
+  .nav-item:hover{background:var(--surface-2);color:var(--paper);}
+  .nav-item.active{background:var(--surface-2);color:var(--paper);border-color:var(--border);}
+  .nav-item.active .num{color:var(--amber);}
+
+  .rail-footer{margin-top:auto;font-family:var(--font-mono);font-size:0.65rem;color:var(--ash-dim);padding-top:16px;border-top:1px solid var(--border);}
+
+  /* mobile top bar */
+  .mobile-bar{display:none;}
+
+  /* ===== MAIN ===== */
+  .main{padding:52px 56px 100px;max-width:980px;}
+  .section{display:none;animation:fadeIn 0.25s ease;}
+  .section.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .eyebrow{font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ash-dim);margin-bottom:10px;}
+  .section h2.title{font-size:2rem;margin-bottom:14px;}
+  .lede{font-size:1.05rem;color:var(--ash);max-width:640px;margin-bottom:34px;}
+
+  /* Hero */
+  .hero{padding-bottom:38px;border-bottom:1px solid var(--border);margin-bottom:38px;}
+  .hero h1{font-size:2.6rem;line-height:1.08;max-width:680px;margin-bottom:16px;}
+  .hero h1 .amber{color:var(--amber);}
+  .hero h1 .peri{color:var(--peri);}
+  .hero-sub{font-size:1.05rem;color:var(--ash);max-width:600px;margin-bottom:34px;}
+
+  .clock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:38px;}
+  .clock-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 20px;}
+  .clock-card .clabel{font-family:var(--font-mono);font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--ash-dim);margin-bottom:10px;}
+  .clock-card .cval{font-family:var(--font-mono);font-size:2.1rem;font-weight:700;line-height:1;}
+  .clock-card .csub{font-family:var(--font-mono);font-size:0.72rem;color:var(--ash-dim);margin-top:8px;}
+  .clock-card.gate{border-color:var(--amber-dim);}
+  .clock-card.gate .cval{color:var(--amber);}
+  .clock-card.intern{border-color:var(--peri-dim);}
+  .clock-card.intern .cval{color:var(--peri);}
+
+  /* sector map full */
+  .sector-full{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:26px;margin-bottom:38px;}
+  .sector-full-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+  .sector-full-head .now{font-family:var(--font-mono);font-size:0.85rem;color:var(--paper);}
+  .sector-full-head .now .dim{color:var(--ash-dim);}
+  .sector-bar{display:flex;height:34px;border-radius:8px;overflow:hidden;position:relative;background:var(--surface-3);margin-bottom:12px;}
+  .sector-seg{display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.04em;text-transform:uppercase;border-right:2px solid var(--ink);position:relative;}
+  .sector-seg:last-child{border-right:none;}
+  .sector-marker{position:absolute;top:-6px;width:2px;height:46px;background:var(--paper);}
+  .sector-marker::after{content:"▲";position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:var(--paper);}
+  .sector-legend{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--font-mono);font-size:0.7rem;color:var(--ash);}
+  .sector-legend span.dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;}
+
+  /* Cards / grids */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;}
+  .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:34px;}
+  .card h3{font-size:1rem;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .card p, .card li{font-size:0.9rem;color:var(--ash);}
+  .card ul{padding-left:18px;margin-top:8px;}
+  .card li{margin-bottom:6px;}
+
+  /* Tags */
+  .tag{display:inline-block;font-family:var(--font-mono);font-size:0.64rem;text-transform:uppercase;letter-spacing:0.05em;padding:3px 8px;border-radius:20px;border:1px solid;}
+  .tag-gate{color:var(--amber);border-color:var(--amber-dim);background:var(--amber-glow);}
+  .tag-prog{color:var(--peri);border-color:var(--peri-dim);background:var(--peri-glow);}
+  .tag-shared{color:var(--plum);border-color:var(--plum-dim);background:rgba(154,103,174,0.14);}
+
+  /* Tables */
+  table{width:100%;border-collapse:collapse;margin-bottom:8px;}
+  th{text-align:left;font-family:var(--font-mono);font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--ash-dim);padding:0 14px 10px;border-bottom:1px solid var(--border);font-weight:500;}
+  td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:0.87rem;vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  .tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:30px;}
+  .tbl-wrap table{margin-bottom:0;}
+  .tbl-wrap th:first-child, .tbl-wrap td:first-child{padding-left:20px;}
+  .col-time{font-family:var(--font-mono);color:var(--ash);white-space:nowrap;font-size:0.8rem;}
+  .col-strong{color:var(--paper);font-weight:500;}
+
+  /* Timeline (schedule) specific */
+  .timeline-row td{border-bottom:1px solid var(--border);}
+  .block-title{color:var(--paper);font-weight:600;margin-bottom:3px;}
+  .block-desc{color:var(--ash);font-size:0.83rem;}
+
+  /* Callout */
+  .callout{border-left:3px solid var(--amber);background:var(--amber-glow);border-radius:0 12px 12px 0;padding:16px 20px;margin:24px 0;font-size:0.88rem;color:var(--paper);}
+  .callout.peri{border-left-color:var(--peri);background:var(--peri-glow);}
+  .callout.plum{border-left-color:var(--plum);background:rgba(154,103,174,0.12);}
+  .callout b{color:inherit;}
+
+  /* Phase blocks (GATE / Programmer plans) */
+  .phase-block{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:18px;}
+  .phase-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+  .phase-head h3{font-size:1.15rem;}
+  .phase-dates{font-family:var(--font-mono);font-size:0.72rem;color:var(--ash-dim);}
+  .phase-body{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+  .phase-col-label{font-family:var(--font-mono);font-size:0.64rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--ash-dim);margin-bottom:8px;}
+  .phase-col ul{padding-left:16px;}
+  .phase-col li{font-size:0.87rem;color:var(--ash);margin-bottom:5px;}
+  .phase-col li b{color:var(--paper);font-weight:500;}
+  .res-line{font-size:0.83rem;color:var(--ash);margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);}
+  .res-line a{color:var(--peri);}
+
+  /* Milestones */
+  .milestone-list{display:flex;flex-direction:column;gap:2px;}
+  .milestone-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;cursor:pointer;transition:background 0.15s;}
+  .milestone-item:hover{background:var(--surface-2);}
+  .milestone-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--ash-dim);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.7rem;transition:all 0.15s;}
+  .milestone-item.done .milestone-check{background:var(--good);border-color:var(--good);color:var(--ink);}
+  .milestone-item.done .mlabel{color:var(--ash-dim);text-decoration:line-through;}
+  .mlabel{font-size:0.88rem;color:var(--paper);flex:1;}
+  .mcat{font-family:var(--font-mono);font-size:0.6rem;text-transform:uppercase;color:var(--ash-dim);}
+
+  /* Resource arsenal */
+  .res-cat{margin-bottom:26px;}
+  .res-cat h4{font-family:var(--font-mono);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--ash-dim);margin-bottom:10px;}
+  .res-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;background:var(--surface);}
+  .res-item .rname{font-size:0.88rem;color:var(--paper);font-weight:500;}
+  .res-item .rdesc{font-size:0.78rem;color:var(--ash-dim);margin-top:2px;}
+  .res-item a{font-family:var(--font-mono);font-size:0.74rem;white-space:nowrap;margin-left:16px;}
+
+  footer.credits{margin-top:60px;padding-top:20px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:0.7rem;color:var(--ash-dim);}
+
+  /* Scrollbar */
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-track{background:var(--ink);}
+  ::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:5px;}
+
+  @media (max-width:900px){
+    .app{grid-template-columns:1fr;}
+    .rail{display:none;}
+    .mobile-bar{
+      display:flex;position:sticky;top:0;z-index:5;background:var(--surface);
+      border-bottom:1px solid var(--border);padding:14px 16px;gap:14px;
+      align-items:center;overflow-x:auto;white-space:nowrap;
+    }
+    .mobile-bar .brand-mark{font-size:0.95rem;flex-shrink:0;}
+    .mobile-nav-item{font-family:var(--font-mono);font-size:0.7rem;color:var(--ash);padding:6px 10px;border-radius:20px;border:1px solid var(--border);flex-shrink:0;cursor:pointer;}
+    .mobile-nav-item.active{color:var(--ink);background:var(--amber);border-color:var(--amber);}
+    .main{padding:32px 20px 80px;}
+    .hero h1{font-size:1.9rem;}
+    .clock-grid{grid-template-columns:1fr;}
+    .card-grid{grid-template-columns:1fr;}
+    .phase-body{grid-template-columns:1fr;}
+    table, thead, tbody, th, td, tr{display:block;}
+    .tbl-wrap thead{display:none;}
+    .tbl-wrap tr{padding:14px 16px;border-bottom:1px solid var(--border);}
+    .tbl-wrap td{border:none;padding:3px 0;}
+  }
+</style>
+</head>
+<body>
+
+<div class="mobile-bar" id="mobileBar">
+  <span class="brand-mark">GM<span style="color:var(--amber)">//</span>27</span>
+  <div id="mobileNavList" style="display:flex;gap:8px;"></div>
+</div>
+
+<div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <div class="brand-mark">GODMODE <span>// 2027</span></div>
+      <div class="brand-sub">Shivprasad · Backend Engineer + AIR 1</div>
+    </div>
+
+    <div class="rail-block">
+      <div class="rail-label">Live Clocks</div>
+      <div class="ticker-item">
+        <span class="ticker-name">Internship</span>
+        <span class="ticker-val peri mono" id="tickIntern">—</span>
+      </div>
+      <div class="ticker-item">
+        <span class="ticker-name">GATE Exam</span>
+        <span class="ticker-val amber mono" id="tickGate">—</span>
+      </div>
+    </div>
+
+    <div class="rail-block">
+      <div class="rail-label">Sector Map</div>
+      <div class="sector-mini" id="sectorMini"></div>
+      <div class="sector-now-label" id="sectorNowLabel">—</div>
+    </div>
+
+    <div class="rail-block" style="flex:1;">
+      <div class="rail-label">Navigate</div>
+      <nav class="nav" id="navList">
+        <div class="nav-item" data-target="dashboard"><span class="num">01</span> Command Center</div>
+        <div class="nav-item" data-target="convergence"><span class="num">02</span> The Convergence</div>
+        <div class="nav-item" data-target="college-day"><span class="num">03</span> College-Day Protocol</div>
+        <div class="nav-item" data-target="non-college-day"><span class="num">04</span> Non-College Protocol</div>
+        <div class="nav-item" data-target="gate-plan"><span class="num">05</span> GATE Battle Plan</div>
+        <div class="nav-item" data-target="programmer-plan"><span class="num">06</span> Programmer Ascension</div>
+        <div class="nav-item" data-target="internship-plan"><span class="num">07</span> Internship Assault</div>
+        <div class="nav-item" data-target="resources"><span class="num">08</span> Resource Arsenal</div>
+      </nav>
+    </div>
+
+    <div class="rail-footer">TODAY // <span id="todayMono"></span></div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ============ 01 DASHBOARD ============ -->
+    <section class="section active" id="sec-dashboard">
+      <div class="hero">
+        <div class="eyebrow">Command Center</div>
+        <h1>Two clocks.<br>One <span class="amber">driver</span>. One <span class="peri">system</span>.</h1>
+        <p class="hero-sub">A remote SDE internship by December. AIR 1 in February. Both run on the same fuel: DSA, OS, CN, DBMS, COA — the stuff that's on the GATE syllabus AND in every backend interview. This is the operating system for the next 30 weeks. No filler, no motivation posters. Just the machine.</p>
+
+        <div class="clock-grid">
+          <div class="clock-card intern">
+            <div class="clabel">Internship Deadline · 31 Dec 2026</div>
+            <div class="cval mono" id="cdIntern">—</div>
+            <div class="csub">days left to lock an offer</div>
+          </div>
+          <div class="clock-card gate">
+            <div class="clabel">GATE Exam Window · Early Feb 2027</div>
+            <div class="cval mono" id="cdGate">—</div>
+            <div class="csub">days left · dates are tentative, IIT Madras confirms ~Aug 2026</div>
+          </div>
+          <div class="clock-card">
+            <div class="clabel">GATE Prep Lock · 31 Jan 2027</div>
+            <div class="cval mono" id="cdGatePrep">—</div>
+            <div class="csub">days of new content left before pure revision</div>
+          </div>
+        </div>
+
+        <div class="sector-full">
+          <div class="sector-full-head">
+            <h3 style="font-size:1rem;">The Lap — 13 Jul 2026 → 06 Feb 2027</h3>
+            <div class="now" id="sectorFullNow">—</div>
+          </div>
+          <div class="sector-bar" id="sectorBar"></div>
+          <div class="sector-legend" id="sectorLegend"></div>
+        </div>
+      </div>
+
+      <h2 class="title">Mission Briefing</h2>
+      <p class="lede">Read this once. It's the whole strategy in four moves.</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <h3><span class="tag tag-shared">01</span> Stack, don't split</h3>
+          <p>You are not running two prep tracks. You're running one deep-CS campaign with two scoreboards. Every hour on DSA, OS, CN, DBMS, and COA pays both the GATE examiner and the interviewer. That's ~80% of the syllabus doing double duty. See <b>The Convergence</b>.</p>
+        </div>
+        <div class="card">
+          <h3><span class="tag tag-shared">02</span> Peak on purpose</h3>
+          <p>Champions don't run at 100% every week for 7 months — they periodize. Foundation → Completion → Consolidation → Sharpening. Syllabus complete by mid-October (same date GO Classes builds their own batch around), so November–January is pure sharpening, not scrambling.</p>
+        </div>
+        <div class="card">
+          <h3><span class="tag tag-shared">03</span> Backward-plan the internship</h3>
+          <p>"Deadline: 31 Dec" is not "start applying 31 Dec." Interview pipelines take 3–6 weeks. Portfolio + resume go live by early September. Applications ramp through September–November so offers can land by December.</p>
+        </div>
+        <div class="card">
+          <h3><span class="tag tag-shared">04</span> Protect the machine</h3>
+          <p>7 hours of sleep isn't rest, it's a performance setting — this is when consolidation into long-term memory happens. A brain running on 5 hours loses more processing speed than the extra study hour buys back. Every schedule below is built around this on purpose.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <b>The Struggle Protocol still applies here.</b> Every DSA problem gets a fixed timebox (30–40 min) of real, undistracted attempt before you touch a hint or editorial. Log it either way — solved or not — in your error log. The struggle is where the pattern gets wired in, not the solution.
+      </div>
+
+      <h2 class="title" style="margin-top:50px;">Milestone Tracker</h2>
+      <p class="lede">Tap to mark complete. Saved automatically to this browser — <span id="milestoneProgress" class="mono" style="color:var(--paper);">0/0 done</span>. <a href="#" id="resetProgress" style="font-size:0.82rem;">Reset progress</a></p>
+      <div class="card" style="padding:8px 8px;">
+        <div class="milestone-list" id="milestoneList"></div>
+      </div>
+    </section>
+
+    <!-- ============ 02 CONVERGENCE ============ -->
+    <section class="section" id="sec-convergence">
+      <div class="eyebrow">02 · Strategy</div>
+      <h2 class="title">The Convergence</h2>
+      <p class="lede">This is the single insight the whole plan is built on: the GATE CS syllabus and the "elite backend engineer" curriculum are not two lists — they're the same list, viewed from two angles. Roughly 80% of GATE's technical weight is also core professional engineering literacy.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:22%">GATE Subject</th><th>What It Actually Builds</th><th style="width:14%">GATE Weight</th></tr></thead>
+          <tbody id="convergenceTable"></tbody>
+        </table>
+      </div>
+
+      <div class="callout peri">
+        <b>What's NOT shared</b> — System Design (HLD/LLD), Docker/Kubernetes/Redis, and framework-specific work (Next.js/MERN) don't appear on the GATE syllabus at all. These are the genuinely separate 20% — the layer that makes you hireable on top of being GATE-ready. They get dedicated blocks in every schedule below, never sacrificed for GATE revision.
+      </div>
+    </section>
+
+    <!-- ============ 03 COLLEGE DAY ============ -->
+    <section class="section" id="sec-college-day">
+      <div class="eyebrow">03 · Weekday Protocol</div>
+      <h2 class="title">College-Day Protocol</h2>
+      <p class="lede">Up at 4:30, ready-for-college at 8:00, class 9:00, home 4:30, walking commute both ways. ~6 hours of deep, structured work fit around a full college day — plus the walk and the classroom dead-time turned into passive gains.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:14%">Time</th><th style="width:10%">Track</th><th>Block</th></tr></thead>
+          <tbody id="collegeTimeline"></tbody>
+        </table>
+      </div>
+
+      <div class="callout plum">
+        <b>Dead-time isn't dead.</b> Walk to college = audio layer (GATE concept audio / your own recorded notes / a tech podcast). Every college break = a 5-minute flashcard pass on your phone (formulas, edge cases, syntax you keep forgetting). None of this is scheduled above because it's opportunistic — grab it when it appears.
+      </div>
+    </section>
+
+    <!-- ============ 04 NON-COLLEGE DAY ============ -->
+    <section class="section" id="sec-non-college-day">
+      <div class="eyebrow">04 · Full-Send Protocol</div>
+      <h2 class="title">Non-College-Day Protocol</h2>
+      <p class="lede">The full day is yours. ~12 hours of structured deep work, still with real breaks, real meals, and 7+ hours of sleep. This is the upper edge of what serious GATE toppers and competitive programmers actually report doing during peak prep — not a fantasy number.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:14%">Time</th><th style="width:10%">Track</th><th>Block</th></tr></thead>
+          <tbody id="nonCollegeTimeline"></tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <b>Sector shift:</b> once you're inside the Sharpening phase (from ~21 Dec), every second non-college day becomes a full-length timed GATE mock, run at the exact exam session timing. Mock-test alignment with real exam timing is a standard topper technique — it trains your body clock, not just your brain.
+      </div>
+    </section>
+
+    <!-- ============ 05 GATE PLAN ============ -->
+    <section class="section" id="sec-gate-plan">
+      <div class="eyebrow">05 · Goal 2</div>
+      <h2 class="title">GATE Battle Plan</h2>
+      <p class="lede">GATE CS/IT 2027, conducted by IIT Madras, expected first two weekends of February 2027. 100 marks, 65 questions, 3 hours, MCQ + MSQ + NAT, General Aptitude fixed at 15 marks. Registration opens ~August 2026 — notification is due any day now.</p>
+
+      <div id="gatePhases"></div>
+
+      <h3 style="margin:36px 0 14px;font-size:1.1rem;">Weightage Reality (5–10 year trend)</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:30%">Tier</th><th>Subjects</th></tr></thead>
+          <tbody id="weightageTable"></tbody>
+        </table>
+      </div>
+      <div class="callout amber">
+        <b>Read this as triage, not permission to skip.</b> Low-weightage subjects still cost you marks if ignored completely — but when time is short in Sharpening, Tier 1 gets first claim on every revision hour.
+      </div>
+    </section>
+
+    <!-- ============ 06 PROGRAMMER PLAN ============ -->
+    <section class="section" id="sec-programmer-plan">
+      <div class="eyebrow">06 · The God-Tier Layer</div>
+      <h2 class="title">Programmer Ascension</h2>
+      <p class="lede">Four tracks running in parallel across the same four phases. DSA is fully shared with GATE (see The Convergence) — the other three are the pure-engineering layer that GATE doesn't test but every real job does.</p>
+      <div id="progTracks"></div>
+    </section>
+
+    <!-- ============ 07 INTERNSHIP PLAN ============ -->
+    <section class="section" id="sec-internship-plan">
+      <div class="eyebrow">07 · Goal 1</div>
+      <h2 class="title">Internship Assault</h2>
+      <p class="lede">Backward-planned from 31 Dec 2026. Interview pipelines take 3–6 weeks from first application to offer, so the real deadline for your <i>first serious application</i> is early September, not December.</p>
+
+      <div id="internTimeline"></div>
+
+      <h3 style="margin:36px 0 14px;font-size:1.1rem;">Where to Apply</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:20%">Platform</th><th>What It's Good For</th></tr></thead>
+          <tbody id="platformTable"></tbody>
+        </table>
+      </div>
+
+      <div class="callout peri">
+        <b>Your X account is a recruiting channel, not a side project.</b> @Shivdev2807 already has real developer content. Every project you ship in the Programmer Ascension track becomes a build-in-public thread. Recruiters at small/remote-first teams look at GitHub + X before they look at a resume.
+      </div>
+    </section>
+
+    <!-- ============ 08 RESOURCES ============ -->
+    <section class="section" id="sec-resources">
+      <div class="eyebrow">08 · Arsenal</div>
+      <h2 class="title">Resource Arsenal</h2>
+      <p class="lede">Everything referenced above, in one place. Verified as of July 2026.</p>
+      <div id="resourceCats"></div>
+
+      <footer class="credits">GODMODE // 2027 — built 12 Jul 2026 · data lives only in this browser (window.storage) · edit the JS object at the bottom of this file to adjust any schedule, phase, or resource</footer>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const LAP_START   = new Date(2026,6,13);
+const LAP_END      = new Date(2027,1,6);
+const INTERN_DEADLINE = new Date(2026,11,31);
+const GATE_PREP_LOCK  = new Date(2027,0,31);
+const GATE_EXAM_START = new Date(2027,1,6);
+
+const PHASES = [
+  { key:'foundation',    label:'Foundation',     short:'FOUND',  start:new Date(2026,6,13), end:new Date(2026,7,31),  color:'var(--peri)',  dim:'var(--peri-dim)' },
+  { key:'completion',    label:'Completion',     short:'CMPLT',  start:new Date(2026,8,1),  end:new Date(2026,9,15),  color:'var(--plum)',  dim:'var(--plum-dim)' },
+  { key:'consolidation', label:'Consolidation',  short:'CNSLD',  start:new Date(2026,9,16), end:new Date(2026,11,20), color:'var(--amber)', dim:'var(--amber-dim)' },
+  { key:'sharpening',    label:'Sharpening',     short:'SHARP',  start:new Date(2026,11,21),end:new Date(2027,1,6),   color:'var(--coral)', dim:'var(--coral-dim)' },
+];
+
+const MILESTONES = [
+  { id:'m01', cat:'GATE',  tag:'tag-gate',   label:'GO Classes syllabus pace matched — no lecture backlog', due:'31 Aug 2026' },
+  { id:'m02', cat:'PROG',  tag:'tag-prog',   label:"Linux + shell comfort: daily-driver terminal workflow, no GUI crutches", due:'31 Aug 2026' },
+  { id:'m03', cat:'PROG',  tag:'tag-prog',   label:'Git fluency: rebase, cherry-pick, bisect, worktrees used for real', due:'31 Aug 2026' },
+  { id:'m04', cat:'DSA',   tag:'tag-shared', label:"Striver's A2Z Sheet — 50% complete", due:'15 Sep 2026' },
+  { id:'m05', cat:'INTERN',tag:'tag-prog',   label:'Resume finalized + one-page, tailored for backend/SDE intern roles', due:'1 Sep 2026' },
+  { id:'m06', cat:'INTERN',tag:'tag-prog',   label:'Portfolio site + GitHub profile polished and live', due:'1 Sep 2026' },
+  { id:'m07', cat:'GATE',  tag:'tag-gate',   label:'Full syllabus — revision pass 1 complete, all 11 sections', due:'15 Oct 2026' },
+  { id:'m08', cat:'PROG',  tag:'tag-prog',   label:'Redis integrated into a real project (caching or queues)', due:'15 Oct 2026' },
+  { id:'m09', cat:'PROG',  tag:'tag-prog',   label:'First HLD write-up published (system design doc, build in public)', due:'31 Oct 2026' },
+  { id:'m10', cat:'INTERN',tag:'tag-prog',   label:'First 20 internship applications sent', due:'30 Sep 2026' },
+  { id:'m11', cat:'INTERN',tag:'tag-prog',   label:'First technical interview attended', due:'31 Oct 2026' },
+  { id:'m12', cat:'DSA',   tag:'tag-shared', label:"Striver's A2Z Sheet — 100% complete", due:'30 Nov 2026' },
+  { id:'m13', cat:'PROG',  tag:'tag-prog',   label:'Kubernetes: local cluster running, one project deployed to it', due:'30 Nov 2026' },
+  { id:'m14', cat:'GATE',  tag:'tag-gate',   label:'50+ Gate Overflow PYQ sets logged in the error log', due:'1 Dec 2026' },
+  { id:'m15', cat:'DSA',   tag:'tag-shared', label:'NeetCode 150 — complete', due:'15 Dec 2026' },
+  { id:'m16', cat:'GATE',  tag:'tag-gate',   label:'All sectional mock tests attempted at least once', due:'20 Dec 2026' },
+  { id:'m17', cat:'INTERN',tag:'tag-prog',   label:'Offer received / internship locked', due:'31 Dec 2026' },
+  { id:'m18', cat:'GATE',  tag:'tag-gate',   label:'12-day General Aptitude sprint completed', due:'10 Jan 2027' },
+  { id:'m19', cat:'GATE',  tag:'tag-gate',   label:'First full-length timed mock, run at real exam-session timing', due:'5 Jan 2027' },
+  { id:'m20', cat:'GATE',  tag:'tag-gate',   label:'Formula / short-notes sheet finalized for all 11 subjects', due:'25 Jan 2027' },
+  { id:'m21', cat:'GATE',  tag:'tag-gate',   label:'GATE admit card downloaded', due:'Jan 2027' },
+  { id:'m22', cat:'GATE',  tag:'tag-gate',   label:'Final mock — score plateaued at target percentile', due:'31 Jan 2027' },
+  { id:'m23', cat:'GATE',  tag:'tag-gate',   label:'GATE CS/IT paper — sat and submitted', due:'6-7 Feb 2027' },
+];
+
+const CONVERGENCE = [
+  ['Discrete Mathematics','Graph theory and combinatorics underneath every graph/DP problem you will ever solve — the same reasoning shows up as "prove this" on GATE and "design the algorithm" in an interview.','~13%'],
+  ['Engineering Mathematics','Linear algebra, calculus, probability — the same statistical intuition backend and ML-adjacent roles expect out of any strong candidate.','~13%'],
+  ['Digital Logic','Number systems and combinational/sequential circuits — baseline hardware literacy that shows up in low-level and embedded interviews.','~5%'],
+  ['Computer Organization & Architecture','Pipelining, cache, memory hierarchy — the mental model behind every "why is this slow" performance conversation.','~8%'],
+  ['Programming & Data Structures','C, recursion, arrays, linked lists, trees, heaps — literally the vocabulary of every DSA interview round.','~7%'],
+  ['Algorithms','Greedy, DP, divide-and-conquer, graph traversal, shortest paths — the actual content of LeetCode/Codeforces practice.','~8%'],
+  ['Theory of Computation','Automata and regular languages — the theory behind every regex engine, parser, and lexer you will ever use.','~6%'],
+  ['Compiler Design','Lexing, parsing, intermediate code, optimization — how the code you write actually becomes execution.','~5%'],
+  ['Operating Systems','Processes, threads, concurrency, scheduling, memory, file systems — core backend engineering literacy, full stop.','~8%'],
+  ['Databases','ER modelling, SQL, normalization, indexing, transactions — what a backend engineer does most days of the week.','~7%'],
+  ['Computer Networks','OSI/TCP-IP, routing, DNS, HTTP, sockets — the networking layer every backend and infra role assumes you know.','~7%'],
+];
+
+const COLLEGE_TIMELINE = [
+  ['04:30','SHARED','Wake up','Water, 5-minute look at today\'s plan. No phone scrolling.'],
+  ['04:45 – 07:30','DSA','Deep Work Block 1 — DSA / Algorithms','Timeboxed problems from the A2Z sheet / NeetCode 150. Struggle first, editorial only after the timer runs out.'],
+  ['07:30 – 08:00','SHARED','Buffer','Wrap up, log progress. Roll straight into getting ready.'],
+  ['08:00 – 09:00','SHARED','Get ready + walk to college','Audio layer: GATE concept audio, your own recorded notes, or a tech podcast. Dead time, not wasted time.'],
+  ['09:00 – 16:30','SHARED','College','Every break = 5-minute flashcard pass on your phone — formulas, edge cases, syntax you keep forgetting.'],
+  ['16:30 – 17:00','SHARED','Walk home','Audio layer continues.'],
+  ['17:00 – 17:20','SHARED','Break','Snack, no screens, reset before the next block.'],
+  ['17:20 – 19:20','GATE','Deep Work Block 2 — Core GATE subject','Rotates daily: OS → CN → DBMS → COA → TOC → Discrete/Engg Math → back to OS.'],
+  ['19:20 – 20:00','SHARED','Dinner','Away from the desk.'],
+  ['20:00 – 21:15','PROG','Deep Work Block 3 — Programmer Ascension','Rotates through the four tracks: Development, System Design, Tools/DevOps, and spillover DSA.'],
+  ['21:15 – 21:30','SHARED','Wind-down','Log today\'s error-log entries, plan tomorrow\'s first block. Screens off now.'],
+  ['21:30','SHARED','Sleep','7 hours, non-negotiable.'],
+];
+
+const NONCOLLEGE_TIMELINE = [
+  ['04:30','SHARED','Wake up','Same as college days — the body clock doesn\'t get a day off.'],
+  ['04:45 – 07:00','DSA','Deep Work Block 1 — Hardest DSA topic of the week','Timeboxed, struggle-first. This is the sharpest-focus window of the day; spend it on the thing you\'re worst at.'],
+  ['07:00 – 07:30','SHARED','Breakfast',''],
+  ['07:30 – 10:00','GATE','Deep Work Block 2 — Core subject, full pass','One rotating subject: concept + PYQs together, not concept-then-PYQs-later.'],
+  ['10:00 – 10:15','SHARED','Break','Walk if you can.'],
+  ['10:15 – 12:00','PROG','Deep Work Block 3 — System Design / Development','Ship something. A project commit, a design doc, a PR — real output, not passive reading.'],
+  ['12:00 – 13:00','SHARED','Lunch + rest','Actually rest. No podcasts, no phone.'],
+  ['13:00 – 15:00','GATE','Deep Work Block 4 — Gate Overflow PYQ practice','Timed sets. Every wrong answer goes in the error log with the reason, not just the correction.'],
+  ['15:00 – 15:30','SHARED','Break','Walk / stretch.'],
+  ['15:30 – 17:00','PROG','Deep Work Block 5 — Tools rotation','Linux → Git → Docker → Kubernetes → Redis, one focus area per session.'],
+  ['17:00 – 17:45','SHARED','Dinner',''],
+  ['17:45 – 19:30','SHARED','Deep Work Block 6 — Timed mock / weak-area drilling','From the Sharpening phase onward, every second non-college day becomes a full-length timed GATE mock at real exam-session timing instead.'],
+  ['19:30 – 20:15','SHARED','Review','Flashcards, tomorrow\'s plan, error-log cleanup.'],
+  ['20:15 – 21:30','SHARED','Free time','Exercise, family, or a build-in-public post on X. Guard this — it\'s what makes the next 7 months sustainable.'],
+  ['21:30','SHARED','Sleep','7 hours.'],
+];
+
+const WEIGHTAGE = [
+  ['Tier 1 — highest weight','Algorithms & Data Structures, Operating Systems, Databases, Computer Networks, General Aptitude (fixed 15%), Engineering Mathematics'],
+  ['Tier 2 — moderate weight','Computer Organization & Architecture, Theory of Computation, Discrete Mathematics, Programming (C)'],
+  ['Tier 3 — lower weight','Digital Logic, Compiler Design'],
+];
+
+const GATE_PHASES = [
+  { idx:0, title:'Build every foundation at once', gate:[
+      'Cover every subject at GO Classes\' live pace — zero lecture backlog by the end of this phase.',
+      'Engineering Math + Discrete Math refreshed early; they compound into every other subject.',
+      'Start an error log from problem #1 — not after you start losing marks.',
+    ], prog:[
+      'DSA: begin the A2Z sheet from the start, arrays through recursion.',
+      'Linux + Git fluency built to "daily driver" level — no more GUI crutches.',
+      'Pick the stack for your flagship project (build on what you already know — Flask/web).',
+    ]},
+  { idx:1, title:'Finish the syllabus, start proving it', gate:[
+      'Finish 100% of new content — nothing new after this phase, only depth.',
+      'Begin subject-wise PYQs on Gate Overflow as each topic closes, not all at the end.',
+      'First full syllabus revision pass complete by the end of this phase.',
+    ], prog:[
+      'A2Z sheet crosses 50%; start timed contests on Codeforces/LeetCode.',
+      'Portfolio + resume go live — this phase is also the internship application launch window.',
+      'Docker: containerize your flagship project.',
+    ]},
+  { idx:2, title:'Volume, then triage', gate:[
+      'Heavy Gate Overflow PYQ volume — 50+ sets logged with reasons, not just corrections.',
+      'All sectional mock tests attempted at least once; weak sections identified explicitly.',
+      'Tier 1 subjects (see Weightage table) get first claim on every revision hour.',
+    ], prog:[
+      'A2Z sheet to 100%, NeetCode 150 in progress.',
+      'First system design write-up published — build in public on X.',
+      'Kubernetes + Redis introduced on real projects, not tutorials alone.',
+    ]},
+  { idx:3, title:'Sharpen, don\'t learn', gate:[
+      'No new content — pure revision, formula sheets, and timed practice only.',
+      '12-day General Aptitude sprint slotted in early in this phase.',
+      'Every second non-college day = a full-length mock at real exam-session timing.',
+    ], prog:[
+      'Interview prep for any live internship pipelines takes priority over new tooling.',
+      'DSA becomes spaced-repetition of your own error log, not new problems.',
+      'Everything else pauses in the final 10 days before the exam — protect sleep and recall.',
+    ]},
+];
+
+const PROG_TRACKS = [
+  { name:'Track A — DSA (shared with GATE)', tag:'tag-shared',
+    phases:['Arrays → recursion → linked lists, timeboxed daily on the A2Z sheet.',
+            'A2Z sheet past 50%; first timed Codeforces/LeetCode contests.',
+            'A2Z sheet to 100%; NeetCode 150 underway; error log reviewed weekly.',
+            'Pure spaced-repetition of your own error log — no new problems this phase.'] },
+  { name:'Track B — Development', tag:'tag-prog',
+    phases:['Pick the flagship project stack; ship the first working version.',
+            'Portfolio site live; resume tailored; project deployed publicly.',
+            'Second project or major feature shipped; every ship gets a build-in-public post.',
+            'Only maintenance — no new feature work during Sharpening.'] },
+  { name:'Track C — System Design', tag:'tag-prog',
+    phases:['Read the fundamentals: scaling, caching, load balancing basics.',
+            'First HLD write-up for your own project — not a tutorial copy.',
+            'Design one system end-to-end (LLD included) and defend it out loud.',
+            'Interview-format system design practice only, timed.'] },
+  { name:'Track D — Tools & Infra', tag:'tag-prog',
+    phases:['Linux + Git to daily-driver fluency.',
+            'Docker: containerize the flagship project.',
+            'Kubernetes local cluster + Redis integrated into a real project.',
+            'No new tools — only using what you already know, faster.'] },
+];
+
+const INTERN_TIMELINE = [
+  ['1 Sep 2026','Resume + portfolio + GitHub profile all live and polished. This is the real start line — not December.'],
+  ['Sep 2026','First 20 applications sent across platforms. Applying stays a standing weekly habit from here, not a one-time push.'],
+  ['Sep – Oct 2026','Every shipped project becomes a build-in-public thread on X — recruiters at small/remote teams check GitHub + X before the resume.'],
+  ['Oct 2026','First technical interviews. Treat each one as free interview-pattern data, win or lose.'],
+  ['Oct – Nov 2026','Applications keep flowing while interviews are in progress — never stop the top of the funnel.'],
+  ['Dec 2026','Interview pipelines close out. Backward math: a pipeline started in December can\'t close by the 31st.'],
+  ['31 Dec 2026','Deadline. Offer in hand.'],
+];
+
+const PLATFORMS = [
+  ['LinkedIn','Direct outreach + easy-apply for SDE intern roles; keep the profile in sync with the resume.'],
+  ['Internshala','India-specific internship listings, filterable by stipend, remote, and tech stack.'],
+  ['Wellfound','Startup-focused listings; strong fit for small/remote-first teams that value a public GitHub.'],
+  ['Unstop / HackerEarth','Company-run hackathons and coding challenges that convert directly into interview shortlists.'],
+  ['GitHub','The actual portfolio. Pin the flagship project; keep commit history active and honest.'],
+  ['X (Twitter)','Build-in-public threads for every shipped project — a recruiting channel, not a side project.'],
+];
+
+const RESOURCES = [
+  { cat:'GATE — Core', items:[
+      ['GO Classes 2027 CSE Batch','Primary structured course — already enrolled.','https://www.goclasses.in/'],
+      ['Made Easy — GATE 2027 PYQ Book','Subject-wise previous year questions with solutions.','https://www.madeeasy.in/'],
+      ['GATE Overflow','The single best PYQ + discussion platform for GATE CS — use for every practice set.','https://gateoverflow.in/'],
+      ['NPTEL','Free lecture series straight from IIT faculty — useful for any topic GO Classes moves past too fast.','https://nptel.ac.in/'],
+      ['GOAPS Portal (official)','Registration, admit card, and all official GATE 2027 communication.','https://gate2027.iitm.ac.in/'],
+    ]},
+  { cat:'GATE — Reference Textbooks', items:[
+      ['CLRS — Introduction to Algorithms','The standard reference for Algorithms and Data Structures.',''],
+      ['Galvin — Operating System Concepts','Standard OS reference, matches the GATE OS syllabus closely.',''],
+      ['Silberschatz / Korth — Database System Concepts','Standard DBMS reference.',''],
+      ['Forouzan — Data Communications and Networking','Standard CN reference.',''],
+      ['Morris Mano — Digital Logic and Computer Design','Standard Digital Logic reference.',''],
+    ]},
+  { cat:'DSA Practice', items:[
+      ["Striver's A2Z DSA Sheet",'Full structured roadmap from beginner to advanced — the primary DSA track.','https://takeuforward.org/strivers-a2z-dsa-course-sheet-2/'],
+      ['NeetCode 150','Curated interview-pattern problem set, video explanations for every problem.','https://neetcode.io/'],
+      ['Visualgo','Visualizes DS/algorithm execution step-by-step — use whenever intuition is stuck, not just code.','https://visualgo.net/'],
+      ['LeetCode','Volume practice + weekly contests for speed and rating.','https://leetcode.com/'],
+      ['Codeforces','Harder competitive programming, real contest rating.','https://codeforces.com/'],
+    ]},
+  { cat:'System Design', items:[
+      ['System Design Primer (GitHub)','The most-cited free open-source system design reference.','https://github.com/donnemartin/system-design-primer'],
+      ['ByteByteGo','Newsletter + diagrams that explain real production systems.','https://bytebytego.com/'],
+      ['Gaurav Sen (YouTube)','Widely-used free video series on system design fundamentals.','https://www.youtube.com/@gkcs'],
+    ]},
+  { cat:'Tools & Infra', items:[
+      ['Linux Journey','Structured, free Linux fundamentals.','https://linuxjourney.com/'],
+      ['OverTheWire: Bandit','Hands-on Linux/CLI wargame — learn commands by necessity, not memorization.','https://overthewire.org/wargames/bandit/'],
+      ['Learn Git Branching','Interactive visual Git practice — covers rebase, cherry-pick, and more.','https://learngitbranching.js.org/'],
+      ['Docker Docs — Get Started','Official Docker fundamentals walkthrough.','https://docs.docker.com/get-started/'],
+      ['Kubernetes — Official Tutorials','Official, free, hands-on Kubernetes basics.','https://kubernetes.io/docs/tutorials/'],
+      ['Redis University','Free official Redis courses.','https://redis.io/university/'],
+    ]},
+  { cat:'Internship Hunt', items:[
+      ['LinkedIn','Networking + easy-apply.','https://www.linkedin.com/'],
+      ['Internshala','India-specific internship listings.','https://internshala.com/'],
+      ['Wellfound','Startup-focused job board.','https://wellfound.com/'],
+      ['Unstop','Hackathons, coding challenges, and campus hiring drives.','https://unstop.com/'],
+    ]},
+];
+
+// ============================================================
+// STORAGE
+// ============================================================
+const STORE_KEY = 'godmode2027_progress';
+
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){
+    console.warn('Progress storage unavailable in this context (e.g. sandboxed preview). Using in-memory fallback.', e);
+    return window.__godmodeMemFallback || {};
+  }
+}
+function saveProgress(state){
+  try{
+    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+  }catch(e){
+    console.warn('Could not persist to localStorage — falling back to in-memory only for this session.', e);
+    window.__godmodeMemFallback = state;
+  }
+}
+
+// ============================================================
+// UTIL
+// ============================================================
+function pad(n){ return n<10 ? '0'+n : ''+n; }
+function fmtDate(d){
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
+}
+function daysBetween(a,b){
+  const MS=86400000;
+  const A=new Date(a.getFullYear(),a.getMonth(),a.getDate());
+  const B=new Date(b.getFullYear(),b.getMonth(),b.getDate());
+  return Math.round((B-A)/MS);
+}
+function clamp(v,lo,hi){ return Math.max(lo,Math.min(hi,v)); }
+function currentPhase(now){
+  for(const p of PHASES){ if(now>=p.start && now<=p.end) return p; }
+  if(now < PHASES[0].start) return PHASES[0];
+  return PHASES[PHASES.length-1];
+}
+
+// ============================================================
+// RENDER: clocks & countdowns
+// ============================================================
+function renderClocks(){
+  const now = new Date();
+  document.getElementById('todayMono').textContent = fmtDate(now).toUpperCase();
+
+  const dIntern = daysBetween(now, INTERN_DEADLINE);
+  const dGate   = daysBetween(now, GATE_EXAM_START);
+  const dPrep   = daysBetween(now, GATE_PREP_LOCK);
+
+  const internTxt = dIntern>=0 ? dIntern+'d' : 'DUE';
+  const gateTxt    = dGate>=0 ? dGate+'d' : 'LIVE';
+  const prepTxt    = dPrep>=0 ? dPrep+'d' : 'LOCKED';
+
+  document.getElementById('tickIntern').textContent = internTxt;
+  document.getElementById('tickGate').textContent = gateTxt;
+  document.getElementById('cdIntern').textContent = internTxt;
+  document.getElementById('cdGate').textContent = gateTxt;
+  document.getElementById('cdGatePrep').textContent = prepTxt;
+}
+
+// ============================================================
+// RENDER: sector map (mini + full)
+// ============================================================
+function renderSectorMap(){
+  const now = new Date();
+  const totalDays = daysBetween(LAP_START, LAP_END);
+  const elapsed = clamp(daysBetween(LAP_START, now), 0, totalDays);
+  const pct = totalDays>0 ? (elapsed/totalDays*100) : 0;
+  const phase = currentPhase(now);
+
+  // mini (rail)
+  const mini = document.getElementById('sectorMini');
+  mini.innerHTML = PHASES.map(p=>{
+    const w = (daysBetween(p.start,p.end)+1)/ (totalDays+1) * 100;
+    return '<div class="sector-mini-seg" style="width:'+w+'%;background:'+p.dim+';"></div>';
+  }).join('');
+  document.getElementById('sectorNowLabel').innerHTML =
+    phase.short+' <span class="dim">· '+fmtDate(now)+'</span>';
+
+  // full (dashboard)
+  const bar = document.getElementById('sectorBar');
+  bar.innerHTML = PHASES.map(p=>{
+    const w = (daysBetween(p.start,p.end)+1)/ (totalDays+1) * 100;
+    const active = p.key===phase.key ? ' style="width:'+w+'%;background:'+p.dim+';box-shadow:inset 0 0 0 2px '+p.color+';"' : ' style="width:'+w+'%;background:'+p.dim+';"';
+    return '<div class="sector-seg"'+active+'>'+p.short+'</div>';
+  }).join('') + '<div class="sector-marker" style="left:'+pct+'%;"></div>';
+
+  document.getElementById('sectorLegend').innerHTML = PHASES.map(p=>
+    '<span><span class="dot" style="background:'+p.color+';"></span>'+p.label+' — '+fmtDate(p.start)+' to '+fmtDate(p.end)+'</span>'
+  ).join('');
+
+  document.getElementById('sectorFullNow').innerHTML =
+    '<span class="dim">Day</span> '+ (elapsed+1) +' <span class="dim">of</span> '+ (totalDays+1) +' <span class="dim">·</span> '+phase.label;
+}
+
+// ============================================================
+// RENDER: milestones
+// ============================================================
+function renderMilestones(){
+  const state = loadProgress();
+  const list = document.getElementById('milestoneList');
+  list.innerHTML = MILESTONES.map(m=>{
+    const done = !!state[m.id];
+    return '<div class="milestone-item'+(done?' done':'')+'" data-id="'+m.id+'">'
+      + '<div class="milestone-check">'+(done?'✓':'')+'</div>'
+      + '<div class="mlabel">'+m.label+'</div>'
+      + '<div class="mcat"><span class="tag '+m.tag+'" style="margin-right:8px;">'+m.cat+'</span>'+m.due+'</div>'
+      + '</div>';
+  }).join('');
+
+  list.querySelectorAll('.milestone-item').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const id = el.getAttribute('data-id');
+      const s = loadProgress();
+      s[id] = !s[id];
+      saveProgress(s);
+      renderMilestones();
+      updateProgressCounter();
+    });
+  });
+  updateProgressCounter();
+}
+function updateProgressCounter(){
+  const state = loadProgress();
+  const done = MILESTONES.filter(m=>state[m.id]).length;
+  document.getElementById('milestoneProgress').textContent = done+'/'+MILESTONES.length+' done';
+}
+
+// ============================================================
+// RENDER: convergence table
+// ============================================================
+function renderConvergence(){
+  document.getElementById('convergenceTable').innerHTML = CONVERGENCE.map(row=>
+    '<tr><td class="col-strong">'+row[0]+'</td><td>'+row[1]+'</td><td class="col-time">'+row[2]+'</td></tr>'
+  ).join('');
+}
+
+// ============================================================
+// RENDER: timelines (college / non-college)
+// ============================================================
+function tagFor(track){
+  if(track==='GATE') return 'tag-gate';
+  if(track==='PROG') return 'tag-prog';
+  if(track==='DSA') return 'tag-shared';
+  return 'tag-shared';
+}
+function renderTimeline(elId, rows){
+  document.getElementById(elId).innerHTML = rows.map(r=>{
+    const [time,track,title,desc] = r;
+    const tag = track==='SHARED' ? '<span class="tag tag-shared">—</span>' : '<span class="tag '+tagFor(track)+'">'+track+'</span>';
+    return '<tr class="timeline-row"><td class="col-time">'+time+'</td><td>'+tag+'</td>'
+      + '<td><div class="block-title">'+title+'</div>'+(desc?'<div class="block-desc">'+desc+'</div>':'')+'</td></tr>';
+  }).join('');
+}
+
+// ============================================================
+// RENDER: GATE phases + weightage
+// ============================================================
+function renderGatePhases(){
+  document.getElementById('gatePhases').innerHTML = GATE_PHASES.map(gp=>{
+    const p = PHASES[gp.idx];
+    return '<div class="phase-block">'
+      + '<div class="phase-head"><h3><span class="tag tag-shared" style="margin-right:8px;">Phase '+(gp.idx+1)+'</span>'+p.label+' — '+gp.title+'</h3>'
+      + '<div class="phase-dates">'+fmtDate(p.start)+' → '+fmtDate(p.end)+'</div></div>'
+      + '<div class="phase-body">'
+      + '<div class="phase-col"><div class="phase-col-label">GATE Focus</div><ul>'+gp.gate.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>'
+      + '<div class="phase-col"><div class="phase-col-label">Programmer Focus</div><ul>'+gp.prog.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>'
+      + '</div></div>';
+  }).join('');
+
+  document.getElementById('weightageTable').innerHTML = WEIGHTAGE.map(row=>
+    '<tr><td class="col-strong">'+row[0]+'</td><td>'+row[1]+'</td></tr>'
+  ).join('');
+}
+
+// ============================================================
+// RENDER: programmer tracks
+// ============================================================
+function renderProgTracks(){
+  document.getElementById('progTracks').innerHTML = PROG_TRACKS.map(t=>{
+    return '<div class="phase-block">'
+      + '<div class="phase-head"><h3><span class="tag '+t.tag+'" style="margin-right:8px;">Track</span>'+t.name+'</h3></div>'
+      + '<div class="phase-body">'
+      + PHASES.map((p,i)=>'<div class="phase-col"><div class="phase-col-label">'+p.label+'</div><ul><li>'+t.phases[i]+'</li></ul></div>').join('')
+      + '</div></div>';
+  }).join('');
+}
+
+// ============================================================
+// RENDER: internship timeline + platforms
+// ============================================================
+function renderInternTimeline(){
+  document.getElementById('internTimeline').innerHTML =
+    '<div class="tbl-wrap"><table><thead><tr><th style="width:20%">When</th><th>Action</th></tr></thead><tbody>'
+    + INTERN_TIMELINE.map(r=>'<tr><td class="col-time col-strong">'+r[0]+'</td><td>'+r[1]+'</td></tr>').join('')
+    + '</tbody></table></div>';
+
+  document.getElementById('platformTable').innerHTML = PLATFORMS.map(r=>
+    '<tr><td class="col-strong">'+r[0]+'</td><td>'+r[1]+'</td></tr>'
+  ).join('');
+}
+
+// ============================================================
+// RENDER: resources
+// ============================================================
+function renderResources(){
+  document.getElementById('resourceCats').innerHTML = RESOURCES.map(cat=>{
+    return '<div class="res-cat"><h4>'+cat.cat+'</h4>'
+      + cat.items.map(it=>{
+          const [name,desc,url]=it;
+          const link = url ? '<a href="'+url+'" target="_blank" rel="noopener">Open ↗</a>' : '<span class="mono" style="color:var(--ash-dim);font-size:0.74rem;">Book</span>';
+          return '<div class="res-item"><div><div class="rname">'+name+'</div><div class="rdesc">'+desc+'</div></div>'+link+'</div>';
+        }).join('')
+      + '</div>';
+  }).join('');
+}
+
+// ============================================================
+// NAV
+// ============================================================
+const NAV_ITEMS = [
+  {t:'dashboard', n:'01', label:'Command Center'},
+  {t:'convergence', n:'02', label:'The Convergence'},
+  {t:'college-day', n:'03', label:'College-Day Protocol'},
+  {t:'non-college-day', n:'04', label:'Non-College Protocol'},
+  {t:'gate-plan', n:'05', label:'GATE Battle Plan'},
+  {t:'programmer-plan', n:'06', label:'Programmer Ascension'},
+  {t:'internship-plan', n:'07', label:'Internship Assault'},
+  {t:'resources', n:'08', label:'Resource Arsenal'},
+];
+
+function setActiveSection(target){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+target).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.classList.toggle('active', el.getAttribute('data-target')===target);
+  });
+  document.querySelectorAll('.mobile-nav-item').forEach(el=>{
+    el.classList.toggle('active', el.getAttribute('data-target')===target);
+  });
+  window.scrollTo({top:0,behavior:'instant' in window ? 'instant' : 'auto'});
+}
+
+function initNav(){
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.addEventListener('click', ()=> setActiveSection(el.getAttribute('data-target')));
+  });
+  const mobileNav = document.getElementById('mobileNavList');
+  mobileNav.innerHTML = NAV_ITEMS.map(it=>
+    '<div class="mobile-nav-item'+(it.t==='dashboard'?' active':'')+'" data-target="'+it.t+'">'+it.n+' '+it.label+'</div>'
+  ).join('');
+  mobileNav.querySelectorAll('.mobile-nav-item').forEach(el=>{
+    el.addEventListener('click', ()=> setActiveSection(el.getAttribute('data-target')));
+  });
+  setActiveSection('dashboard');
+}
+
+function initResetButton(){
+  document.getElementById('resetProgress').addEventListener('click', (e)=>{
+    e.preventDefault();
+    if(confirm('Clear all saved milestone progress? This cannot be undone.')){
+      saveProgress({});
+      renderMilestones();
+    }
+  });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function init(){
+  renderClocks();
+  renderSectorMap();
+  renderMilestones();
+  renderConvergence();
+  renderTimeline('collegeTimeline', COLLEGE_TIMELINE);
+  renderTimeline('nonCollegeTimeline', NONCOLLEGE_TIMELINE);
+  renderGatePhases();
+  renderProgTracks();
+  renderInternTimeline();
+  renderResources();
+  initNav();
+  initResetButton();
+
+  setInterval(()=>{ renderClocks(); renderSectorMap(); }, 60*1000);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+</script>
+</body>
+</html>

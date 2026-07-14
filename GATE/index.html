@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GODMODE // 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0c0a11;
+    --surface:#151020;
+    --surface-2:#1c1628;
+    --surface-3:#251e33;
+    --plum:#9a67ae;
+    --plum-dim:#4a3a55;
+    --amber:#e8a33d;
+    --amber-dim:#4a3a20;
+    --amber-glow:rgba(232,163,61,0.14);
+    --peri:#98a8f7;
+    --peri-dim:#302f52;
+    --peri-glow:rgba(152,168,247,0.14);
+    --paper:#f4f0f8;
+    --ash:#a99fbe;
+    --ash-dim:#6d647f;
+    --border:#2b2438;
+    --good:#8ad9a8;
+    --font-display:'Space Grotesk',sans-serif;
+    --font-body:'Inter',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:var(--font-body);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(154,103,174,0.10), transparent 45%),
+      radial-gradient(circle at 85% 90%, rgba(152,168,247,0.08), transparent 45%);
+    pointer-events:none;
+    z-index:0;
+  }
+  h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;letter-spacing:-0.01em;color:var(--paper);}
+  a{color:var(--peri);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  ::selection{background:var(--plum);color:var(--paper);}
+  .mono{font-family:var(--font-mono);}
+
+  /* ===== APP SHELL ===== */
+  .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh;position:relative;z-index:1;}
+
+  /* ===== RAIL ===== */
+  .rail{
+    background:var(--surface);
+    border-right:1px solid var(--border);
+    padding:28px 22px;
+    display:flex;flex-direction:column;gap:26px;
+    position:sticky;top:0;height:100vh;overflow-y:auto;
+  }
+  .brand{display:flex;flex-direction:column;gap:4px;}
+  .brand-mark{font-family:var(--font-display);font-size:1.15rem;font-weight:700;letter-spacing:0.02em;}
+  .brand-mark span{color:var(--amber);}
+  .brand-sub{font-family:var(--font-mono);font-size:0.68rem;color:var(--ash-dim);text-transform:uppercase;letter-spacing:0.08em;}
+
+  .rail-block{border-top:1px solid var(--border);padding-top:18px;}
+  .rail-label{font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ash-dim);margin-bottom:10px;}
+
+  .ticker-item{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px dashed var(--border);}
+  .ticker-item:last-child{border-bottom:none;}
+  .ticker-name{font-size:0.72rem;color:var(--ash);text-transform:uppercase;letter-spacing:0.04em;}
+  .ticker-val{font-family:var(--font-mono);font-size:0.92rem;font-weight:600;}
+  .ticker-val.amber{color:var(--amber);}
+  .ticker-val.peri{color:var(--peri);}
+
+  .sector-mini{display:flex;height:8px;border-radius:4px;overflow:hidden;margin-bottom:8px;background:var(--surface-3);}
+  .sector-mini-seg{position:relative;border-right:1px solid var(--ink);}
+  .sector-mini-seg:last-child{border-right:none;}
+  .sector-now-label{font-family:var(--font-mono);font-size:0.68rem;color:var(--paper);}
+  .sector-now-label .dim{color:var(--ash-dim);}
+
+  .nav{display:flex;flex-direction:column;gap:2px;}
+  .nav-item{
+    display:flex;align-items:baseline;gap:10px;
+    padding:9px 10px;border-radius:8px;cursor:pointer;
+    font-size:0.84rem;color:var(--ash);
+    transition:background 0.15s, color 0.15s;
+    border:1px solid transparent;
+  }
+  .nav-item .num{font-family:var(--font-mono);font-size:0.68rem;color:var(--ash-dim);}
+  .nav-item:hover{background:var(--surface-2);color:var(--paper);}
+  .nav-item.active{background:var(--surface-2);color:var(--paper);border-color:var(--border);}
+  .nav-item.active .num{color:var(--amber);}
+
+  .rail-footer{margin-top:auto;font-family:var(--font-mono);font-size:0.65rem;color:var(--ash-dim);padding-top:16px;border-top:1px solid var(--border);}
+
+  /* mobile top bar */
+  .mobile-bar{display:none;}
+
+  /* ===== MAIN ===== */
+  .main{padding:52px 56px 100px;max-width:980px;}
+  .section{display:none;animation:fadeIn 0.25s ease;}
+  .section.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .eyebrow{font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ash-dim);margin-bottom:10px;}
+  .section h2.title{font-size:2rem;margin-bottom:14px;}
+  .lede{font-size:1.05rem;color:var(--ash);max-width:640px;margin-bottom:34px;}
+
+  /* Hero */
+  .hero{padding-bottom:38px;border-bottom:1px solid var(--border);margin-bottom:38px;}
+  .hero h1{font-size:2.6rem;line-height:1.08;max-width:680px;margin-bottom:16px;}
+  .hero h1 .amber{color:var(--amber);}
+  .hero h1 .peri{color:var(--peri);}
+  .hero-sub{font-size:1.05rem;color:var(--ash);max-width:600px;margin-bottom:34px;}
+
+  .clock-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:38px;}
+  .clock-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 20px;}
+  .clock-card .clabel{font-family:var(--font-mono);font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--ash-dim);margin-bottom:10px;}
+  .clock-card .cval{font-family:var(--font-mono);font-size:2.1rem;font-weight:700;line-height:1;}
+  .clock-card .csub{font-family:var(--font-mono);font-size:0.72rem;color:var(--ash-dim);margin-top:8px;}
+  .clock-card.gate{border-color:var(--amber-dim);}
+  .clock-card.gate .cval{color:var(--amber);}
+  .clock-card.intern{border-color:var(--peri-dim);}
+  .clock-card.intern .cval{color:var(--peri);}
+
+  /* sector map full */
+  .sector-full{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:26px;margin-bottom:38px;}
+  .sector-full-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+  .sector-full-head .now{font-family:var(--font-mono);font-size:0.85rem;color:var(--paper);}
+  .sector-full-head .now .dim{color:var(--ash-dim);}
+  .sector-bar{display:flex;height:34px;border-radius:8px;overflow:hidden;position:relative;background:var(--surface-3);margin-bottom:12px;}
+  .sector-seg{display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:0.68rem;letter-spacing:0.04em;text-transform:uppercase;border-right:2px solid var(--ink);position:relative;}
+  .sector-seg:last-child{border-right:none;}
+  .sector-marker{position:absolute;top:-6px;width:2px;height:46px;background:var(--paper);}
+  .sector-marker::after{content:"▲";position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:var(--paper);}
+  .sector-legend{display:flex;gap:18px;flex-wrap:wrap;font-family:var(--font-mono);font-size:0.7rem;color:var(--ash);}
+  .sector-legend span.dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;}
+
+  /* Cards / grids */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;}
+  .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:34px;}
+  .card h3{font-size:1rem;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .card p, .card li{font-size:0.9rem;color:var(--ash);}
+  .card ul{padding-left:18px;margin-top:8px;}
+  .card li{margin-bottom:6px;}
+
+  /* Tags */
+  .tag{display:inline-block;font-family:var(--font-mono);font-size:0.64rem;text-transform:uppercase;letter-spacing:0.05em;padding:3px 8px;border-radius:20px;border:1px solid;}
+  .tag-gate{color:var(--amber);border-color:var(--amber-dim);background:var(--amber-glow);}
+  .tag-prog{color:var(--peri);border-color:var(--peri-dim);background:var(--peri-glow);}
+  .tag-shared{color:var(--plum);border-color:var(--plum-dim);background:rgba(154,103,174,0.14);}
+
+  /* Tables */
+  table{width:100%;border-collapse:collapse;margin-bottom:8px;}
+  th{text-align:left;font-family:var(--font-mono);font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--ash-dim);padding:0 14px 10px;border-bottom:1px solid var(--border);font-weight:500;}
+  td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:0.87rem;vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  .tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:30px;}
+  .tbl-wrap table{margin-bottom:0;}
+  .tbl-wrap th:first-child, .tbl-wrap td:first-child{padding-left:20px;}
+  .col-time{font-family:var(--font-mono);color:var(--ash);white-space:nowrap;font-size:0.8rem;}
+  .col-strong{color:var(--paper);font-weight:500;}
+
+  /* Timeline (schedule) specific */
+  .timeline-row td{border-bottom:1px solid var(--border);}
+  .block-title{color:var(--paper);font-weight:600;margin-bottom:3px;}
+  .block-desc{color:var(--ash);font-size:0.83rem;}
+
+  /* Callout */
+  .callout{border-left:3px solid var(--amber);background:var(--amber-glow);border-radius:0 12px 12px 0;padding:16px 20px;margin:24px 0;font-size:0.88rem;color:var(--paper);}
+  .callout.peri{border-left-color:var(--peri);background:var(--peri-glow);}
+  .callout.plum{border-left-color:var(--plum);background:rgba(154,103,174,0.12);}
+  .callout b{color:inherit;}
+
+  /* Phase blocks (GATE / Programmer plans) */
+  .phase-block{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:18px;}
+  .phase-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+  .phase-head h3{font-size:1.15rem;}
+  .phase-dates{font-family:var(--font-mono);font-size:0.72rem;color:var(--ash-dim);}
+  .phase-body{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+  .phase-col-label{font-family:var(--font-mono);font-size:0.64rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--ash-dim);margin-bottom:8px;}
+  .phase-col ul{padding-left:16px;}
+  .phase-col li{font-size:0.87rem;color:var(--ash);margin-bottom:5px;}
+  .phase-col li b{color:var(--paper);font-weight:500;}
+  .res-line{font-size:0.83rem;color:var(--ash);margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);}
+  .res-line a{color:var(--peri);}
+
+  /* Milestones */
+  .milestone-list{display:flex;flex-direction:column;gap:2px;}
+  .milestone-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;cursor:pointer;transition:background 0.15s;}
+  .milestone-item:hover{background:var(--surface-2);}
+  .milestone-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--ash-dim);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.7rem;transition:all 0.15s;}
+  .milestone-item.done .milestone-check{background:var(--good);border-color:var(--good);color:var(--ink);}
+  .milestone-item.done .mlabel{color:var(--ash-dim);text-decoration:line-through;}
+  .mlabel{font-size:0.88rem;color:var(--paper);flex:1;}
+  .mcat{font-family:var(--font-mono);font-size:0.6rem;text-transform:uppercase;color:var(--ash-dim);}
+
+  /* Resource arsenal */
+  .res-cat{margin-bottom:26px;}
+  .res-cat h4{font-family:var(--font-mono);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--ash-dim);margin-bottom:10px;}
+  .res-item{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;background:var(--surface);}
+  .res-item .rname{font-size:0.88rem;color:var(--paper);font-weight:500;}
+  .res-item .rdesc{font-size:0.78rem;color:var(--ash-dim);margin-top:2px;}
+  .res-item a{font-family:var(--font-mono);font-size:0.74rem;white-space:nowrap;margin-left:16px;}
+
+  footer.credits{margin-top:60px;padding-top:20px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:0.7rem;color:var(--ash-dim);}
+
+  /* Scrollbar */
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-track{background:var(--ink);}
+  ::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:5px;}
+
+  @media (max-width:900px){
+    .app{grid-template-columns:1fr;}
+    .rail{display:none;}
+    .mobile-bar{
+      display:flex;position:sticky;top:0;z-index:5;background:var(--surface);
+      border-bottom:1px solid var(--border);padding:14px 16px;gap:14px;
+      align-items:center;overflow-x:auto;white-space:nowrap;
+    }
+    .mobile-bar .brand-mark{font-size:0.95rem;flex-shrink:0;}
+    .mobile-nav-item{font-family:var(--font-mono);font-size:0.7rem;color:var(--ash);padding:6px 10px;border-radius:20px;border:1px solid var(--border);flex-shrink:0;cursor:pointer;}
+    .mobile-nav-item.active{color:var(--ink);background:var(--amber);border-color:var(--amber);}
+    .main{padding:32px 20px 80px;}
+    .hero h1{font-size:1.9rem;}
+    .clock-grid{grid-template-columns:1fr;}
+    .card-grid{grid-template-columns:1fr;}
+    .phase-body{grid-template-columns:1fr;}
+    table, thead, tbody, th, td, tr{display:block;}
+    .tbl-wrap thead{display:none;}
+    .tbl-wrap tr{padding:14px 16px;border-bottom:1px solid var(--border);}
+    .tbl-wrap td{border:none;padding:3px 0;}
+  }
+</style>
+</head>
+<body>
+
+<div class="mobile-bar" id="mobileBar">
+  <span class="brand-mark">GM<span style="color:var(--amber)">//</span>27</span>
+</div>
+
+<div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <div class="brand-mark">GODMODE <span>// 2027</span></div>
+      <div class="brand-sub">Shivprasad · Backend Engineer + AIR 1</div>
+    </div>
+
+    <div class="rail-block">
+      <div class="rail-label">Live Clocks</div>
+      <div class="ticker-item">
+        <span class="ticker-name">Internship</span>
+        <span class="ticker-val peri mono" id="tickIntern">—</span>
+      </div>
+      <div class="ticker-item">
+        <span class="ticker-name">GATE Exam</span>
+        <span class="ticker-val amber mono" id="tickGate">—</span>
+      </div>
+    </div>
+
+    <div class="rail-block">
+      <div class="rail-label">Sector Map</div>
+      <div class="sector-mini" id="sectorMini"></div>
+      <div class="sector-now-label" id="sectorNowLabel">—</div>
+    </div>
+
+    <div class="rail-block" style="flex:1;">
+      <div class="rail-label">Navigate</div>
+      <nav class="nav" id="navList">
+        <div class="nav-item" data-target="dashboard"><span class="num">01</span> Command Center</div>
+        <div class="nav-item" data-target="convergence"><span class="num">02</span> The Convergence</div>
+        <div class="nav-item" data-target="college-day"><span class="num">03</span> College-Day Protocol</div>
+        <div class="nav-item" data-target="non-college-day"><span class="num">04</span> Non-College Protocol</div>
+        <div class="nav-item" data-target="gate-plan"><span class="num">05</span> GATE Battle Plan</div>
+        <div class="nav-item" data-target="programmer-plan"><span class="num">06</span> Programmer Ascension</div>
+        <div class="nav-item" data-target="internship-plan"><span class="num">07</span> Internship Assault</div>
+        <div class="nav-item" data-target="resources"><span class="num">08</span> Resource Arsenal</div>
+      </nav>
+    </div>
+
+    <div class="rail-footer">TODAY // <span id="todayMono"></span></div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ============ 01 DASHBOARD ============ -->
+    <section class="section active" id="sec-dashboard">
+      <div class="hero">
+        <div class="eyebrow">Command Center</div>
+        <h1>Two clocks.<br>One <span class="amber">driver</span>. One <span class="peri">system</span>.</h1>
+        <p class="hero-sub">A remote SDE internship by December. AIR 1 in February. Both run on the same fuel: DSA, OS, CN, DBMS, COA — the stuff that's on the GATE syllabus AND in every backend interview. This is the operating system for the next 30 weeks. No filler, no motivation posters. Just the machine.</p>
+
+        <div class="clock-grid">
+          <div class="clock-card intern">
+            <div class="clabel">Internship Deadline · 31 Dec 2026</div>
+            <div class="cval mono" id="cdIntern">—</div>
+            <div class="csub">days left to lock an offer</div>
+          </div>
+          <div class="clock-card gate">
+            <div class="clabel">GATE Exam Window · Early Feb 2027</div>
+            <div class="cval mono" id="cdGate">—</div>
+            <div class="csub">days left · dates are tentative, IIT Madras confirms ~Aug 2026</div>
+          </div>
+          <div class="clock-card">
+            <div class="clabel">GATE Prep Lock · 31 Jan 2027</div>
+            <div class="cval mono" id="cdGatePrep">—</div>
+            <div class="csub">days of new content left before pure revision</div>
+          </div>
+        </div>
+
+        <div class="sector-full">
+          <div class="sector-full-head">
+            <h3 style="font-size:1rem;">The Lap — 13 Jul 2026 → 06 Feb 2027</h3>
+            <div class="now" id="sectorFullNow">—</div>
+          </div>
+          <div class="sector-bar" id="sectorBar"></div>
+          <div class="sector-legend" id="sectorLegend"></div>
+        </div>
+      </div>
+
+      <h2 class="title">Mission Briefing</h2>
+      <p class="lede">Read this once. It's the whole strategy in four moves.</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <h3><span class="tag tag-shared">01</span> Stack, don't split</h3>
+          <p>You are not running two prep tracks. You're running one deep-CS campaign with two scoreboards. Every hour on DSA, OS, CN, DBMS, and COA pays both the GATE examiner and the interviewer. That's ~80% of the syllabus doing double duty. See <b>The Convergence</b>.</p>
+        </div>
+        <div class="card">
+          <h3><span class="tag tag-shared">02</span> Peak on purpose</h3>
+          <p>Champions don't run at 100% every week for 7 months — they periodize. Foundation → Completion → Consolidation → Sharpening. Syllabus complete by mid-October (same date GO Classes builds their own batch around), so November–January is pure sharpening, not scrambling.</p>
+        </div>
+        <div class="card">
+          <h3><span class="tag tag-shared">03</span> Backward-plan the internship</h3>
+          <p>"Deadline: 31 Dec" is not "start applying 31 Dec." Interview pipelines take 3–6 weeks. Portfolio + resume go live by early September. Applications ramp through September–November so offers can land by December.</p>
+        </div>
+        <div class="card">
+          <h3><span class="tag tag-shared">04</span> Protect the machine</h3>
+          <p>7 hours of sleep isn't rest, it's a performance setting — this is when consolidation into long-term memory happens. A brain running on 5 hours loses more processing speed than the extra study hour buys back. Every schedule below is built around this on purpose.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <b>The Struggle Protocol still applies here.</b> Every DSA problem gets a fixed timebox (30–40 min) of real, undistracted attempt before you touch a hint or editorial. Log it either way — solved or not — in your error log. The struggle is where the pattern gets wired in, not the solution.
+      </div>
+
+      <h2 class="title" style="margin-top:50px;">Milestone Tracker</h2>
+      <p class="lede">Tap to mark complete. Saved automatically to this browser.</p>
+      <div class="card" style="padding:8px 8px;">
+        <div class="milestone-list" id="milestoneList"></div>
+      </div>
+    </section>
+
+    <!-- ============ 02 CONVERGENCE ============ -->
+    <section class="section" id="sec-convergence">
+      <div class="eyebrow">02 · Strategy</div>
+      <h2 class="title">The Convergence</h2>
+      <p class="lede">This is the single insight the whole plan is built on: the GATE CS syllabus and the "elite backend engineer" curriculum are not two lists — they're the same list, viewed from two angles. Roughly 80% of GATE's technical weight is also core professional engineering literacy.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:22%">GATE Subject</th><th>What It Actually Builds</th><th style="width:14%">GATE Weight</th></tr></thead>
+          <tbody id="convergenceTable"></tbody>
+        </table>
+      </div>
+
+      <div class="callout peri">
+        <b>What's NOT shared</b> — System Design (HLD/LLD), Docker/Kubernetes/Redis, and framework-specific work (Next.js/MERN) don't appear on the GATE syllabus at all. These are the genuinely separate 20% — the layer that makes you hireable on top of being GATE-ready. They get dedicated blocks in every schedule below, never sacrificed for GATE revision.
+      </div>
+    </section>
+
+    <!-- ============ 03 COLLEGE DAY ============ -->
+    <section class="section" id="sec-college-day">
+      <div class="eyebrow">03 · Weekday Protocol</div>
+      <h2 class="title">College-Day Protocol</h2>
+      <p class="lede">Ready-for-college at 8:00, class 9:00, home 4:30, walking commute both ways. ~6.5 hours of deep, structured work fit around a full college day — plus the walk and the classroom dead-time turned into passive gains.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:14%">Time</th><th style="width:10%">Track</th><th>Block</th></tr></thead>
+          <tbody id="collegeTimeline"></tbody>
+        </table>
+      </div>
+
+      <div class="callout plum">
+        <b>Dead-time isn't dead.</b> Walk to college = audio layer (GATE concept audio / your own recorded notes / a tech podcast). Every college break = a 5-minute flashcard pass on your phone (formulas, edge cases, syntax you keep forgetting). None of this is scheduled above because it's opportunistic — grab it when it appears.
+      </div>
+    </section>
+
+    <!-- ============ 04 NON-COLLEGE DAY ============ -->
+    <section class="section" id="sec-non-college-day">
+      <div class="eyebrow">04 · Full-Send Protocol</div>
+      <h2 class="title">Non-College-Day Protocol</h2>
+      <p class="lede">The full day is yours. ~12 hours of structured deep work, still with real breaks, real meals, and 7+ hours of sleep. This is the upper edge of what serious GATE toppers and competitive programmers actually report doing during peak prep — not a fantasy number.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:14%">Time</th><th style="width:10%">Track</th><th>Block</th></tr></thead>
+          <tbody id="nonCollegeTimeline"></tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <b>Sector shift:</b> once you're inside the Sharpening phase (from ~21 Dec), every second non-college day becomes a full-length timed GATE mock, run at the exact exam session timing. Mock-test alignment with real exam timing is a standard topper technique — it trains your body clock, not just your brain.
+      </div>
+    </section>
+
+    <!-- ============ 05 GATE PLAN ============ -->
+    <section class="section" id="sec-gate-plan">
+      <div class="eyebrow">05 · Goal 2</div>
+      <h2 class="title">GATE Battle Plan</h2>
+      <p class="lede">GATE CS/IT 2027, conducted by IIT Madras, expected first two weekends of February 2027. 100 marks, 65 questions, 3 hours, MCQ + MSQ + NAT, General Aptitude fixed at 15 marks. Registration opens ~August 2026 — notification is due any day now.</p>
+
+      <div id="gatePhases"></div>
+
+      <h3 style="margin:36px 0 14px;font-size:1.1rem;">Weightage Reality (5–10 year trend)</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:30%">Tier</th><th>Subjects</th></tr></thead>
+          <tbody id="weightageTable"></tbody>
+        </table>
+      </div>
+      <div class="callout amber">
+        <b>Read this as triage, not permission to skip.</b> Low-weightage subjects still cost you marks if ignored completely — but when time is short in Sharpening, Tier 1 gets first claim on every revision hour.
+      </div>
+    </section>
+
+    <!-- ============ 06 PROGRAMMER PLAN ============ -->
+    <section class="section" id="sec-programmer-plan">
+      <div class="eyebrow">06 · The God-Tier Layer</div>
+      <h2 class="title">Programmer Ascension</h2>
+      <p class="lede">Four tracks running in parallel across the same four phases. DSA is fully shared with GATE (see The Convergence) — the other three are the pure-engineering layer that GATE doesn't test but every real job does.</p>
+      <div id="progTracks"></div>
+    </section>
+
+    <!-- ============ 07 INTERNSHIP PLAN ============ -->
+    <section class="section" id="sec-internship-plan">
+      <div class="eyebrow">07 · Goal 1</div>
+      <h2 class="title">Internship Assault</h2>
+      <p class="lede">Backward-planned from 31 Dec 2026. Interview pipelines take 3–6 weeks from first application to offer, so the real deadline for your <i>first serious application</i> is early September, not December.</p>
+
+      <div id="internTimeline"></div>
+
+      <h3 style="margin:36px 0 14px;font-size:1.1rem;">Where to Apply</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:20%">Platform</th><th>What It's Good For</th></tr></thead>
+          <tbody id="platformTable"></tbody>
+        </table>
+      </div>
+
+      <div class="callout peri">
+        <b>Your X account is a recruiting channel, not a side project.</b> @Shivdev2807 already has real developer content. Every project you ship in the Programmer Ascension track becomes a build-in-public thread. Recruiters at small/remote-first teams look at GitHub + X before they look at a resume.
+      </div>
+    </section>
+
+    <!-- ============ 08 RESOURCES ============ -->
+    <section class="section" id="sec-resources">
+      <div class="eyebrow">08 · Arsenal</div>
+      <h2 class="title">Resource Arsenal</h2>
+      <p class="lede">Everything referenced above, in one place. Verified as of July 2026.</p>
+      <div id="resourceCats"></div>
+
+      <footer class="credits">GODMODE // 2027 — built 12 Jul 2026 · data lives only in this browser (window.storage) · edit the JS object at the bottom of this file to adjust any schedule, phase, or resource</footer>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+</script>
+</body>
+</html>
