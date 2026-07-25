@@ -109,7 +109,9 @@ consumePromiseFive()
 async function getallUsers() {
     try {
         const response = await fetch('https://jsonplaceholder.typicode.com/users')
-        const data = response.json()
+        // console.log(response);
+
+        const data = await response.json()
         console.log(data);
     } catch (error) {
         console.log("E: ",error);
