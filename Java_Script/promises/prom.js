@@ -81,3 +81,22 @@ promiseFour
 })
 .finally(() => console.log("The promise is either resolved or rejected"))//!finally is like default
 
+
+const promiseFive = new Promise((resolve, reject) => {
+    setTimeout(function(){
+        let error = true
+        if(!error){
+            resolve({username:"js",password:"123"})
+        }else{
+            reject('ERROR: js went wrong')
+        }
+    },1000)
+})
+
+// promiseFive.then()
+
+async function consumePromiseFive(){
+    const response = await promiseFive
+    console.log(response);
+    
+}
