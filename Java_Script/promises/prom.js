@@ -95,8 +95,9 @@ const promiseFive = new Promise((resolve, reject) => {
 
 // promiseFive.then()
 
-async function consumePromiseFive(){
+async function consumePromiseFive(){ //! async does nto directly handle errors try and catch block
     const response = await promiseFive
     console.log(response);
-    
 }
+
+consumePromiseFive()
