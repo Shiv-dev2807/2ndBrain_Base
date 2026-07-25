@@ -128,3 +128,7 @@ fetch('https://jsonplaceholder.typicode.com/users')
     console.log(data);
 })
 .catch((error)=>console.log(error))
+
+
+//! data coming 1st in output why? then other async? why? 
+//? 
