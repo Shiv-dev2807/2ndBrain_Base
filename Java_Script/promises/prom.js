@@ -68,12 +68,15 @@ const promiseFour = new Promise(function(resolve,reject){
 
 // promiseFour.then().catch()
 
-promiseFour.then((user)=>{
+promiseFour
+.then((user)=>{
     console.log(user);
     return user.username
-}).then((username)=>{
+})
+.then((username)=>{
     console.log(username);
-}).catch(function(error){
+})
+.catch(function(error){
     console.log(error);  
 })
 
