@@ -1,5 +1,7 @@
 // consume mostly
 
+const { use } = require("react");
+
 // fetch('http://sss.com').then().catch().finally()
 
 //object representing eventual completion
@@ -42,3 +44,12 @@ new Promise(function(resolve,reject){
 
 
 
+const promiseThree = new Promise(function(resolve,reject){
+    setTimeout(function(){
+        resolve({username:"Shiv",email:"shiv@examplegmail.com"})
+    },1000)
+})
+
+promiseThree.then(function(user){
+    console.log(user);
+})
