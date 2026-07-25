@@ -106,16 +106,25 @@ async function consumePromiseFive(){ //! async does nto directly handle errors |
 
 consumePromiseFive()
 
-async function getallUsers() {
-    try {
-        const response = await fetch('https://jsonplaceholder.typicode.com/users')
-        // console.log(response);
+// async function getallUsers() {
+//     try {
+//         const response = await fetch('https://jsonplaceholder.typicode.com/users')
+//         // console.log(response);
 
-        const data = await response.json()
-        console.log(data);
-    } catch (error) {
-        console.log("E: ",error);
-    }
-}
+//         const data = await response.json()
+//         console.log(data);
+//     } catch (error) {
+//         console.log("E: ",error);
+//     }
+// }
 
-getallUsers()
+// getallUsers()
+
+fetch('https://jsonplaceholder.typicode.com/users')
+.then((response)=>{
+    return response.json()
+})
+.then((data)=>{//chainable thenable
+    console.log(data);
+})
+.catch((error)=>console.log(error))
