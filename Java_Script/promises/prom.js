@@ -105,3 +105,11 @@ async function consumePromiseFive(){ //! async does nto directly handle errors |
 }
 
 consumePromiseFive()
+
+async function getallUsers() {
+    const response = await fetch('https://jsonplaceholder.typicode.com/users')
+    const data = response.json()
+    console.log(data);
+}
+
+getallUsers()
