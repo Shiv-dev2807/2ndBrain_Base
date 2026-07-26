@@ -21,3 +21,11 @@ goes to network and gets response it goes to => onfulfilled[]
 
 cannot go to network or does not get response or stuck response then
 it goes to => onrejection[]
+
+
+data is empty (undefined can say)
+from network request either we get onfulfilled or on rejection 
+these 2 has functions(which are responsible to fullfilled the data)
+
+once data fullfiled
+data is responsible to fullfill the global variable that we created in this case response
