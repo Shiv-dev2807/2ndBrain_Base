@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>PROJECT AIR-1 · GATE CS 2027 Command Center</title>
+<meta name="description" content="Personal command center for GATE CS 2027 preparation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   PROJECT AIR-1 — Design Tokens
+   ============================================================ */
+:root{
+  --bg:            #090b0f;
+  --bg-panel:      #12151c;
+  --bg-elevated:   #181c25;
+  --bg-hover:      #1e2330;
+  --border:        #242a37;
+  --border-soft:   #1a1f2a;
+
+  --text:          #eceff4;
+  --text-dim:      #8b93a6;
+  --text-faint:    #545c6e;
+
+  --amber:         #e8a23d;
+  --amber-dim:     #7a5c2a;
+  --amber-glow:    rgba(232,162,61,.14);
+
+  --cyan:          #3fd4c8;
+  --cyan-dim:      #245e58;
+  --cyan-glow:     rgba(63,212,200,.13);
+
+  --green:         #52d68a;
+  --green-glow:    rgba(82,214,138,.13);
+
+  --red:           #f0566d;
+  --red-glow:      rgba(240,86,109,.13);
+
+  --violet:        #9c8cf0;
+
+  --font-display:  'Space Grotesk', sans-serif;
+  --font-body:     'Inter', sans-serif;
+  --font-mono:     'JetBrains Mono', monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --sidebar-w: 236px;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0;
+  background:
+    radial-gradient(1100px 620px at 84% -8%, rgba(232,162,61,.07), transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, rgba(63,212,200,.06), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+::selection{ background:var(--amber); color:#14100a; }
+::-webkit-scrollbar{ width:10px; height:10px; }
+::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar-thumb{ background:#262b38; border-radius:8px; border:2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover{ background:#323949; }
+
+a{ color:inherit; }
+h1,h2,h3,h4{ font-family:var(--font-display); margin:0; letter-spacing:-0.01em; }
+p{ margin:0; }
+button{ font-family:var(--font-body); cursor:pointer; }
+input,textarea,select{ font-family:var(--font-body); }
+
+.mono{ font-family:var(--font-mono); }
+.dim{ color:var(--text-dim); }
+.faint{ color:var(--text-faint); }
+
+/* focus visibility */
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible{
+  outline:2px solid var(--cyan); outline-offset:2px; border-radius:4px;
+}
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; transition-duration:.001ms !important; scroll-behavior:auto !important; }
+}
+
+/* ============================================================
+   Shell layout
+   ============================================================ */
+.shell{ display:flex; min-height:100vh; }
+
+/* ---------- Sidebar ---------- */
+.sidebar{
+  width:var(--sidebar-w);
+  flex-shrink:0;
+  background:linear-gradient(180deg, var(--bg-panel), #0d1015);
+  border-right:1px solid var(--border-soft);
+  display:flex;
+  flex-direction:column;
+  position:sticky;
+  top:0;
+  height:100vh;
+  z-index:40;
+}
+.brand{
+  padding:22px 20px 16px;
+  border-bottom:1px solid var(--border-soft);
+}
+.brand-tag{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:.18em;
+  color:var(--amber);
+  text-transform:uppercase;
+}
+.brand-name{
+  font-family:var(--font-display);
+  font-size:19px;
+  font-weight:700;
+  margin-top:4px;
+  letter-spacing:-0.01em;
+}
+.brand-sub{
+  font-size:11px;
+  color:var(--text-faint);
+  margin-top:2px;
+  font-family:var(--font-mono);
+}
+
+.navlist{ list-style:none; margin:0; padding:14px 10px; flex:1; overflow-y:auto; }
+.navlist li{ margin-bottom:2px; }
+.navlink{
+  display:flex; align-items:center; gap:11px;
+  padding:9px 10px; border-radius:var(--radius-sm);
+  text-decoration:none; color:var(--text-dim);
+  font-size:13.5px; font-weight:500;
+  transition:background .15s, color .15s;
+  border:1px solid transparent;
+}
+.navlink:hover{ background:var(--bg-hover); color:var(--text); }
+.navlink.active{
+  background:var(--amber-glow);
+  color:var(--amber);
+  border-color:rgba(232,162,61,.28);
+}
+.navcode{
+  font-family:var(--font-mono); font-size:10px; font-weight:700;
+  width:26px; height:20px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:4px; background:var(--bg-elevated); color:var(--text-faint);
+  letter-spacing:.02em;
+}
+.navlink.active .navcode{ background:rgba(232,162,61,.22); color:var(--amber); }
+.nav-section-label{
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--text-faint);
+  padding:14px 10px 6px;
+}
+
+.sidebar-foot{
+  padding:14px 20px 18px; border-top:1px solid var(--border-soft);
+  font-size:11px; color:var(--text-faint); font-family:var(--font-mono);
+}
+
+/* mobile topbar / hamburger */
+.mobile-topbar{ display:none; }
+
+/* ---------- Main ---------- */
+.main{ flex:1; min-width:0; display:flex; flex-direction:column; }
+
+.hud{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px; padding:16px 30px; border-bottom:1px solid var(--border-soft);
+  background:rgba(9,11,15,.7); backdrop-filter:blur(6px);
+  position:sticky; top:0; z-index:30; flex-wrap:wrap;
+}
+.hud-left{ display:flex; flex-direction:column; gap:2px; }
+.hud-title{ font-family:var(--font-display); font-size:20px; font-weight:700; }
+.hud-date{ font-size:12px; color:var(--text-faint); font-family:var(--font-mono); }
+
+.hud-right{ display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
+.hud-stat{ text-align:right; }
+.hud-stat-label{ font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); font-family:var(--font-mono); }
+.hud-stat-value{ font-family:var(--font-mono); font-size:16px; font-weight:600; color:var(--amber); }
+
+.rank-chip{
+  display:flex; align-items:center; gap:8px;
+  padding:6px 12px 6px 6px; border-radius:100px;
+  background:var(--bg-elevated); border:1px solid var(--border);
+}
+.rank-dot{ width:10px; height:10px; border-radius:50%; background:var(--cyan); box-shadow:0 0 10px var(--cyan); }
+.rank-chip-text{ font-family:var(--font-mono); font-size:11.5px; }
+.rank-chip-text b{ color:var(--text); }
+
+.view{ padding:28px 30px 80px; max-width:1180px; }
+.view[hidden]{ display:none; }
+
+/* ============================================================
+   Reusable components
+   ============================================================ */
+.eyebrow{
+  font-family:var(--font-mono); font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--amber); margin-bottom:8px; display:block;
+}
+.page-title{ font-size:30px; font-weight:700; margin-bottom:6px; }
+.page-lede{ color:var(--text-dim); font-size:14.5px; max-width:640px; margin-bottom:28px; }
+
+.grid{ display:grid; gap:16px; }
+.grid-2{ grid-template-columns:1fr 1fr; }
+.grid-3{ grid-template-columns:repeat(3,1fr); }
+.grid-4{ grid-template-columns:repeat(4,1fr); }
+@media (max-width:1000px){ .grid-3{ grid-template-columns:repeat(2,1fr);} .grid-4{ grid-template-columns:repeat(2,1fr);} }
+@media (max-width:640px){ .grid-2,.grid-3,.grid-4{ grid-template-columns:1fr; } }
+
+.card{
+  background:linear-gradient(180deg, var(--bg-panel), var(--bg-elevated) 180%);
+  border:1px solid var(--border); border-radius:var(--radius-lg);
+  padding:20px;
+}
+.card-flush{ padding:0; overflow:hidden; }
+.card-title{ font-family:var(--font-display); font-size:15px; font-weight:600; margin-bottom:2px; }
+.card-sub{ font-size:12px; color:var(--text-faint); margin-bottom:14px; }
+
+.btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:9px 16px; border-radius:8px; border:1px solid var(--border);
+  background:var(--bg-elevated); color:var(--text); font-size:13px; font-weight:600;
+  transition:border-color .15s, background .15s, transform .1s;
+}
+.btn:hover{ border-color:var(--amber); background:var(--bg-hover); }
+.btn:active{ transform:scale(.97); }
+.btn-primary{ background:var(--amber); color:#1a1206; border-color:var(--amber); }
+.btn-primary:hover{ background:#f0ad52; border-color:#f0ad52; }
+.btn-sm{ padding:6px 11px; font-size:12px; border-radius:6px; }
+.btn-danger:hover{ border-color:var(--red); }
+.btn-ghost{ background:transparent; }
+
+.pill{
+  display:inline-flex; align-items:center; gap:5px; padding:3px 9px;
+  border-radius:100px; font-size:10.5px; font-family:var(--font-mono);
+  font-weight:600; letter-spacing:.02em; border:1px solid var(--border);
+  color:var(--text-dim); background:var(--bg-elevated); white-space:nowrap;
+}
+.pill-amber{ color:var(--amber); border-color:rgba(232,162,61,.35); background:var(--amber-glow); }
+.pill-cyan{ color:var(--cyan); border-color:rgba(63,212,200,.35); background:var(--cyan-glow); }
+.pill-green{ color:var(--green); border-color:rgba(82,214,138,.35); background:var(--green-glow); }
+.pill-red{ color:var(--red); border-color:rgba(240,86,109,.35); background:var(--red-glow); }
+
+.progress-track{ height:8px; border-radius:100px; background:var(--bg-elevated); overflow:hidden; border:1px solid var(--border-soft); }
+.progress-fill{ height:100%; border-radius:100px; background:linear-gradient(90deg, var(--cyan), var(--amber)); transition:width .4s ease; }
+
+.divider{ height:1px; background:var(--border-soft); margin:22px 0; border:none; }
+
+.tag-row{ display:flex; flex-wrap:wrap; gap:6px; }
+
+textarea.gnote, input.ginput{
+  width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text);
+  border-radius:8px; padding:10px 12px; font-size:13px; resize:vertical;
+}
+textarea.gnote:focus, input.ginput:focus{ border-color:var(--cyan); }
+select.gselect{ background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:9px 10px; font-size:13px; }
+
+.empty-state{ text-align:center; padding:40px 20px; color:var(--text-faint); }
+.empty-state b{ color:var(--text-dim); display:block; margin-bottom:4px; font-family:var(--font-display); font-size:15px;}
+
+/* checklist rows */
+.topic-row{
+  display:flex; align-items:flex-start; gap:11px; padding:9px 4px; border-radius:8px;
+  border-bottom:1px solid var(--border-soft);
+}
+.topic-row:last-child{ border-bottom:none; }
+.topic-row input[type=checkbox]{ margin-top:3px; }
+.topic-row.done .topic-label{ color:var(--text-faint); text-decoration:line-through; }
+.topic-label{ font-size:13.5px; flex:1; }
+
+/* checkbox custom */
+input[type=checkbox]{
+  appearance:none; -webkit-appearance:none; width:18px; height:18px; border-radius:5px;
+  border:1.5px solid var(--border); background:var(--bg); flex-shrink:0; cursor:pointer; position:relative;
+  transition:border-color .15s, background .15s;
+}
+input[type=checkbox]:checked{ background:var(--amber); border-color:var(--amber); }
+input[type=checkbox]:checked::after{
+  content:''; position:absolute; left:5px; top:1px; width:5px; height:9px;
+  border:solid #1a1206; border-width:0 2px 2px 0; transform:rotate(45deg);
+}
+
+table.dtable{ width:100%; border-collapse:collapse; font-size:13px; }
+table.dtable th{ text-align:left; font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-faint); font-weight:600; padding:8px 10px; border-bottom:1px solid var(--border); }
+table.dtable td{ padding:9px 10px; border-bottom:1px solid var(--border-soft); vertical-align:top; }
+table.dtable tr:last-child td{ border-bottom:none; }
+
+.hero-ring-wrap{ position:relative; width:168px; height:168px; flex-shrink:0; }
+.hero-ring-wrap svg{ width:100%; height:100%; transform:rotate(-90deg); }
+.hero-ring-track{ fill:none; stroke:var(--bg-elevated); stroke-width:9; }
+.hero-ring-fill{ fill:none; stroke:url(#ringGrad); stroke-width:9; stroke-linecap:round; transition:stroke-dashoffset .6s ease; }
+.hero-ring-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.hero-ring-num{ font-family:var(--font-mono); font-size:34px; font-weight:700; line-height:1; }
+.hero-ring-label{ font-size:9.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.1em; margin-top:4px; font-family:var(--font-mono); }
+
+.timeline{ position:relative; padding-left:26px; }
+.timeline::before{ content:''; position:absolute; left:6px; top:6px; bottom:6px; width:2px; background:linear-gradient(180deg, var(--amber), var(--cyan), var(--border)); }
+.tl-item{ position:relative; padding-bottom:22px; }
+.tl-item::before{
+  content:''; position:absolute; left:-26px; top:3px; width:13px; height:13px; border-radius:50%;
+  background:var(--bg); border:2px solid var(--amber);
+}
+.tl-item.tl-current::before{ background:var(--amber); box-shadow:0 0 0 4px var(--amber-glow); }
+.tl-item.tl-done::before{ border-color:var(--green); background:var(--green); }
+.tl-item.tl-future::before{ border-color:var(--border); }
+.tl-phase{ font-family:var(--font-mono); font-size:10.5px; color:var(--amber); letter-spacing:.06em; }
+.tl-title{ font-family:var(--font-display); font-weight:600; font-size:15px; margin:2px 0 4px; }
+.tl-dates{ font-size:11px; color:var(--text-faint); font-family:var(--font-mono); margin-bottom:6px; }
+.tl-desc{ font-size:13px; color:var(--text-dim); }
+
+.callout{
+  border:1px solid var(--border); border-left:3px solid var(--amber);
+  background:var(--bg-elevated); border-radius:0 var(--radius-md) var(--radius-md) 0;
+  padding:14px 16px; font-size:13.5px; color:var(--text-dim);
+}
+.callout b{ color:var(--text); }
+.callout-cyan{ border-left-color:var(--cyan); }
+.callout-red{ border-left-color:var(--red); }
+.callout-green{ border-left-color:var(--green); }
+
+.accordion-item{ border:1px solid var(--border); border-radius:var(--radius-md); margin-bottom:10px; overflow:hidden; background:var(--bg-panel); }
+.accordion-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; cursor:pointer; gap:10px; }
+.accordion-head:hover{ background:var(--bg-hover); }
+.accordion-title{ font-family:var(--font-display); font-weight:600; font-size:14.5px; display:flex; align-items:center; gap:10px; }
+.accordion-chev{ transition:transform .2s; color:var(--text-faint); flex-shrink:0; }
+.accordion-item.open .accordion-chev{ transform:rotate(180deg); }
+.accordion-body{ display:none; padding:0 16px 16px; font-size:13.5px; color:var(--text-dim); }
+.accordion-item.open .accordion-body{ display:block; }
+.accordion-body ul{ margin:6px 0; padding-left:18px; }
+.accordion-body li{ margin-bottom:5px; }
+
+.subject-code{
+  font-family:var(--font-mono); font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px;
+  background:var(--bg); border:1px solid var(--border); color:var(--text-dim);
+}
+
+.two-col{ display:grid; grid-template-columns:220px 1fr; gap:24px; }
+@media (max-width:800px){ .two-col{ grid-template-columns:1fr; } }
+
+.subnav{ display:flex; flex-direction:column; gap:2px; position:sticky; top:90px; }
+.subnav button{
+  text-align:left; padding:8px 12px; border-radius:8px; border:1px solid transparent;
+  background:transparent; color:var(--text-dim); font-size:13px; font-weight:500;
+}
+.subnav button:hover{ background:var(--bg-hover); color:var(--text); }
+.subnav button.active{ background:var(--amber-glow); color:var(--amber); border-color:rgba(232,162,61,.28); }
+
+/* day schedule blocks */
+.dayblock{ display:flex; gap:12px; padding:11px 0; border-bottom:1px solid var(--border-soft); align-items:flex-start; }
+.dayblock:last-child{ border-bottom:none; }
+.dayblock-time{ font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint); width:104px; flex-shrink:0; padding-top:1px; }
+.dayblock-bar{ width:4px; align-self:stretch; border-radius:4px; flex-shrink:0; }
+.dayblock-content{ flex:1; }
+.dayblock-title{ font-weight:600; font-size:13.5px; }
+.dayblock-desc{ font-size:12px; color:var(--text-faint); margin-top:2px; }
+
+.daytabs{ display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap; }
+.daytab{ padding:8px 15px; border-radius:100px; border:1px solid var(--border); background:var(--bg-elevated); font-size:12.5px; font-weight:600; color:var(--text-dim); }
+.daytab.active{ background:var(--amber); color:#1a1206; border-color:var(--amber); }
+
+.stat-big{ font-family:var(--font-mono); font-size:28px; font-weight:700; }
+
+.chartwrap{ width:100%; height:180px; }
+
+.formcard-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+.formcard-row > *{ flex:1; min-width:120px; }
+
+.hidden-below-640{ display:block;}
+@media (max-width:640px){ .hidden-below-640{ display:none; } }
+
+@media (max-width:880px){
+  .shell{ flex-direction:column; }
+  .sidebar{ position:fixed; left:-260px; top:0; height:100vh; transition:left .2s ease; box-shadow:20px 0 60px rgba(0,0,0,.5); }
+  .sidebar.open{ left:0; }
+  .mobile-topbar{
+    display:flex; align-items:center; gap:12px; padding:14px 18px; border-bottom:1px solid var(--border-soft);
+    position:sticky; top:0; background:var(--bg); z-index:50;
+  }
+  .hamb{ width:38px; height:38px; border-radius:8px; border:1px solid var(--border); background:var(--bg-elevated); display:flex; align-items:center; justify-content:center; }
+  .hud{ padding:14px 16px; }
+  .view{ padding:18px 16px 70px; }
+  .backdrop{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:39; }
+  .backdrop.show{ display:block; }
+}
+</style>
+</head>
+<body>
+
+<div class="backdrop" id="backdrop"></div>
+
+<div class="shell">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <span class="brand-tag">Project · AIR-1</span>
+      <div class="brand-name">GATE CS 2027</div>
+      <div class="brand-sub" id="brandDaysLeft">— days to exam</div>
+    </div>
+    <ul class="navlist" id="navlist">
+      <!-- injected by JS -->
+    </ul>
+    <div class="sidebar-foot">
+      Target: 6 Feb 2027<br>Old IITs · CSE M.Tech
+    </div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <div class="main">
+    <div class="mobile-topbar">
+      <button class="hamb" id="hambBtn" aria-label="Open menu">☰</button>
+      <strong style="font-family:var(--font-display)">AIR-1</strong>
+    </div>
+
+    <div class="hud">
+      <div class="hud-left">
+        <div class="hud-title" id="hudTitle">Dashboard</div>
+        <div class="hud-date" id="hudDate">—</div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-stat">
+          <div class="hud-stat-label">D-Day</div>
+          <div class="hud-stat-value" id="hudDday">—</div>
+        </div>
+        <div class="hud-stat hidden-below-640">
+          <div class="hud-stat-label">Phase</div>
+          <div class="hud-stat-value" id="hudPhase" style="color:var(--cyan)">—</div>
+        </div>
+        <div class="rank-chip">
+          <span class="rank-dot" id="rankDot"></span>
+          <span class="rank-chip-text">Tier: <b id="rankLabel">Recruit</b></span>
+        </div>
+      </div>
+    </div>
+
+    <main id="viewport"><!-- views injected by JS --></main>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   PROJECT AIR-1 — Data Layer
+   ================================================================ */
+const EXAM_DATE   = new Date('2027-02-06T09:00:00');
+const START_DATE  = new Date('2026-07-27T00:00:00');
+const TOTAL_DAYS  = Math.round((EXAM_DATE - START_DATE)/86400000);
+
+const NAV = [
+  {sec:'Command'},
+  {id:'dashboard', code:'DB', label:'Dashboard'},
+  {id:'timetable', code:'TT', label:'Timetable'},
+  {id:'strategy',  code:'PL', label:'Master Strategy'},
+  {sec:'Tracking'},
+  {id:'syllabus',  code:'SY', label:'Syllabus Tracker'},
+  {id:'tests',     code:'TS', label:'Test Log'},
+  {id:'mistakes',  code:'MX', label:'Mistake Ledger'},
+  {id:'notes',     code:'SN', label:'Short Notes Vault'},
+  {sec:'Support'},
+  {id:'resources', code:'RS', label:'Resources'},
+  {id:'examday',   code:'ED', label:'Exam-Day Protocol'},
+];
+
+/* ---------------- Syllabus (from GATE 2027 CS + GA official syllabus) ---------------- */
+const SYLLABUS = [
+  { code:'DM', name:'Discrete Mathematics', group:'Foundation', weight:'~12–13 avg', topics:[
+    'Propositional logic','First order logic','Sets','Relations','Functions','Partial orders & lattices',
+    'Monoids','Groups','Graphs — connectivity','Graphs — matching','Graphs — colouring',
+    'Combinatorics — counting','Recurrence relations','Generating functions'
+  ]},
+  { code:'DL', name:'Digital Logic', group:'Foundation', weight:'~5–6 avg', topics:[
+    'Boolean algebra & minimization — algebraic technique','K-map minimization','Tabular (Quine–McCluskey) method',
+    'Combinational circuit design','Sequential circuit design','Number representation (fixed & floating point)',
+    'Binary arithmetic'
+  ]},
+  { code:'DS', name:'Programming & Data Structures', group:'Foundation', weight:'~4–6 avg', topics:[
+    'Programming in C','Recursion','Arrays','Stacks','Queues','Linked lists',
+    'Trees','Binary search trees','Binary heaps','Graphs (as a data structure)'
+  ]},
+  { code:'AL', name:'Algorithms', group:'Core CS', weight:'~8–9 avg', topics:[
+    'Searching','Sorting','Hashing','Asymptotic worst-case time & space complexity',
+    'Greedy design technique','Dynamic programming','Divide & conquer',
+    'Graph traversals','Minimum spanning trees','Shortest paths'
+  ]},
+  { code:'TC', name:'Theory of Computation', group:'Core CS', weight:'~6–7 avg', topics:[
+    'Regular expressions','Finite automata','Context-free grammars','Push-down automata',
+    'Regular languages','Context-free languages','Pumping lemma','Turing machines','Undecidability'
+  ]},
+  { code:'CO', name:'Computer Organization & Architecture', group:'Core CS', weight:'~6–7 avg', topics:[
+    'Instruction sets','Addressing modes','ALU design','Control unit — hardwired',
+    'Control unit — microprogrammed','Memory hierarchy & performance','Cache mapping policies',
+    'I/O interface — interrupt','I/O interface — DMA','Instruction pipelining','Pipeline hazards'
+  ]},
+  { code:'OS', name:'Operating System', group:'Systems', weight:'~6–8 avg', topics:[
+    'System calls','Processes & threads','Inter-process communication','Concurrency & synchronization',
+    'Deadlock','CPU scheduling','I/O scheduling','Memory management','Virtual memory','File systems'
+  ]},
+  { code:'DB', name:'Databases', group:'Systems', weight:'~6–7 avg', topics:[
+    'ER model','Relational algebra','Tuple calculus','SQL','Integrity constraints','Normal forms',
+    'File organization','Indexing — B trees','Indexing — B+ trees','Transactions & concurrency control'
+  ]},
+  { code:'CN', name:'Computer Networks', group:'Systems', weight:'~8–9 avg', topics:[
+    'Principles of layering','Circuit / packet / virtual-circuit switching','Performance metrics',
+    'Data link layer — error detection','Medium access control','Ethernet',
+    'Distance vector routing','Link state routing','IPv4 — fragmentation','CIDR notation','NAT',
+    'TCP — flow control','TCP — congestion control','Socket API','DNS','HTTP'
+  ]},
+  { code:'CD', name:'Compiler Design', group:'Systems', weight:'~3–4 avg', topics:[
+    'Lexical analysis','Parsing','Syntax-directed translation','Runtime environments',
+    'Intermediate code generation','Local optimisation','Constant propagation','Liveness analysis','Common sub-expression elimination'
+  ]},
+  { code:'EM', name:'Engineering Mathematics (Linear Algebra · Calculus · Probability)', group:'Last Mile', weight:'~14 avg', topics:[
+    'Matrices & determinants','System of linear equations','Eigenvalues & eigenvectors','LU decomposition',
+    'Limits, continuity & differentiability','Maxima & minima','Mean value theorem','Integration',
+    'Random variables','Uniform / normal / exponential / Poisson / binomial distributions',
+    'Mean, median, mode, standard deviation','Conditional probability & Bayes theorem'
+  ]},
+  { code:'GA', name:'General Aptitude', group:'Running Thread', weight:'15 fixed', topics:[
+    'Grammar — tenses, articles, prepositions, agreement','Vocabulary — words, idioms, phrases',
+    'Reading comprehension','Narrative sequencing',
+    'Data interpretation — graphs, plots, maps, tables','Ratios, percentages, powers, logarithms',
+    'Permutations & combinations','Series','Mensuration & geometry','Elementary statistics & probability',
+    'Logic — deduction & induction','Analogy','Numerical relations & reasoning',
+    'Shape transformation — rotation, scaling, mirroring','Paper folding, cutting & patterns'
+  ]},
+];
+
+/* ---------------- Master timeline (phase by phase, Jul 27 2026 -> Feb 6 2027) ---------------- */
+const TIMELINE = [
+  {s:'2026-07-27', e:'2026-08-02', code:'DM', title:'Onboarding + Logic & Combinatorics', desc:'Set up trackers, mistake ledger, short-notes vault. Start Discrete Math with Propositional/First-Order Logic and Combinatorics first — this is the bridge topic every other subject leans on.'},
+  {s:'2026-08-03', e:'2026-08-09', code:'DM', title:'Sets, Relations, Functions, POSets', desc:'Continue Discrete Math core structures.'},
+  {s:'2026-08-10', e:'2026-08-16', code:'DM', title:'Groups, Lattices & Graph Theory', desc:'Monoids/Groups, then graph connectivity, matching, colouring.'},
+  {s:'2026-08-17', e:'2026-08-23', code:'DM', title:'Recurrences + DM Revision + Subject Test', desc:'Generating functions & recurrences. Full DM cyclic revision. First subject-wise test.'},
+  {s:'2026-08-24', e:'2026-08-30', code:'DS', title:'C Programming + Recursion', desc:'Compact subject — full lectures, heavy on practice, not theory.'},
+  {s:'2026-08-31', e:'2026-09-06', code:'DL', title:'Digital Logic I', desc:'Boolean algebra, K-map, tabular method, combinational design.'},
+  {s:'2026-09-07', e:'2026-09-13', code:'DL', title:'Digital Logic II + Revision + Test', desc:'Sequential circuits, number representation, fixed/floating point arithmetic.'},
+  {s:'2026-09-14', e:'2026-09-20', code:'DS', title:'Data Structures I', desc:'Arrays, stacks, queues, linked lists.'},
+  {s:'2026-09-21', e:'2026-09-27', code:'DS', title:'Data Structures II + Revision + Test', desc:'Trees, BSTs, binary heaps, graphs as structures.'},
+  {s:'2026-09-28', e:'2026-10-04', code:'AL', title:'Algorithms I', desc:'Asymptotic complexity, searching, sorting, hashing.'},
+  {s:'2026-10-05', e:'2026-10-11', code:'AL', title:'Algorithms II + Revision + Test', desc:'Greedy, DP, divide & conquer, graph algorithms, MST, shortest paths. ★ Weekly full-length tests begin this week — syllabus is ~50% covered.'},
+  {s:'2026-10-12', e:'2026-10-18', code:'TC', title:'Theory of Computation I', desc:'Regular expressions, finite automata.'},
+  {s:'2026-10-19', e:'2026-10-25', code:'TC', title:'Theory of Computation II + Revision + Test', desc:'CFGs, PDA, pumping lemma, Turing machines, undecidability.'},
+  {s:'2026-10-26', e:'2026-11-01', code:'CO', title:'Computer Organization I', desc:'Instruction sets, addressing modes, ALU, control unit design.'},
+  {s:'2026-11-02', e:'2026-11-08', code:'CO', title:'Computer Organization II + Revision + Test', desc:'Memory hierarchy, cache mapping, I/O interfacing, pipelining & hazards.'},
+  {s:'2026-11-09', e:'2026-11-15', code:'OS', title:'Operating Systems I', desc:'Processes, threads, IPC, concurrency, synchronization, deadlock.'},
+  {s:'2026-11-16', e:'2026-11-22', code:'OS', title:'Operating Systems II + Revision + Test', desc:'CPU/IO scheduling, memory management, virtual memory, file systems.'},
+  {s:'2026-11-23', e:'2026-11-29', code:'DB', title:'Databases I', desc:'ER model, relational algebra, tuple calculus, SQL.'},
+  {s:'2026-11-30', e:'2026-12-06', code:'DB', title:'Databases II + Revision + Test', desc:'Normal forms, indexing (B/B+ trees), transactions & concurrency control.'},
+  {s:'2026-12-07', e:'2026-12-13', code:'CN', title:'Computer Networks I', desc:'Layering, switching, data link layer, MAC, Ethernet.'},
+  {s:'2026-12-14', e:'2026-12-20', code:'CN', title:'Computer Networks II + Compiler Design + Test', desc:'Routing, IPv4/CIDR/NAT, TCP, DNS, HTTP. Fold in Compiler Design (small subject) alongside revision.'},
+  {s:'2026-12-21', e:'2026-12-27', code:'EM', title:'Engineering Mathematics I', desc:'Deliberately last: Linear Algebra + Calculus. Formula-heavy — kept fresh close to exam on purpose.'},
+  {s:'2026-12-28', e:'2027-01-03', code:'EM', title:'Engineering Mathematics II + Full Revision', desc:'Probability & Statistics. Syllabus checkpoint: 100% first pass complete.'},
+  {s:'2027-01-04', e:'2027-01-10', code:'ALL', title:'Full-Syllabus Diagnostic + Gap Repair', desc:'One diagnostic full-length test across all subjects. Patch the weakest 2–3 topics identified.'},
+  {s:'2027-01-11', e:'2027-01-24', code:'ALL', title:'Revision + Test Sprint (Round 1)', desc:'Cyclic revision of every subject via short notes. 3 full-length tests across these 2 weeks. Mistake ledger reviewed daily.'},
+  {s:'2027-01-25', e:'2027-02-01', code:'ALL', title:'Revision + Test Sprint (Round 2)', desc:'Second full pass, weighted toward weak subjects from the mistake ledger. Full-length test every 2–3 days.'},
+  {s:'2027-02-02', e:'2027-02-05', code:'ALL', title:'Final Taper — No New Content', desc:'Formula sheets & short notes only. No new PYQs, no new mocks. Sleep, food, calm. See Exam-Day Protocol.'},
+  {s:'2027-02-06', e:'2027-02-06', code:'EXAM', title:'GATE 2027 — CSE Paper', desc:'Execute the Attitude Card and the AR1 two-pass strategy. Target: 70+.'},
+];
+
+/* ---------------- Timetable ---------------- */
+const TIMETABLE = {
+  college: [
+    {t:'6:30 – 8:30 AM', k:'sleep', title:'Wake · light revision optional', desc:'If awake early, 15 min glance at short notes only. Otherwise use the time to sleep — 7.5–8 hrs matters more.'},
+    {t:'8:30 – 9:00 AM', k:'life', title:'Get ready for college', desc:'Fixed block — no study, no phone scrolling.'},
+    {t:'9:00 AM – ~4:00 PM', k:'college', title:'College', desc:'Sit near the front for lectures you can link to GATE subjects (esp. DS, Algo, DBMS, OS, CN semesters) — free revision.'},
+    {t:'~4:00 – 4:30 PM', k:'life', title:'Walk home', desc:'Use it to mentally recall one formula or short-note page — free rehearsal, zero extra time cost.'},
+    {t:'4:30 – 5:00 PM', k:'life', title:'Reach home · reset', desc:'Snack, change, breathe. Do not start studying tired and resentful — 15 min matters.'},
+    {t:'5:00 – 5:20 PM', k:'revise', title:'REVISE (R of RNP)', desc:'Read — don\u2019t cram — yesterday\u2019s short notes. Just familiarity, not memorization.'},
+    {t:'5:20 – 8:00 PM', k:'new', title:'NEW — today\u2019s topic', desc:'Lecture + handwritten notes for the day\u2019s topic from the Strategy roadmap.'},
+    {t:'8:00 – 8:45 PM', k:'life', title:'Dinner break', desc:'Full break. No lecture playing in the background.'},
+    {t:'8:45 – 10:15 PM', k:'practice', title:'PRACTICE (P of RNP)', desc:'PYQs for today\u2019s topic. Ask 3 questions on every PYQ: why is this correct, is there a shortcut, what silly mistake could I make here.'},
+    {t:'10:15 – 10:45 PM', k:'log', title:'Mistake Ledger + Notes tidy-up', desc:'Log anything wrong into the Mistake Ledger. Tidy today\u2019s short-note page.'},
+    {t:'10:45 – 11:15 PM', k:'life', title:'Wind down', desc:'No new content after this point. Screens down.'},
+  ],
+  noncollege: [
+    {t:'7:00 – 7:30 AM', k:'life', title:'Wake + light movement', desc:'A short walk/stretch — protects focus for the long day ahead.'},
+    {t:'7:30 – 8:00 AM', k:'life', title:'Breakfast'},
+    {t:'8:00 – 8:20 AM', k:'revise', title:'REVISE', desc:'Yesterday\u2019s short notes, quick read-through.'},
+    {t:'8:20 – 11:00 AM', k:'new', title:'NEW — deep topic block 1', desc:'Longest, freshest-brain block of the day. Hardest sub-topic goes here.'},
+    {t:'11:00 – 11:15 AM', k:'life', title:'Break'},
+    {t:'11:15 AM – 1:00 PM', k:'practice', title:'PRACTICE — PYQs on today\u2019s + yesterday\u2019s topic'},
+    {t:'1:00 – 2:00 PM', k:'life', title:'Lunch + real rest'},
+    {t:'2:00 – 4:00 PM', k:'new', title:'NEW — topic block 2 / GA-Aptitude', desc:'Continue the subject, or run the 30–45 min daily Aptitude protocol here.'},
+    {t:'4:00 – 4:30 PM', k:'life', title:'Break / walk'},
+    {t:'4:30 – 6:00 PM', k:'practice', title:'Topic test or DPP set', desc:'Timed, exam-like conditions where possible.'},
+    {t:'6:00 – 7:00 PM', k:'life', title:'Dinner + break'},
+    {t:'7:00 – 8:30 PM', k:'practice', title:'PRACTICE — weak-topic shoring', desc:'Pull from the Mistake Ledger — attack yesterday\u2019s red flags.'},
+    {t:'8:30 – 9:00 PM', k:'log', title:'Mistake Ledger + Notes tidy-up'},
+    {t:'9:00 – 10:00 PM', k:'life', title:'Free time — properly free'},
+    {t:'10:00 – 10:30 PM', k:'life', title:'Wind down, sleep by 11'},
+  ],
+  sunday: [
+    {t:'7:00 – 8:00 AM', k:'life', title:'Wake, breakfast, no screens'},
+    {t:'8:00 – 11:00/11:30 AM', k:'test', title:'FULL-LENGTH TEST (once Test Phase begins, ~Oct)', desc:'Simulated exam conditions: 3 hrs, no pausing, no notes. Before the test phase begins, use this slot for a subject-wise or topic-wise test instead.'},
+    {t:'11:30 AM – 1:00 PM', k:'log', title:'Test analysis', desc:'Compare your thought-process to the solution for every wrong/guessed answer. Log every miss into the Mistake Ledger with a cause.'},
+    {t:'1:00 – 2:00 PM', k:'life', title:'Lunch + real rest'},
+    {t:'2:00 – 6:00 PM', k:'revise', title:'CYCLIC REVISION — one earlier subject', desc:'Full day\u2019s revision of a previously-completed subject using short notes only. Rotate subjects week to week (Pillar 4).'},
+    {t:'6:00 – 7:00 PM', k:'life', title:'Dinner + break'},
+    {t:'7:00 – 8:30 PM', k:'practice', title:'Light PYQ practice on the revised subject'},
+    {t:'8:30 – 9:00 PM', k:'life', title:'Plan next week', desc:'Glance at the Strategy roadmap for the week ahead.'},
+  ],
+  taper: [
+    {t:'Wake naturally', k:'life', title:'No fixed alarm-stress', desc:'Sleep is now a study technique, not a luxury.'},
+    {t:'30–45 min', k:'revise', title:'Formula sheet + short notes read-through', desc:'Read only. No new PYQs. No new mock tests.'},
+    {t:'Light Aptitude glance', k:'revise', title:'GA formula/trick sheet', desc:'5–10 minutes, familiarity only.'},
+    {t:'Rest of the day', k:'life', title:'Calm. Walk. Eat well. Light entertainment is fine.', desc:'Protect sleep above everything else in these 4 days.'},
+  ]
+};
+
+/* ---------------- Resources ---------------- */
+const RESOURCES = {
+  owned: [
+    {name:'GO Classes — GATE CS 2027 Complete Course', cost:'₹26,000 (already purchased)', note:'Primary lecture spine for every subject in the roadmap. Sachin & Deepak Poonia\u2019s GO Classes has produced recent CS AIR-1s — follow its subject order if it conflicts with the roadmap here, since your notes will be built against its lecture sequence.'},
+    {name:'Made Easy — GATE 2027 PYQ Book', cost:'Already purchased', note:'Your physical, subject-wise PYQ bank. Pair with GATE Overflow online for community-vetted solutions and discussion on anything the book\u2019s solution doesn\u2019t fully click.'},
+  ],
+  recommended: [
+    {name:'GATE Overflow / GO Classes Test Series 2027', cost:'≈ ₹3,000–4,500', note:'Topic-wise tests → subject tests → multi-subject tests → full-length mocks, all GATE-calibrated. This is Pillar 3 (Test Series) and pairs directly with your GO Classes lectures. Highest-leverage single purchase beyond what you already own.', url:'https://gateoverflow.in/exams'},
+  ],
+  free: [
+    {name:'GATE Overflow', desc:'Free previous-year questions with community solutions, difficulty voting and discussion threads. Use it as your default doubt-solving companion.', url:'https://gateoverflow.in'},
+    {name:'NPTEL', desc:'Official IIT-faculty video lectures — the same academic level GATE papers are set at. Best as a second opinion when a GO Classes explanation doesn\u2019t click, especially for OS, DBMS, CN, Algorithms.', url:'https://nptel.ac.in'},
+    {name:'Gate Smashers (YouTube)', desc:'Clear, exam-focused explanations — strong for Digital Logic, COA, OS, DBMS, CN.'},
+    {name:'Knowledge Gate (YouTube)', desc:'Broad subject coverage, good for a fast second pass or quick revision before a topic test.'},
+    {name:'Gajendra Purohit (YouTube)', desc:'Especially strong for Engineering Mathematics & Discrete Mathematics — the two most formula-dense subjects.'},
+    {name:'GeeksforGeeks', desc:'Fast reference notes + practice problems, best for Data Structures and Algorithms quick lookups.'},
+  ],
+  books: [
+    {subject:'Algorithms', book:'Introduction to Algorithms — Cormen, Leiserson, Rivest, Stein'},
+    {subject:'Operating Systems', book:'Operating System Concepts — Silberschatz, Galvin, Gagne'},
+    {subject:'Databases', book:'Database System Concepts — Silberschatz, Korth, Sudarshan'},
+    {subject:'Computer Networks', book:'Computer Networking: A Top-Down Approach — Kurose & Ross'},
+    {subject:'Digital Logic', book:'Digital Logic and Computer Design — M. Morris Mano'},
+    {subject:'Theory of Computation', book:'Introduction to Automata Theory, Languages, and Computation — Hopcroft, Ullman, Motwani'},
+    {subject:'Computer Organization', book:'Computer Organization — Hamacher / Computer Organization and Embedded Systems'},
+  ],
+  note:'Reference textbooks are for on-demand clarity on a single sticky concept — never cover-to-cover reading. Every topper interview in the source material agrees: lectures + own notes + PYQs + tests is the loop; textbooks are a fallback, not a track.'
+};
+
+/* ---------------- Strategy content (accordion) ---------------- */
+const STRATEGY_SECTIONS = [
+  { id:'philosophy', title:'0 · The Core Philosophy', body:`
+    <p><b>The target is 70+ marks</b>, not 60. Competition has risen, so the safety margin has to rise with it. Aim at 70 and a rough day still lands you in the low-to-mid 60s — Old-IIT territory. Aim at 60 and a rough day drops you into the 40s.</p>
+    <p style="margin-top:10px"><b>Trick your own brain out of the 2-lakh-applicant panic.</b> You don\u2019t need to beat 2 lakh people — you need one seat. Historically, of the ~2 lakh CS applicants, maybe 10–15k are seriously preparing, and of those maybe 5–6k execute all three pillars below properly. Those 5–6k become the top ranks. The "competition" is really a much smaller room than it looks.</p>
+    <p style="margin-top:10px"><b>Three Pillars — do these three properly and the rank is close to guaranteed:</b></p>
+    <ul><li>Syllabus completion, weighted toward high-frequency topics (never skip a subject entirely)</li>
+    <li>PYQs — solved from day one of every topic, not saved for "later"</li>
+    <li>Test Series — topic → subject → multi-subject → full-length, analysed every time</li></ul>
+    <p style="margin-top:10px">Consistency beats raw intelligence. The gap between an "average" student who runs this loop for 6 months and a "genius" who doesn\u2019t is not close.</p>
+  `},
+  { id:'timeline', title:'1 · The Master Timeline', body:`
+    <p>194 days from 27 Jul 2026 to 6 Feb 2027 (~27.7 weeks). Full breakdown is on the <b>Master Strategy → Timeline</b> tab and mirrored on the Dashboard as your current phase. Structure in five acts:</p>
+    <ul>
+      <li><b>Act I — Foundation</b> (Jul 27 – Sep 13): Discrete Math → C/Recursion → Digital Logic. These make everything after easier to read.</li>
+      <li><b>Act II — Core CS</b> (Sep 14 – Nov 1): Data Structures → Algorithms → Theory of Computation → Computer Organization.</li>
+      <li><b>Act III — Systems</b> (Nov 2 – Dec 20): Operating Systems → Databases → Computer Networks (+ Compiler Design folded in).</li>
+      <li><b>Act IV — Engineering Mathematics</b> (Dec 21 – Jan 3): Deliberately last — see reasoning below.</li>
+      <li><b>Act V — Revision & Test Sprint</b> (Jan 4 – Feb 5): Diagnostic → two revision rounds → 4-day taper.</li>
+    </ul>
+    <p style="margin-top:10px">Full-length tests begin around <b>week 11 (early October)</b>, once ~50–55% of the syllabus is covered — not at 80–90% like most students wait for. Aptitude runs the entire time underneath everything else (see section 6).</p>
+  `},
+  { id:'order', title:'2 · Subject Order & Why', body:`
+    <p>Two orders exist in the source material: a strict prerequisite chain (Level 1 → 2 → 3) and a topper\u2019s specific 6-month sequence. This roadmap merges both:</p>
+    <ul>
+      <li><b>Discrete Math goes first</b>, and inside it, <b>Logic and Combinatorics go first of all.</b> Without them, "how many ways / schedules / DFAs are possible" questions and "if–then / true–false" questions across DBMS, TOC, and Digital Logic become unsolvable even with the concept known cold. Discrete Math is the bridge course — exactly like the bridge courses IITs run for students who test below the bar on entry.</li>
+      <li><b>Engineering Mathematics (Linear Algebra, Calculus, Probability) goes last</b>, deliberately. It is formula-heavy and needs to be fresh in memory on exam day, not revised five times because it was learned six months early. It's also generally not conceptually hard once other subjects have sharpened your problem-solving.</li>
+      <li>Everything else follows real prerequisite logic: C → Data Structures → Algorithms; Digital Logic → Computer Organization; Digital Logic + Computer Organization + OS → Computer Networks; TOC → Compiler Design.</li>
+    </ul>
+    <p style="margin-top:10px">If you\u2019re ever unsure, the rule from the source material is simple: <b>start with whichever subject feels easiest to you personally</b> — the early confidence boost compounds. "Easy" and "hard" are personal; there\u2019s no universal ranking.</p>
+  `},
+  { id:'rnp', title:'3 · Daily System — the R-N-P Rule', body:`
+    <p>Every study session, in this order:</p>
+    <ul>
+      <li><b>Revise (≈10% of the day\u2019s time):</b> re-read — don\u2019t force-memorize — yesterday\u2019s short notes before touching anything new.</li>
+      <li><b>New (≈70–80%):</b> dedicated block for today\u2019s planned topic — lecture, then handwritten notes.</li>
+      <li><b>Practice (≈20–30%):</b> PYQs on today\u2019s topic, ideally as a timed mini-test so you build real exam-pace instincts, not just untimed familiarity.</li>
+    </ul>
+    <p style="margin-top:10px">See the <b>Timetable</b> tab for exactly how this maps onto college-day and non-college-day hours.</p>
+  `},
+  { id:'pyq', title:'4 · The PYQ Method', body:`
+    <p>PYQs are not revision material — they are the syllabus\u2019s actual GPS. They tell you exactly what gets asked and how it gets framed, and no amount of textbook reading substitutes for them.</p>
+    <ul>
+      <li>Solve PYQs <b>from day one of every topic</b> — not after finishing the whole subject.</li>
+      <li>On every question, ask three things: <b>(1)</b> why is the correct option actually correct, <b>(2)</b> is there a faster trick or shortcut here, <b>(3)</b> what silly mistake could trip me up even though I got it right this time.</li>
+      <li>When two years\u2019 questions on one topic are near-duplicates (same method, different numbers), don\u2019t solve both — drop one and use the freed time to reach further back into older years on that topic instead. Depth of coverage beats redundant repetition.</li>
+      <li>Never skip PYQs on a subject you find weak. The 20/80 rule below means exactly those "dead-certain" questions are sitting there waiting, and skipping the subject costs you free marks nearly every other serious aspirant will collect.</li>
+    </ul>
+  `},
+  { id:'shortnotes', title:'5 · Short Notes — the retention multiplier', body:`
+    <p>The retention math from the source material is blunt: lecture alone ≈ 5–10% retained; lecture + someone else\u2019s printed notes ≈ 20–25%; lecture + <b>your own handwritten</b> notes ≈ 70%+, climbing toward ~100% with revision cycles.</p>
+    <p style="margin-top:10px">Short notes are not a condensed copy of your running notes — they\u2019re your own intuition: how <i>you</i> remember a formula, the one-line trigger that unlocks a derivation, the trap you personally fall into. Borrowed topper notes are freely available and mostly useless for this exact reason — they encode someone else\u2019s intuition, not yours.</p>
+    <p style="margin-top:10px">Use the <b>Short Notes Vault</b> tab to build these per-subject as you go.</p>
+  `},
+  { id:'revision', title:'6 · Cyclic Revision', body:`
+    <p>One day a week — Sunday in this plan — is reserved entirely for revising a <i>previously completed</i> subject (or the current one, before you have a backlog) using short notes only, no new lectures. A full subject re-pass this way takes roughly 2–3 sessions. This is what keeps month-2 material alive by month-6.</p>
+  `},
+  { id:'tests', title:'7 · Test-Series Roadmap', body:`
+    <p>Ladder: <b>Topic-wise test → Subject-wise test → Multi-subject test → Full-length test.</b> Don\u2019t wait for 80–90% syllabus completion to start full-length tests — begin at ~50–55% (this plan: early October). Ideally give <b>at least 12–15 full-length tests</b> before exam day, ramping from weekly (Oct–Dec) to every 2–3 days in the final revision sprint (Jan).</p>
+    <p style="margin-top:10px">A test\u2019s value is entirely in the analysis afterward, not the score. Every wrong or guessed answer gets the same treatment: read the official solution, compare it to your own exam-time thought process, and write down specifically where the two diverged. That divergence — not the topic name — is what goes in the Mistake Ledger.</p>
+  `},
+  { id:'mistake', title:'8 · The Mistake Ledger Protocol', body:`
+    <p>After every test — topic, subject, or full-length — don\u2019t just check the score. For every question:</p>
+    <ul>
+      <li>Solved correctly and efficiently → nothing to do.</li>
+      <li>Solved correctly but slowly → note the faster method from the solution.</li>
+      <li>Wrong because of a slip (decimal, unit, sign, formula mix-up) → log the slip type. These compound: 20–25 marks of "silly mistakes" is not bad luck, it\u2019s a practice gap.</li>
+      <li>Wrong because the concept itself was unknown → this is the one to flag hardest. These are also the exact "few-students-solve-this" questions that create rank separation — master them, don\u2019t skip them.</li>
+    </ul>
+    <p style="margin-top:10px">Spend 10–15 minutes before sleep reviewing the ledger. Use the <b>Mistake Ledger</b> tab to log entries as you go, tagged by type and colour exactly like this system.</p>
+  `},
+  { id:'eightytwenty', title:'9 · The 20/80 Rule — never skip a subject', body:`
+    <p>Roughly 20% of the syllabus produces 80% of the marks. Certain topics are close to "dead-certain" every year regardless of overall paper difficulty — IP addressing, a TCP-header or TCP-timing question, an OSI/TCP-model layer-function question, a paging numerical, a cache-mapping numerical, a limits question solvable by L\u2019Hôpital, a matrix-rank question, a DFA/NFA state-count question. You find these precisely by tracking PYQ patterns per topic, not by guessing.</p>
+    <p style="margin-top:10px">This is exactly why <b>no subject gets skipped entirely</b> even if it feels weak or low-weightage in a given year — the weightage swings wildly year to year, but the "dead-certain" pocket inside every subject doesn\u2019t. Skipping a whole subject means conceding free marks that most serious competitors will collect.</p>
+  `},
+  { id:'aptitude', title:'10 · Aptitude & GA Protocol', body:`
+    <p>General Aptitude is a fixed 15 marks and — combined with a solid Engineering-Maths base — the two alone hover near the historical qualifying cutoff. Treat it as a standing daily habit, not a block to "get to eventually":</p>
+    <ul>
+      <li><b>30–45 minutes daily</b>, from week one, mixing topics across the four GA categories (verbal, quantitative, analytical, spatial) rather than one category at a time.</li>
+      <li>Read notes for the day\u2019s topics, then <b>immediately</b> solve PYQs on them — don\u2019t separate learning from practice for GA.</li>
+      <li>Before starting each day, re-read (not re-memorize) yesterday\u2019s GA notes — repetition builds the memory on its own.</li>
+      <li>Quant is mostly a practice game; Analytical rewards calm, unhurried thinking; Verbal and Spatial are heavily pattern-based — PYQ exposure matters more than theory for these two.</li>
+      <li>2–3 timed GA mocks per week to build speed, tracking time-per-question, not just correctness.</li>
+    </ul>
+  `},
+  { id:'final', title:'11 · Final Revision Sprint (Jan 11 – Feb 1)', body:`
+    <p>Two revision rounds across every subject, driven by short notes and the Mistake Ledger — not fresh lectures. Round 2 is explicitly weighted toward whatever the ledger shows as recurring weak spots. Full-length tests continue every 2–3 days through this window.</p>
+  `},
+  { id:'taper', title:'12 · The Last 4 Days (Feb 2 – 5) — Taper', body:`
+    <p>No new content. No new PYQs. No new mock tests. This is a hard rule repeated across every source in the material — the marginal learning from a new topic in the last 4 days is far outweighed by the anxiety and fatigue it creates. Only formula sheets and short notes, read (not crammed), plus sleep, food, and calm.</p>
+  `},
+  { id:'examdaylink', title:'13 · Exam Day', body:`
+    <p>The accuracy rule, the attitude card, and the AR1 two-pass exam strategy all live on the dedicated <b>Exam-Day Protocol</b> tab — review it once during the taper week and again the morning of 6 Feb 2027.</p>
+  `},
+];
+
+/* ---------------- Exam day protocol content ---------------- */
+const EXAMDAY = {
+  accuracy: {
+    title:'The Accuracy Rule',
+    body:'A clean 45 is worth more than a 60 built on 15 marks of negative-marking errors. Speed without accuracy is a net loss in a negatively-marked paper — this is the single change that took one repeat aspirant from four attempts stuck in place to a clean break past his ceiling.'
+  },
+  attitude: [
+    {k:'Worry', v:'"What if I blank on a formula? What if an easy question hides in a subject I skipped?" Counter it by focusing entirely on inputs you control — the prep you\u2019ve actually put in — not on hypothetical failure states.'},
+    {k:'Stress', v:'Biologically normal before a high-stakes exam. Don\u2019t fight it — relabel it. The same physiological arousal that feels like anxiety can be read as energy for the exam. The reframe itself changes the exam-day experience.'},
+    {k:'Complacency', v:'The moment a question looks easy, that\u2019s exactly when silly mistakes creep in. Relaxation is for after the exam. During the exam: careful, warrior-mode, every single question — easy or hard.'},
+  ],
+  ar1: {
+    title:'The AR1 Two-Pass Strategy',
+    steps:[
+      'Pass 1: go through all 65 questions in order, 1 → 65. Solve anything that reads as solvable at a glance. Skip — deliberately and without guilt — anything that feels unsure or slow.',
+      'Pass 2: go back to 1 and pick up everything you skipped, now with full knowledge of how much time is left.',
+      'This strategy needs rehearsal in full-length tests before exam day — it is not something to try cold on 6 Feb. Practice it across your test-series mocks from October onward.'
+    ]
+  }
+};
+</script>
+<script>
+/* ================================================================
+   PROJECT AIR-1 — App Logic
+   ================================================================ */
+
+/* ---------- tiny storage helpers ---------- */
+function load(key, fallback){
+  try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch(e){ return fallback; }
+}
+function save(key, val){
+  try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+}
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+/* ---------- date helpers ---------- */
+function pad2(n){ return n<10?'0'+n:''+n; }
+function toISO(d){ return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+function todayObj(){ const t = new Date(); t.setHours(0,0,0,0); return t; }
+function daysBetween(a,b){ return Math.round((b-a)/86400000); }
+const DOW = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function humanDate(d){ return DOW[d.getDay()]+', '+d.getDate()+' '+MON[d.getMonth()]+' '+d.getFullYear(); }
+function humanRange(s,e){
+  const so=new Date(s), eo=new Date(e);
+  if(s===e) return so.getDate()+' '+MON[so.getMonth()];
+  if(so.getMonth()===eo.getMonth()) return so.getDate()+'–'+eo.getDate()+' '+MON[eo.getMonth()];
+  return so.getDate()+' '+MON[so.getMonth()]+' – '+eo.getDate()+' '+MON[eo.getMonth()];
+}
+
+/* ---------- global state ---------- */
+let state = {
+  view: (location.hash||'#dashboard').slice(1),
+  syllabusOpen: SYLLABUS[0].code,
+};
+let syllabusProgress = load('air1_syllabus', {});
+let mistakes  = load('air1_mistakes', []);
+let tests     = load('air1_tests', []);
+let notesVault= load('air1_notes', {});
+let dayFlags  = load('air1_dayflags', {});     // dateStr -> 'college'|'noncollege'
+let taskState = load('air1_tasks', {});        // dateStr -> {idx:bool}
+
+/* ---------- derived data ---------- */
+function totalTopics(){ return SYLLABUS.reduce((a,s)=>a+s.topics.length,0); }
+function doneTopics(){
+  let n=0;
+  SYLLABUS.forEach(s=>s.topics.forEach((t,i)=>{ if(syllabusProgress[s.code+'::'+i]) n++; }));
+  return n;
+}
+function subjectPercent(code){
+  const s = SYLLABUS.find(x=>x.code===code);
+  if(!s) return 0;
+  let n=0; s.topics.forEach((t,i)=>{ if(syllabusProgress[code+'::'+i]) n++; });
+  return Math.round(100*n/s.topics.length);
+}
+function currentPhase(){
+  const t = todayObj();
+  for(const ph of TIMELINE){
+    const s = new Date(ph.s+'T00:00:00'), e = new Date(ph.e+'T23:59:59');
+    if(t>=s && t<=e) return ph;
+  }
+  if(t < new Date(TIMELINE[0].s)) return TIMELINE[0];
+  return TIMELINE[TIMELINE.length-1];
+}
+function isTaperDay(d){ const iso=toISO(d); return iso>='2027-02-02' && iso<='2027-02-05'; }
+function isExamDay(d){ return toISO(d)==='2027-02-06'; }
+function dayTypeFor(d){
+  const iso = toISO(d);
+  if(dayFlags[iso]) return dayFlags[iso];
+  const dow = d.getDay();
+  return (dow===0) ? 'sunday' : (dow===6 ? 'noncollege' : 'college');
+}
+function fullTests(){ return tests.filter(t=>t.type==='full'); }
+function rankTier(){
+  const ft = fullTests().slice(-3);
+  if(ft.length===0) return {label:'Recruit', sub:'diagnostic pending', color:'var(--text-faint)'};
+  const avg = ft.reduce((a,t)=>a+(t.score/t.total*100),0)/ft.length;
+  if(avg<25) return {label:'Recruit', sub:avg.toFixed(0)+'/100 avg', color:'var(--text-dim)'};
+  if(avg<40) return {label:'Cadet', sub:avg.toFixed(0)+'/100 avg', color:'var(--red)'};
+  if(avg<55) return {label:'Operative', sub:avg.toFixed(0)+'/100 avg', color:'var(--amber)'};
+  if(avg<70) return {label:'Specialist', sub:avg.toFixed(0)+'/100 avg', color:'var(--cyan)'};
+  if(avg<85) return {label:'Elite', sub:avg.toFixed(0)+'/100 avg', color:'var(--green)'};
+  return {label:'Apex · AIR-1 track', sub:avg.toFixed(0)+'/100 avg', color:'var(--green)'};
+}
+
+/* ---------- daily tasks ---------- */
+const TASKS_COLLEGE = ['Revise yesterday\u2019s short notes (15–20 min)','Complete today\u2019s NEW topic block','Solve PYQs for today\u2019s topic (Practice)','Update Mistake Ledger + tidy short notes'];
+const TASKS_NONCOLLEGE = ['Revise yesterday\u2019s short notes','NEW — deep topic block','PRACTICE — PYQs on today+yesterday\u2019s topic','30–45 min GA / Aptitude practice','Topic test or DPP set (timed)','Update Mistake Ledger + tidy short notes'];
+const TASKS_SUNDAY = ['Take the weekly test (full-length once test-phase begins)','Analyse test — log every miss in the Mistake Ledger','Cyclic revision — one earlier subject, short notes only','Light PYQ practice on the revised subject'];
+const TASKS_TAPER = ['Read formula sheet / short notes (NO new content)','Light GA formula glance (5–10 min)','Protect sleep — lights out on schedule','Stay calm — walk, eat well, no cramming'];
+
+function tasksForToday(){
+  const d = todayObj();
+  if(isExamDay(d)) return ['Execute the Attitude Card','Run the AR1 two-pass strategy','Trust the prep — you\u2019ve done the work'];
+  if(isTaperDay(d)) return TASKS_TAPER;
+  const type = dayTypeFor(d);
+  if(type==='sunday') return TASKS_SUNDAY;
+  if(type==='college') return TASKS_COLLEGE;
+  return TASKS_NONCOLLEGE;
+}
+
+/* ---------- SVG chart for test scores ---------- */
+function scoreChart(list){
+  if(list.length===0) return '<div class="empty-state"><b>No tests logged yet</b>Log your first topic test from the form above — trend line appears here.</div>';
+  const w=640,h=170,pad=28;
+  const pts = list.slice(-15);
+  const maxN = pts.length-1||1;
+  const toXY = (v,i)=>{
+    const x = pad + (i/maxN)*(w-2*pad);
+    const y = h-pad - (v/100)*(h-2*pad);
+    return [x,y];
+  };
+  const coords = pts.map((t,i)=>toXY(Math.min(100,(t.score/t.total*100)), i));
+  const path = coords.map((c,i)=>(i===0?'M':'L')+c[0].toFixed(1)+','+c[1].toFixed(1)).join(' ');
+  const target = h-pad-(70/100)*(h-2*pad);
+  let dots = coords.map((c,i)=>`<circle cx="${c[0].toFixed(1)}" cy="${c[1].toFixed(1)}" r="3.5" fill="var(--amber)"/>`).join('');
+  return `<svg viewBox="0 0 ${w} ${h}" class="chartwrap" preserveAspectRatio="none">
+    <line x1="${pad}" y1="${target.toFixed(1)}" x2="${w-pad}" y2="${target.toFixed(1)}" stroke="var(--green)" stroke-width="1" stroke-dasharray="4 4"/>
+    <text x="${w-pad}" y="${(target-6).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--green)" font-family="JetBrains Mono">target 70</text>
+    <path d="${path}" fill="none" stroke="var(--cyan)" stroke-width="2"/>
+    ${dots}
+  </svg>`;
+}
+
+/* ================================================================
+   RENDERERS
+   ================================================================ */
+function renderDashboard(){
+  const today = todayObj();
+  const dLeft = Math.max(0, daysBetween(today, EXAM_DATE));
+  const elapsed = Math.min(TOTAL_DAYS, daysBetween(START_DATE, today));
+  const pct = Math.max(0,Math.min(100, 100*(1-dLeft/TOTAL_DAYS)));
+  const circ = 2*Math.PI*75;
+  const dashOff = circ*(1-pct/100);
+  const phase = currentPhase();
+  const tier = rankTier();
+  const doneT = doneTopics(), totT = totalTopics();
+  const activeM = mistakes.filter(m=>!m.resolved).length;
+  const ft = fullTests();
+  const avgScore = ft.length? Math.round(ft.slice(-5).reduce((a,t)=>a+t.score/t.total*100,0)/Math.min(5,ft.length)) : null;
+  const tasks = tasksForToday();
+  const iso = toISO(today);
+  const tstate = taskState[iso] || {};
+
+  return `
+  <div class="eyebrow">Mission Control</div>
+  <div class="page-title">Good to see you, Operator.</div>
+  <p class="page-lede">Day ${elapsed} of ${TOTAL_DAYS} · ${humanDate(today)}</p>
+
+  <div class="grid grid-2" style="align-items:stretch;margin-bottom:16px;">
+    <div class="card" style="display:flex; gap:22px; align-items:center;">
+      <div class="hero-ring-wrap">
+        <svg viewBox="0 0 170 170">
+          <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="var(--cyan)"/><stop offset="100%" stop-color="var(--amber)"/>
+          </linearGradient></defs>
+          <circle class="hero-ring-track" cx="85" cy="85" r="75"/>
+          <circle class="hero-ring-fill" cx="85" cy="85" r="75" stroke-dasharray="${circ}" stroke-dashoffset="${dashOff}"/>
+        </svg>
+        <div class="hero-ring-center">
+          <div class="hero-ring-num">${dLeft}</div>
+          <div class="hero-ring-label">days left</div>
+        </div>
+      </div>
+      <div>
+        <div class="card-title">Mission Clock</div>
+        <div class="card-sub">GATE CS 2027 · 6 Feb 2027</div>
+        <div class="progress-track" style="margin-bottom:8px;"><div class="progress-fill" style="width:${pct.toFixed(1)}%"></div></div>
+        <div class="dim" style="font-size:12px;">${pct.toFixed(0)}% of runway elapsed</div>
+        <div style="margin-top:12px;" class="tag-row">
+          <span class="pill pill-amber">${phase.code}</span>
+          <span class="pill">${phase.title}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Current Rank Tier</div>
+      <div class="card-sub">Based on your last 3 full-length tests</div>
+      <div style="display:flex;align-items:baseline;gap:10px;">
+        <div class="stat-big" style="color:${tier.color}">${tier.label}</div>
+      </div>
+      <div class="dim" style="font-size:12px;margin-bottom:14px;">${tier.sub}</div>
+      <div class="grid grid-3" style="gap:10px;">
+        <div><div class="hud-stat-label">Syllabus</div><div class="mono" style="font-size:17px;font-weight:700">${Math.round(100*doneT/totT)}%</div></div>
+        <div><div class="hud-stat-label">Tests logged</div><div class="mono" style="font-size:17px;font-weight:700">${tests.length}</div></div>
+        <div><div class="hud-stat-label">Open mistakes</div><div class="mono" style="font-size:17px;font-weight:700;color:${activeM>0?'var(--red)':'var(--green)'}">${activeM}</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title">Today\u2019s Ops — ${humanDate(today)}</div>
+      <div class="card-sub">${isExamDay(today)?'EXAM DAY':isTaperDay(today)?'Final Taper — no new content':dayTypeFor(today)==='sunday'?'Cyclic Revision + Test Day':dayTypeFor(today)==='college'?'College Day schedule':'Non-College Day schedule'}</div>
+      <div id="taskList">
+        ${tasks.map((tk,i)=>`
+          <div class="topic-row ${tstate[i]?'done':''}">
+            <input type="checkbox" data-task="${i}" ${tstate[i]?'checked':''}>
+            <div class="topic-label">${tk}</div>
+          </div>`).join('')}
+      </div>
+      ${!isExamDay(today)&&!isTaperDay(today) ? `
+      <div style="margin-top:12px;" class="tag-row">
+        <button class="btn btn-sm" data-daytype="college">Mark today: College Day</button>
+        <button class="btn btn-sm" data-daytype="noncollege">Mark today: Non-College Day</button>
+      </div>` : ''}
+    </div>
+
+    <div class="card">
+      <div class="card-title">Current Phase</div>
+      <div class="card-sub">${humanRange(phase.s,phase.e)}</div>
+      <p style="font-size:13.5px;color:var(--text-dim);margin-bottom:14px;">${phase.desc}</p>
+      <a href="#strategy" class="btn btn-sm">Open Master Strategy →</a>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:16px;">
+    <div class="card">
+      <div class="card-title">Recent Mistake Ledger</div>
+      <div class="card-sub">Last 3 entries</div>
+      ${mistakes.length===0?'<div class="empty-state"><b>Ledger is empty</b>Log your first mistake after a test.</div>':
+        mistakes.slice(-3).reverse().map(m=>`
+        <div style="padding:8px 0;border-bottom:1px solid var(--border-soft);">
+          <div class="tag-row" style="margin-bottom:4px;">
+            <span class="pill ${mistakeColorClass(m.type)}">${m.type}</span>
+            <span class="pill">${m.subject}</span>
+          </div>
+          <div style="font-size:13px;">${escapeHtml(m.text)}</div>
+        </div>`).join('')}
+      <a href="#mistakes" class="btn btn-sm" style="margin-top:12px;">Open Mistake Ledger →</a>
+    </div>
+    <div class="card">
+      <div class="card-title">Score Trend</div>
+      <div class="card-sub">Last full-length tests${avgScore!==null?' · avg '+avgScore+'/100':''}</div>
+      ${scoreChart(ft)}
+    </div>
+  </div>
+  `;
+}
+
+function mistakeColorClass(type){
+  if(type==='Concept Gap') return 'pill-green';
+  if(type==='Silly Slip') return 'pill-red';
+  if(type==='Time Management') return 'pill-cyan';
+  return 'pill-amber';
+}
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function renderTimetable(){
+  const day = state.timetableDay || 'college';
+  const map = {college:'College Day',noncollege:'Non-College Day',sunday:'Sunday — Revision + Test',taper:'Final Taper (Feb 2–5)'};
+  const kcolor = {revise:'var(--cyan)', new:'var(--amber)', practice:'var(--green)', log:'var(--violet)', life:'var(--border)', college:'var(--text-faint)', test:'var(--red)'};
+  const blocks = TIMETABLE[day];
+  return `
+  <div class="eyebrow">Command · Timetable</div>
+  <div class="page-title">Daily Schedule</div>
+  <p class="page-lede">Built around your fixed anchors: college starts 9:00 AM, ready-up begins 8:30 AM, commute on foot, home by ~4:30 PM.</p>
+
+  <div class="daytabs">
+    ${Object.keys(map).map(k=>`<button class="daytab ${day===k?'active':''}" data-daytab="${k}">${map[k]}</button>`).join('')}
+  </div>
+
+  <div class="card">
+    ${blocks.map(b=>`
+      <div class="dayblock">
+        <div class="dayblock-time">${b.t}</div>
+        <div class="dayblock-bar" style="background:${kcolor[b.k]||'var(--border)'}"></div>
+        <div class="dayblock-content">
+          <div class="dayblock-title">${b.title}</div>
+          ${b.desc?`<div class="dayblock-desc">${b.desc}</div>`:''}
+        </div>
+      </div>`).join('')}
+  </div>
+
+  <div class="callout callout-cyan" style="margin-top:18px;">
+    <b>Why this shape:</b> the R-N-P rule (Revise → New → Practice) runs inside every study day regardless of type. College days trade volume for consistency (~4.5–5 hrs); non-college days go deep (~8+ hrs); Sunday is protected for revision and tests, never new content.
+  </div>
+  `;
+}
+
+function renderStrategy(){
+  return `
+  <div class="eyebrow">Command · Master Strategy</div>
+  <div class="page-title">The Full Plan — Jul 27 2026 → Feb 6 2027</div>
+  <p class="page-lede">Synthesized from every strategy video reviewed: the 3-pillar system, subject sequencing, the R-N-P daily rule, PYQ method, short notes, cyclic revision, test-series ladder, the mistake ledger protocol, the 20/80 rule, and the aptitude protocol.</p>
+
+  <div class="two-col">
+    <div class="subnav">
+      <button class="active" data-strategytab="accordion">Strategy Sections</button>
+      <button data-strategytab="timeline">Full Timeline</button>
+    </div>
+    <div id="strategyBody"></div>
+  </div>
+  `;
+}
+function renderStrategyAccordion(){
+  return STRATEGY_SECTIONS.map((s,i)=>`
+    <div class="accordion-item ${i===0?'open':''}" data-acc="${s.id}">
+      <div class="accordion-head" data-acchead="${s.id}">
+        <div class="accordion-title">${s.title}</div>
+        <div class="accordion-chev">▾</div>
+      </div>
+      <div class="accordion-body">${s.body}</div>
+    </div>`).join('');
+}
+function renderStrategyTimeline(){
+  const today = todayObj();
+  return `<div class="timeline">${TIMELINE.map(ph=>{
+    const s=new Date(ph.s+'T00:00:00'), e=new Date(ph.e+'T23:59:59');
+    const cls = (today>=s&&today<=e) ? 'tl-current' : (today>e ? 'tl-done' : 'tl-future');
+    return `<div class="tl-item ${cls}">
+      <div class="tl-phase">${ph.code}${cls==='tl-current'?' · CURRENT':''}</div>
+      <div class="tl-title">${ph.title}</div>
+      <div class="tl-dates">${humanRange(ph.s,ph.e)}</div>
+      <div class="tl-desc">${ph.desc}</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function renderSyllabus(){
+  const activeCode = state.syllabusOpen || SYLLABUS[0].code;
+  const totT = totalTopics(), doneT = doneTopics();
+  return `
+  <div class="eyebrow">Tracking · Syllabus</div>
+  <div class="page-title">Syllabus Tracker</div>
+  <p class="page-lede">Every topic from the official GATE CS 2027 + General Aptitude syllabus. Overall completion: <b class="mono" style="color:var(--amber)">${Math.round(100*doneT/totT)}%</b> (${doneT}/${totT} topics).</p>
+
+  <div class="two-col">
+    <div class="subnav">
+      ${SYLLABUS.map(s=>`<button class="${s.code===activeCode?'active':''}" data-subj="${s.code}">
+        <span class="subject-code" style="margin-right:6px;">${s.code}</span>${s.name.split('(')[0]}
+      </button>`).join('')}
+    </div>
+    <div id="syllabusBody"></div>
+  </div>
+  `;
+}
+function renderSyllabusSubject(code){
+  const s = SYLLABUS.find(x=>x.code===code);
+  const pct = subjectPercent(code);
+  return `
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+      <div>
+        <div class="card-title">${s.name}</div>
+        <div class="card-sub">${s.group} · typical weightage ${s.weight}</div>
+      </div>
+      <div class="mono" style="font-size:20px;font-weight:700;color:var(--amber)">${pct}%</div>
+    </div>
+    <div class="progress-track" style="margin-bottom:16px;"><div class="progress-fill" style="width:${pct}%"></div></div>
+    ${s.topics.map((t,i)=>{
+      const key = code+'::'+i;
+      const on = !!syllabusProgress[key];
+      return `<div class="topic-row ${on?'done':''}">
+        <input type="checkbox" data-topic="${key}" ${on?'checked':''}>
+        <div class="topic-label">${t}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function renderTests(){
+  return `
+  <div class="eyebrow">Tracking · Test Log</div>
+  <div class="page-title">Test Log</div>
+  <p class="page-lede">Log every topic test, subject test, multi-subject test and full-length mock. The score trend and your Rank Tier on the Dashboard are both driven from this log.</p>
+
+  <div class="card" style="margin-bottom:18px;">
+    <div class="card-title">Log a test</div>
+    <form id="testForm">
+      <div class="formcard-row">
+        <select class="gselect" name="type" required>
+          <option value="">Test type…</option>
+          <option value="topic">Topic-wise</option>
+          <option value="subject">Subject-wise</option>
+          <option value="multi">Multi-subject</option>
+          <option value="full">Full-length</option>
+        </select>
+        <select class="gselect" name="subject">
+          <option value="Mixed/Full">Mixed / Full</option>
+          ${SYLLABUS.map(s=>`<option value="${s.code}">${s.code} — ${s.name.split('(')[0]}</option>`).join('')}
+        </select>
+        <input class="ginput" type="date" name="date" value="${toISO(todayObj())}" required>
+      </div>
+      <div class="formcard-row">
+        <input class="ginput" type="number" name="score" placeholder="Score obtained" step="0.01" required>
+        <input class="ginput" type="number" name="total" placeholder="Out of (e.g. 100)" step="0.01" required>
+        <input class="ginput" type="text" name="notes" placeholder="One-line note (optional)">
+      </div>
+      <button class="btn btn-primary" type="submit">Log test</button>
+    </form>
+  </div>
+
+  <div class="card" style="margin-bottom:18px;">
+    <div class="card-title">Score Trend</div>
+    <div class="card-sub">Full-length tests only, green line = 70-mark target</div>
+    ${scoreChart(fullTests())}
+  </div>
+
+  <div class="card card-flush">
+    <div style="padding:20px 20px 6px;"><div class="card-title">All entries</div><div class="card-sub">${tests.length} logged</div></div>
+    ${tests.length===0?'<div class="empty-state"><b>No tests yet</b>Use the form above after your first topic test.</div>':`
+    <table class="dtable">
+      <thead><tr><th>Date</th><th>Type</th><th>Subject</th><th>Score</th><th>%</th><th>Note</th><th></th></tr></thead>
+      <tbody>
+      ${tests.slice().reverse().map(t=>`
+        <tr>
+          <td class="mono">${t.date}</td>
+          <td><span class="pill">${t.type}</span></td>
+          <td>${t.subject}</td>
+          <td class="mono">${t.score}/${t.total}</td>
+          <td class="mono">${Math.round(t.score/t.total*100)}%</td>
+          <td>${escapeHtml(t.notes||'')}</td>
+          <td><button class="btn btn-sm btn-ghost btn-danger" data-deltest="${t.id}">✕</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`}
+  </div>
+  `;
+}
+
+function renderMistakes(){
+  const filter = state.mistakeFilter || 'all';
+  const list = mistakes.filter(m=> filter==='all' || (filter==='open'? !m.resolved : m.resolved));
+  return `
+  <div class="eyebrow">Tracking · Mistake Ledger</div>
+  <div class="page-title">Mistake Ledger</div>
+  <p class="page-lede">Every wrong or slow answer gets logged here with a cause, not just a mark. Review the open entries for 10–15 minutes before sleep.</p>
+
+  <div class="card" style="margin-bottom:18px;">
+    <div class="card-title">Log a mistake</div>
+    <form id="mistakeForm">
+      <div class="formcard-row">
+        <select class="gselect" name="subject" required>
+          <option value="">Subject…</option>
+          ${SYLLABUS.map(s=>`<option value="${s.code}">${s.code} — ${s.name.split('(')[0]}</option>`).join('')}
+        </select>
+        <select class="gselect" name="type" required>
+          <option value="">Mistake type…</option>
+          <option>Concept Gap</option>
+          <option>Silly Slip</option>
+          <option>Time Management</option>
+          <option>Formula/Unit Error</option>
+        </select>
+        <input class="ginput" type="date" name="date" value="${toISO(todayObj())}" required>
+      </div>
+      <textarea class="gnote" name="text" rows="2" placeholder="What happened — the question, the wrong turn taken…" required></textarea>
+      <textarea class="gnote" name="fix" rows="2" placeholder="The fix — correct method, formula, or reminder for next time" style="margin-top:8px;"></textarea>
+      <button class="btn btn-primary" type="submit" style="margin-top:10px;">Add to ledger</button>
+    </form>
+  </div>
+
+  <div class="tag-row" style="margin-bottom:14px;">
+    <button class="btn btn-sm ${filter==='all'?'btn-primary':''}" data-mfilter="all">All (${mistakes.length})</button>
+    <button class="btn btn-sm ${filter==='open'?'btn-primary':''}" data-mfilter="open">Open (${mistakes.filter(m=>!m.resolved).length})</button>
+    <button class="btn btn-sm ${filter==='resolved'?'btn-primary':''}" data-mfilter="resolved">Resolved (${mistakes.filter(m=>m.resolved).length})</button>
+  </div>
+
+  ${list.length===0?'<div class="empty-state"><b>Nothing here</b>Entries will appear as you log them.</div>':
+    list.slice().reverse().map(m=>`
+    <div class="card" style="margin-bottom:10px; ${m.resolved?'opacity:.55':''}">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <div class="tag-row">
+          <span class="pill ${mistakeColorClass(m.type)}">${m.type}</span>
+          <span class="pill">${m.subject}</span>
+          <span class="pill mono">${m.date}</span>
+        </div>
+        <div class="tag-row">
+          <button class="btn btn-sm" data-resolve="${m.id}">${m.resolved?'Reopen':'Mark fixed'}</button>
+          <button class="btn btn-sm btn-danger" data-delmistake="${m.id}">✕</button>
+        </div>
+      </div>
+      <p style="margin-top:10px;font-size:13.5px;">${escapeHtml(m.text)}</p>
+      ${m.fix?`<p style="margin-top:6px;font-size:13px;color:var(--green);"><b>Fix:</b> ${escapeHtml(m.fix)}</p>`:''}
+    </div>`).join('')}
+  `;
+}
+
+function renderNotes(){
+  const activeCode = state.notesOpen || SYLLABUS[0].code;
+  return `
+  <div class="eyebrow">Tracking · Short Notes</div>
+  <div class="page-title">Short Notes Vault</div>
+  <p class="page-lede">Your own words only — one-liners, the trigger that unlocks a formula, the trap you personally fall into. Autosaves as you type.</p>
+  <div class="two-col">
+    <div class="subnav">
+      ${SYLLABUS.map(s=>`<button class="${s.code===activeCode?'active':''}" data-notesubj="${s.code}"><span class="subject-code" style="margin-right:6px;">${s.code}</span>${s.name.split('(')[0]}</button>`).join('')}
+    </div>
+    <div class="card">
+      <div class="card-title">${SYLLABUS.find(s=>s.code===activeCode).name}</div>
+      <div class="card-sub">Plain text · bullet with "- " if you like</div>
+      <textarea class="gnote" id="notesArea" rows="18" placeholder="Write this subject's short notes here…">${escapeHtml(notesVault[activeCode]||'')}</textarea>
+    </div>
+  </div>
+  `;
+}
+
+function renderResources(){
+  return `
+  <div class="eyebrow">Support · Resources</div>
+  <div class="page-title">Resources</div>
+  <p class="page-lede">What you already own, the one thing worth adding, and free back-ups for every subject.</p>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-title">Already in your arsenal</div>
+    ${RESOURCES.owned.map(r=>`
+      <div class="callout callout-green" style="margin-bottom:10px;">
+        <b>${r.name}</b> — ${r.cost}<br>${r.note}
+      </div>`).join('')}
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-title">Worth adding</div>
+    ${RESOURCES.recommended.map(r=>`
+      <div class="callout" style="margin-bottom:10px;">
+        <b>${r.name}</b> — ${r.cost}<br>${r.note}
+        ${r.url?`<br><a class="btn btn-sm" style="margin-top:8px;" href="${r.url}" target="_blank" rel="noopener">Visit →</a>`:''}
+      </div>`).join('')}
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title">Free back-ups</div>
+      <div class="card-sub">For when a GO Classes lecture doesn\u2019t click</div>
+      ${RESOURCES.free.map(r=>`
+        <div style="padding:10px 0;border-bottom:1px solid var(--border-soft);">
+          <b style="font-size:13.5px;">${r.name}</b>
+          <div style="font-size:12.5px;color:var(--text-dim);margin-top:2px;">${r.desc}</div>
+          ${r.url?`<a href="${r.url}" target="_blank" rel="noopener" class="mono" style="font-size:11.5px;color:var(--cyan)">${r.url}</a>`:''}
+        </div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="card-title">Reference textbooks</div>
+      <div class="card-sub">On-demand clarity only — never cover-to-cover</div>
+      <table class="dtable">
+        ${RESOURCES.books.map(b=>`<tr><td style="width:38%"><span class="subject-code">${b.subject}</span></td><td>${b.book}</td></tr>`).join('')}
+      </table>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:16px;">${RESOURCES.note}</div>
+  `;
+}
+
+function renderExamDay(){
+  return `
+  <div class="eyebrow">Support · Exam Day</div>
+  <div class="page-title">Exam-Day Protocol</div>
+  <p class="page-lede">Read this once during the taper week, and again on the morning of 6 Feb 2027.</p>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-title">${EXAMDAY.accuracy.title}</div>
+    <p style="font-size:13.5px;color:var(--text-dim);">${EXAMDAY.accuracy.body}</p>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-title">The Attitude Card</div>
+    <div class="card-sub">Three things stand between you and your best paper</div>
+    <div class="grid grid-3">
+      ${EXAMDAY.attitude.map(a=>`
+        <div class="card" style="background:var(--bg);">
+          <div style="font-family:var(--font-display);font-weight:700;color:var(--amber);margin-bottom:6px;">${a.k}</div>
+          <div style="font-size:12.5px;color:var(--text-dim);">${a.v}</div>
+        </div>`).join('')}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">${EXAMDAY.ar1.title}</div>
+    <ol style="padding-left:18px;font-size:13.5px;color:var(--text-dim);">
+      ${EXAMDAY.ar1.steps.map(s=>`<li style="margin-bottom:8px;">${s}</li>`).join('')}
+    </ol>
+  </div>
+
+  <div class="callout callout-red" style="margin-top:16px;">
+    <b>D-Day reminder:</b> ${Math.max(0,daysBetween(todayObj(),EXAM_DATE))} days left. Target 70+. Trust the three pillars.
+  </div>
+  `;
+}
+
+/* ================================================================
+   ROUTER + INIT
+   ================================================================ */
+const RENDERERS = {
+  dashboard: renderDashboard, timetable: renderTimetable, strategy: renderStrategy,
+  syllabus: renderSyllabus, tests: renderTests, mistakes: renderMistakes,
+  notes: renderNotes, resources: renderResources, examday: renderExamDay,
+};
+const TITLES = {
+  dashboard:'Dashboard', timetable:'Timetable', strategy:'Master Strategy', syllabus:'Syllabus Tracker',
+  tests:'Test Log', mistakes:'Mistake Ledger', notes:'Short Notes Vault', resources:'Resources', examday:'Exam-Day Protocol'
+};
+
+function buildNav(){
+  const nl = document.getElementById('navlist');
+  nl.innerHTML = NAV.map(item=>{
+    if(item.sec) return `<div class="nav-section-label">${item.sec}</div>`;
+    return `<li><a class="navlink ${state.view===item.id?'active':''}" href="#${item.id}" data-nav="${item.id}">
+      <span class="navcode">${item.code}</span>${item.label}</a></li>`;
+  }).join('');
+}
+
+function render(){
+  const v = RENDERERS[state.view] ? state.view : 'dashboard';
+  state.view = v;
+  document.getElementById('hudTitle').textContent = TITLES[v];
+  document.getElementById('viewport').innerHTML = `<div class="view">${RENDERERS[v]()}</div>`;
+  buildNav();
+  if(v==='strategy') mountStrategyBody();
+  if(v==='syllabus') mountSyllabusBody();
+  if(v==='notes') mountNotesArea();
+  updateHud();
+  window.scrollTo(0,0);
+  const vp = document.getElementById('viewport'); if(vp) vp.scrollTop = 0;
+}
+
+function mountStrategyBody(){
+  const tab = state.strategyTab || 'accordion';
+  document.getElementById('strategyBody').innerHTML = tab==='accordion' ? renderStrategyAccordion() : renderStrategyTimeline();
+}
+function mountSyllabusBody(){
+  document.getElementById('syllabusBody').innerHTML = renderSyllabusSubject(state.syllabusOpen || SYLLABUS[0].code);
+}
+function mountNotesArea(){
+  const ta = document.getElementById('notesArea');
+  if(!ta) return;
+  ta.addEventListener('input', debounce(()=>{
+    notesVault[state.notesOpen||SYLLABUS[0].code] = ta.value;
+    save('air1_notes', notesVault);
+  }, 400));
+}
+function debounce(fn, ms){ let h; return (...a)=>{ clearTimeout(h); h=setTimeout(()=>fn(...a), ms); }; }
+
+function updateHud(){
+  const today = todayObj();
+  document.getElementById('hudDate').textContent = humanDate(today);
+  document.getElementById('hudDday').textContent = Math.max(0,daysBetween(today, EXAM_DATE)) + 'd';
+  document.getElementById('hudPhase').textContent = currentPhase().code;
+  document.getElementById('brandDaysLeft').textContent = Math.max(0,daysBetween(today, EXAM_DATE)) + ' days to exam';
+  const tier = rankTier();
+  document.getElementById('rankLabel').textContent = tier.label;
+  document.getElementById('rankDot').style.background = tier.color;
+  document.getElementById('rankDot').style.boxShadow = '0 0 10px '+tier.color;
+}
+
+/* ---------- event delegation ---------- */
+document.addEventListener('click', function(e){
+  const nav = e.target.closest('[data-nav]');
+  if(nav){ e.preventDefault(); location.hash = nav.dataset.nav; closeSidebar(); return; }
+
+  const daytab = e.target.closest('[data-daytab]');
+  if(daytab){ state.timetableDay = daytab.dataset.daytab; render(); return; }
+
+  const stratTab = e.target.closest('[data-strategytab]');
+  if(stratTab){
+    state.strategyTab = stratTab.dataset.strategytab;
+    document.querySelectorAll('[data-strategytab]').forEach(b=>b.classList.toggle('active', b===stratTab));
+    mountStrategyBody();
+    return;
+  }
+
+  const acchead = e.target.closest('[data-acchead]');
+  if(acchead){ acchead.closest('.accordion-item').classList.toggle('open'); return; }
+
+  const subj = e.target.closest('[data-subj]');
+  if(subj){ state.syllabusOpen = subj.dataset.subj; document.querySelectorAll('[data-subj]').forEach(b=>b.classList.toggle('active', b===subj)); mountSyllabusBody(); return; }
+
+  const notesubj = e.target.closest('[data-notesubj]');
+  if(notesubj){ state.notesOpen = notesubj.dataset.notesubj; document.querySelectorAll('[data-notesubj]').forEach(b=>b.classList.toggle('active', b===notesubj)); mountNotesArea_refresh(); return; }
+
+  const daytype = e.target.closest('[data-daytype]');
+  if(daytype){ dayFlags[toISO(todayObj())] = daytype.dataset.daytype; save('air1_dayflags', dayFlags); render(); return; }
+
+  const mfilter = e.target.closest('[data-mfilter]');
+  if(mfilter){ state.mistakeFilter = mfilter.dataset.mfilter; render(); return; }
+
+  const resolve = e.target.closest('[data-resolve]');
+  if(resolve){
+    const m = mistakes.find(x=>x.id===resolve.dataset.resolve);
+    if(m){ m.resolved = !m.resolved; save('air1_mistakes', mistakes); render(); }
+    return;
+  }
+  const delm = e.target.closest('[data-delmistake]');
+  if(delm){ mistakes = mistakes.filter(x=>x.id!==delm.dataset.delmistake); save('air1_mistakes', mistakes); render(); return; }
+
+  const delt = e.target.closest('[data-deltest]');
+  if(delt){ tests = tests.filter(x=>x.id!==delt.dataset.deltest); save('air1_tests', tests); render(); return; }
+
+  const hamb = e.target.closest('#hambBtn');
+  if(hamb){ document.getElementById('sidebar').classList.toggle('open'); document.getElementById('backdrop').classList.toggle('show'); return; }
+  const backdrop = e.target.closest('#backdrop');
+  if(backdrop){ closeSidebar(); return; }
+});
+
+document.addEventListener('change', function(e){
+  const task = e.target.closest('[data-task]');
+  if(task){
+    const iso = toISO(todayObj());
+    if(!taskState[iso]) taskState[iso] = {};
+    taskState[iso][task.dataset.task] = task.checked;
+    save('air1_tasks', taskState);
+    task.closest('.topic-row').classList.toggle('done', task.checked);
+    return;
+  }
+  const topic = e.target.closest('[data-topic]');
+  if(topic){
+    syllabusProgress[topic.dataset.topic] = topic.checked;
+    save('air1_syllabus', syllabusProgress);
+    topic.closest('.topic-row').classList.toggle('done', topic.checked);
+    updateHud();
+    // refresh percentage displays without full re-render
+    const active = state.syllabusOpen;
+    const pctEl = document.querySelector('#syllabusBody .mono[style*="font-weight:700"]');
+    if(active) mountSyllabusBody();
+    return;
+  }
+});
+
+function mountNotesArea_refresh(){
+  document.getElementById('syllabusBody'); // noop guard
+  const body = document.getElementById('notesArea');
+  render(); // simplest: re-render full notes view since content differs per subject
+}
+
+document.addEventListener('submit', function(e){
+  if(e.target.id==='testForm'){
+    e.preventDefault();
+    const f = new FormData(e.target);
+    tests.push({ id:uid(), type:f.get('type'), subject:f.get('subject'), date:f.get('date'),
+      score:parseFloat(f.get('score')), total:parseFloat(f.get('total')), notes:f.get('notes')||'' });
+    save('air1_tests', tests);
+    render();
+  }
+  if(e.target.id==='mistakeForm'){
+    e.preventDefault();
+    const f = new FormData(e.target);
+    mistakes.push({ id:uid(), subject:f.get('subject'), type:f.get('type'), date:f.get('date'),
+      text:f.get('text'), fix:f.get('fix')||'', resolved:false });
+    save('air1_mistakes', mistakes);
+    render();
+  }
+});
+
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('backdrop').classList.remove('show');
+}
+
+window.addEventListener('hashchange', ()=>{ state.view = location.hash.slice(1); render(); });
+
+/* ---------- boot ---------- */
+buildNav();
+render();
+setInterval(updateHud, 60000);
+</script>
+
+</body>
+</html>

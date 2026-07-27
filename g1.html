@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROJECT AIR-1 · GATE CS 2027 God-Level Command Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #070B12;
+            --bg-card: rgba(15, 23, 42, 0.75);
+            --bg-card-hover: rgba(30, 41, 59, 0.85);
+            --border-card: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(0, 240, 255, 0.3);
+            
+            --cyan: #00F0FF;
+            --cyan-glow: rgba(0, 240, 255, 0.35);
+            --violet: #A855F7;
+            --violet-glow: rgba(168, 85, 247, 0.35);
+            --amber: #F59E0B;
+            --amber-glow: rgba(245, 158, 11, 0.3);
+            --emerald: #10B981;
+            --emerald-glow: rgba(16, 185, 129, 0.3);
+            --crimson: #EF4444;
+            --blue: #3B82F6;
+            
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --text-dim: #64748B;
+            
+            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-display: 'Outfit', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+            
+            --sidebar-w: 275px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.04) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.04) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(7, 11, 18, 0.9); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+
+        .app-container { display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: rgba(11, 17, 28, 0.94);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-card);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .brand {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        .brand-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--cyan);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+        }
+
+        .brand-name {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FFF 30%, var(--cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .navlist {
+            padding: 16px 12px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .nav-group-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-dim);
+            padding: 16px 12px 6px 12px;
+        }
+
+        .navlink {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .navlink:hover {
+            color: #FFF;
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateX(3px);
+        }
+
+        .navlink.active {
+            color: var(--cyan);
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            font-weight: 600;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+        }
+
+        .navcode {
+            font-family: var(--font-code);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.06);
+            margin-right: 12px;
+            color: var(--text-muted);
+        }
+
+        .navlink.active .navcode {
+            background: rgba(0, 240, 255, 0.2);
+            color: var(--cyan);
+        }
+
+        .sidebar-foot {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border-card);
+            font-size: 12px;
+            color: var(--text-dim);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-foot strong { color: var(--amber); }
+
+        /* Main Content */
+        .main {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* Top HUD */
+        .hud {
+            padding: 18px 32px;
+            border-bottom: 1px solid var(--border-card);
+            background: rgba(11, 17, 28, 0.75);
+            backdrop-filter: blur(16px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .hud-left { display: flex; flex-direction: column; }
+        .hud-title {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 800;
+            color: #FFF;
+            letter-spacing: -0.5px;
+        }
+        .hud-date { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+        .hud-right { display: flex; align-items: center; gap: 16px; }
+
+        .hud-stat {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-sm);
+            padding: 6px 14px;
+            text-align: center;
+        }
+        .hud-stat-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+        }
+        .hud-stat-val {
+            font-family: var(--font-code);
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--cyan);
+        }
+
+        .rank-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--violet);
+        }
+        .rank-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--violet);
+            box-shadow: 0 0 10px var(--violet);
+        }
+
+        /* Viewport Container */
+        .viewport {
+            padding: 32px;
+            max-width: 1440px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Cards & Grid */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            backdrop-filter: blur(16px);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: var(--bg-card-hover);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+            color: #FFF;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+
+        @media (max-width: 1024px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .grid-3 { grid-template-columns: repeat(1, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; }
+            .grid-2, .grid-4 { grid-template-columns: 1fr; }
+            .viewport { padding: 16px; }
+            .hud { padding: 16px; }
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            outline: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cyan) 0%, #00B8D9 100%);
+            color: #070B12;
+            box-shadow: 0 4px 20px var(--cyan-glow);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0, 240, 255, 0.5);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-card);
+            color: var(--text-main);
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--crimson);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+        /* Hero Banner */
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            background: radial-gradient(circle at 90% 10%, rgba(0, 240, 255, 0.15), transparent 50%);
+            pointer-events: none;
+        }
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        .hero-desc { color: var(--text-muted); font-size: 15px; max-width: 880px; line-height: 1.6; }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge-cyan { background: rgba(0, 240, 255, 0.15); color: var(--cyan); border: 1px solid rgba(0, 240, 255, 0.3); }
+        .badge-violet { background: rgba(168, 85, 247, 0.15); color: var(--violet); border: 1px solid rgba(168, 85, 247, 0.3); }
+        .badge-amber { background: rgba(245, 158, 11, 0.15); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-emerald { background: rgba(16, 185, 129, 0.15); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-crimson { background: rgba(239, 68, 68, 0.15); color: var(--crimson); border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        /* Progress Bar */
+        .progress-bar-bg {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--cyan), var(--violet));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* Timetable Blocks */
+        .timeline-item { display: flex; gap: 20px; padding: 16px 0; border-bottom: 1px solid var(--border-card); }
+        .timeline-item:last-child { border-bottom: none; }
+        .timeline-time { width: 140px; font-family: var(--font-code); font-size: 13px; font-weight: 700; color: var(--cyan); flex-shrink: 0; }
+        .timeline-content h4 { font-size: 15px; font-weight: 700; color: #FFF; margin-bottom: 4px; }
+        .timeline-content p { font-size: 13.5px; color: var(--text-muted); line-height: 1.5; }
+
+        /* Checkbox items */
+        .task-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            border-radius: var(--radius-sm); background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-card); margin-bottom: 8px; cursor: pointer; transition: var(--transition);
+        }
+        .task-item:hover { background: rgba(255, 255, 255, 0.05); }
+        .task-item.completed { opacity: 0.6; text-decoration: line-through; }
+        .task-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--cyan); cursor: pointer; }
+
+        /* Form Controls */
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-control {
+            width: 100%; padding: 10px 14px; background: rgba(7, 11, 18, 0.8);
+            border: 1px solid var(--border-card); border-radius: var(--radius-sm);
+            color: #FFF; font-family: var(--font-main); font-size: 14px; outline: none; transition: var(--transition);
+        }
+        .form-control:focus { border-color: var(--cyan); box-shadow: 0 0 10px var(--cyan-glow); }
+
+        /* Tables */
+        .dtable { width: 100%; border-collapse: collapse; font-size: 13.5px; text-align: left; }
+        .dtable th { padding: 12px 14px; background: rgba(0, 0, 0, 0.3); color: var(--text-dim); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border-card); }
+        .dtable td { padding: 14px; border-bottom: 1px solid var(--border-card); color: var(--text-muted); }
+        .dtable tr:hover td { background: rgba(255, 255, 255, 0.02); color: #FFF; }
+
+        /* Syllabus Topic Row */
+        .topic-row-card {
+            background: rgba(15, 23, 42, 0.5); border: 1px solid var(--border-card);
+            border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 8px;
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        }
+        .topic-row-card:hover { border-color: rgba(255, 255, 255, 0.15); background: rgba(15, 23, 42, 0.8); }
+        .topic-name { font-size: 14px; font-weight: 500; color: #FFF; flex: 1; }
+        .topic-stages { display: flex; gap: 6px; }
+        .stage-btn {
+            padding: 4px 8px; border-radius: 4px; font-size: 11px; font-family: var(--font-code); font-weight: 700;
+            border: 1px solid var(--border-card); background: rgba(255, 255, 255, 0.04); color: var(--text-dim); cursor: pointer; transition: var(--transition);
+        }
+        .stage-btn.active { background: rgba(0, 240, 255, 0.2); color: var(--cyan); border-color: var(--cyan); }
+
+        /* Flashcard Component */
+        .flashcard-box {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
+            border: 1px solid var(--border-glow); border-radius: var(--radius-lg);
+            padding: 40px; text-align: center; min-height: 220px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; position: relative; user-select: none; transition: var(--transition);
+        }
+        .flashcard-box:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0, 240, 255, 0.15); }
+        .flashcard-sub { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--cyan); letter-spacing: 1.5px; margin-bottom: 12px; }
+        .flashcard-q { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: #FFF; margin-bottom: 16px; }
+        .flashcard-a { font-family: var(--font-code); font-size: 16px; color: var(--emerald); line-height: 1.5; display: none; }
+
+        /* Mobile topbar */
+        .mobile-topbar {
+            display: none; align-items: center; justify-content: space-between; padding: 12px 20px;
+            background: rgba(11, 17, 28, 0.95); border-bottom: 1px solid var(--border-card);
+        }
+        @media (max-width: 768px) { .mobile-topbar { display: flex; } }
+        .hamb { background: none; border: none; color: #FFF; font-size: 24px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <span class="brand-badge">Project · AIR-1</span>
+                <div class="brand-name">GATE CS 2027</div>
+                <div class="brand-sub" id="brandDaysLeft">— Days Remaining</div>
+            </div>
+            <ul class="navlist" id="navlist"></ul>
+            <div class="sidebar-foot">
+                Target: <strong>6th Feb 2027</strong><br>
+                Goal: <strong>AIR 1 (IITB / IISc CSE)</strong>
+            </div>
+        </aside>
+
+        <!-- Main View -->
+        <div class="main">
+            <div class="mobile-topbar">
+                <button class="hamb" id="hambBtn" onclick="toggleSidebar()">☰</button>
+                <strong style="font-family:var(--font-display); color:var(--cyan);">GATE AIR 1</strong>
+            </div>
+
+            <header class="hud">
+                <div class="hud-left">
+                    <div class="hud-title" id="hudTitle">Dashboard</div>
+                    <div class="hud-date" id="hudDate">—</div>
+                </div>
+                <div class="hud-right">
+                    <div class="hud-stat">
+                        <div class="hud-stat-label">Exam D-Day</div>
+                        <div class="hud-stat-val" id="hudDday">—</div>
+                    </div>
+                    <div class="hud-stat">
+                        <div class="hud-stat-label">Phase</div>
+                        <div class="hud-stat-val" id="hudPhase" style="color:var(--cyan)">Phase 1</div>
+                    </div>
+                    <div class="rank-chip">
+                        <span class="rank-dot"></span>
+                        <span>Tier: <b id="rankLabel" style="color:#FFF;">Recruit</b></span>
+                    </div>
+                </div>
+            </header>
+
+            <main class="viewport" id="viewport"></main>
+        </div>
+    </div>
+
+    <script>
+        // Core Data Definitions
+        const EXAM_DATE = new Date('2027-02-06T09:30:00+05:30');
+        const START_DATE = new Date('2026-07-27T04:30:00+05:30');
+
+        const NAV = [
+            { sec: 'Command Center' },
+            { id: 'dashboard', code: 'DB', label: 'Dashboard & HUD' },
+            { id: 'timetable', code: 'TT', label: 'Daily Timetable (4:30 AM)' },
+            { id: 'strategy', code: 'PL', label: 'Master AIR 1 Plan & Strategy' },
+            { id: 'revision', code: 'RV', label: 'Revision Protocol & Cycles' },
+            { sec: 'Tracking & Analytics' },
+            { id: 'syllabus', code: 'SY', label: 'Syllabus Tracker (CS + GA)' },
+            { id: 'tests', code: 'TS', label: 'Test Log & Analytics' },
+            { id: 'mistakes', code: 'MX', label: 'Digital Mistake Copy' },
+            { id: 'notes', code: 'SN', label: 'Short Notes & Flashcards' },
+            { sec: 'Resources & Protocol' },
+            { id: 'resources', code: 'RS', label: 'Curated Resources & Textbooks' },
+            { id: 'examday', code: 'ED', label: 'Exam Hall 3-Pass Protocol' }
+        ];
+
+        const TITLES = {
+            dashboard: 'Dashboard & AIR 1 Command Center',
+            timetable: 'Daily High-Intensity Schedule (4:30 AM Wake Up)',
+            strategy: 'Unbeatable Master Strategy & 5 Pillars',
+            revision: 'Systematic Revision Protocol & Memory Retention System',
+            syllabus: 'Complete Syllabus Mastery Tracker (GATE CS + GA)',
+            tests: 'Test Log, Performance Analytics & AIR Predictor',
+            mistakes: 'Digital Mistake Notebook (Error Ledger)',
+            notes: 'Short Notes Vault & Active Recall Flashcards',
+            resources: 'Curated Resource Stack & Topper Materials',
+            examday: 'Exam Hall Execution & 3-Pass Algorithm'
+        };
+
+        const SYLLABUS = [
+            {
+                code: 'EM', name: 'Engineering Mathematics', level: 'Level 1', weight: '13 Marks',
+                topics: [
+                    'Discrete Math: Propositional & First Order Logic',
+                    'Discrete Math: Sets, Relations, Functions, Partial Orders & Lattices',
+                    'Discrete Math: Monoids & Groups',
+                    'Discrete Math: Graph Connectivity, Matching, Colouring',
+                    'Discrete Math: Combinatorics - Counting, Recurrence Relations, Generating Functions',
+                    'Linear Algebra: Matrices, Determinants, Systems of Linear Equations',
+                    'Linear Algebra: Eigenvalues, Eigenvectors, LU Decomposition',
+                    'Calculus: Limits, Continuity, Differentiability, Maxima & Minima, MVT',
+                    'Calculus: Definite & Indefinite Integration',
+                    'Probability: Random Variables, Uniform, Normal, Exponential, Poisson, Binomial',
+                    'Probability: Mean, Median, Mode, SD, Conditional Probability & Bayes Theorem'
+                ]
+            },
+            {
+                code: 'CPROG', name: 'C Programming', level: 'Level 1', weight: '6 Marks',
+                topics: [
+                    'Data Types, Operators, Expressions & Precedence',
+                    'Control Statements: Conditionals & Loops',
+                    'Functions, Scope & Parameter Passing',
+                    'Recursion & Call Stack Analysis',
+                    'Arrays, Pointers & Pointer Arithmetic',
+                    'Strings, Structures & Memory Layout'
+                ]
+            },
+            {
+                code: 'DL', name: 'Digital Logic', level: 'Level 1', weight: '5 Marks',
+                topics: [
+                    'Boolean Algebra & K-Map Minimization',
+                    'Combinational Circuits: Adders, Mux, Decoders, Encoders',
+                    'Sequential Circuits: Flip-Flops, Counters, Shift Registers',
+                    'Number Representations & Fixed/Floating Point Arithmetic'
+                ]
+            },
+            {
+                code: 'DS', name: 'Data Structures', level: 'Level 2', weight: '8 Marks',
+                topics: [
+                    'Arrays, Stacks, Queues & Applications',
+                    'Singly, Doubly & Circular Linked Lists',
+                    'Trees: Binary Trees, Traversals, BST Operations',
+                    'Binary Heaps, Priority Queues & Heap Sort',
+                    'Graph Representations: Adjacency List & Matrix'
+                ]
+            },
+            {
+                code: 'ALGO', name: 'Algorithms', level: 'Level 2', weight: '8 Marks',
+                topics: [
+                    'Asymptotic Analysis: Time & Space Complexity',
+                    'Searching, Sorting & Hashing',
+                    'Greedy Algorithms: Fractional Knapsack, Huffman Coding',
+                    'Dynamic Programming: 0/1 Knapsack, LCS, Matrix Chain',
+                    'Divide-and-Conquer: Merge Sort, Quick Sort, Binary Search',
+                    'Graph Algorithms: BFS, DFS, Dijkstra, Bellman-Ford, Prim & Kruskal'
+                ]
+            },
+            {
+                code: 'TOC', name: 'Theory of Computation', level: 'Level 2', weight: '7 Marks',
+                topics: [
+                    'Regular Expressions, Finite Automata (DFA, NFA) & Equivalence',
+                    'Pumping Lemma for Regular Languages & Closure Properties',
+                    'Context-Free Grammars, Ambiguity & Pushdown Automata (PDA)',
+                    'Context-Free Languages & Pumping Lemma for CFLs',
+                    'Turing Machines, Decidability & Undecidability (Halting Problem)'
+                ]
+            },
+            {
+                code: 'COA', name: 'Computer Organization & Architecture', level: 'Level 2', weight: '9 Marks',
+                topics: [
+                    'Instruction Set Architecture, Addressing Modes & Instruction Formats',
+                    'ALU Design & Computer Arithmetic',
+                    'Control Unit Design: Hardwired vs Microprogrammed',
+                    'Memory Hierarchy: Cache Mapping, Replacement Policies & Main Memory',
+                    'I/O Organization: Interrupts & DMA',
+                    'Instruction Pipelining, Performance & Pipeline Hazards'
+                ]
+            },
+            {
+                code: 'OS', name: 'Operating System', level: 'Level 3', weight: '9 Marks',
+                topics: [
+                    'System Calls, OS Structures & Process Management',
+                    'Threads, CPU Scheduling Algorithms & Metrics',
+                    'Inter-Process Communication & Process Synchronization (Semaphores, Mutex)',
+                    'Deadlocks: Characterization, Prevention, Avoidance (Banker Algorithm), Detection',
+                    'Memory Management: Paging, Segmentation, Virtual Memory, Page Replacement',
+                    'File Systems, Protection & Disk Scheduling'
+                ]
+            },
+            {
+                code: 'DBMS', name: 'Databases', level: 'Level 3', weight: '8 Marks',
+                topics: [
+                    'ER-Model & Relational Model Mapping',
+                    'Relational Algebra & Tuple Relational Calculus',
+                    'SQL Queries, Joins, Aggregations & Subqueries',
+                    'Functional Dependencies & Normal Forms (1NF, 2NF, 3NF, BCNF)',
+                    'File Organization, Indexing, B Trees & B+ Trees',
+                    'Transaction Processing, ACID, Concurrency Control & Recovery'
+                ]
+            },
+            {
+                code: 'CD', name: 'Compiler Design', level: 'Level 3', weight: '4 Marks',
+                topics: [
+                    'Lexical Analysis & Token Generation',
+                    'Parsing: Top-Down (LL(1)) & Bottom-Up (LR(0), SLR, LALR, CLR)',
+                    'Syntax-Directed Translation & Intermediate Code Generation',
+                    'Runtime Environments, Symbol Tables & Memory Allocation',
+                    'Code Optimization: Constant Propagation, Liveness, Common Subexpressions'
+                ]
+            },
+            {
+                code: 'CN', name: 'Computer Networks', level: 'Level 3', weight: '8 Marks',
+                topics: [
+                    'ISO/OSI & TCP/IP Layering Architecture & Switching Basics',
+                    'Data Link Layer: Error Control, Flow Control, Framing & Ethernet',
+                    'Medium Access Control (MAC) Protocols: CSMA/CD, CSMA/CA',
+                    'Routing Protocols: Distance Vector & Link State Routing',
+                    'IPv4/IPv6 Addressing, Subnetting, CIDR, Fragmentation & NAT',
+                    'Transport Layer: TCP (Flow & Congestion Control), UDP, Socket API',
+                    'Application Layer: DNS, HTTP, DHCP, FTP'
+                ]
+            },
+            {
+                code: 'GA', name: 'General Aptitude', level: 'Level 1', weight: '15 Marks',
+                topics: [
+                    'Verbal Aptitude: Grammar, Vocabulary, Reading Comprehension & Narrative',
+                    'Quantitative Aptitude: Data Interpretation, Ratios, Percentages, Logarithms, Series',
+                    'Analytical Aptitude: Logic Deduction, Induction & Analogy',
+                    'Spatial Aptitude: 2D/3D Transformations, Mirroring, Paper Folding & Patterns'
+                ]
+            }
+        ];
+
+        // Master Timeline Act Breakdown (Jul 27 2026 -> Feb 6 2027)
+        const TIMELINE_PHASES = [
+            { code: 'Act I', title: 'Foundation & Discrete Math', dates: 'Jul 27 – Sep 13', desc: 'Discrete Math (Logic, Combinatorics, Graph Theory) + C Programming + Digital Logic.' },
+            { code: 'Act II', title: 'Core CS Deep Dive', dates: 'Sep 14 – Nov 01', desc: 'Data Structures, Algorithms, Theory of Computation, Computer Organization & Architecture. Weekly tests begin Oct.' },
+            { code: 'Act III', title: 'Systems & Applied CS', dates: 'Nov 02 – Dec 20', desc: 'Operating Systems, Databases, Computer Networks, Compiler Design.' },
+            { code: 'Act IV', title: 'Engg Math & Syllabus Completion', dates: 'Dec 21 – Jan 03', desc: 'Linear Algebra, Calculus, Probability. Formula-heavy subjects kept fresh before final sprint.' },
+            { code: 'Act V', title: 'Revision & FLT Marathon', dates: 'Jan 04 – Feb 01', desc: 'Diagnostic FLTs + 2 Full Revision Cycles + Daily Mistake Ledger Reviews.' },
+            { code: 'Act VI', title: 'Final Taper & Peak Performance', dates: 'Feb 02 – Feb 05', desc: 'Zero new content. Short notes read-through only. Sleep, food, mental calibration.' }
+        ];
+
+        // State Management
+        let state = {
+            view: 'dashboard',
+            timetableType: 'college',
+            syllabus: JSON.parse(localStorage.getItem('air1_syllabus') || '{}'),
+            tests: JSON.parse(localStorage.getItem('air1_tests') || '[]'),
+            mistakes: JSON.parse(localStorage.getItem('air1_mistakes') || '[]'),
+            notes: JSON.parse(localStorage.getItem('air1_notes') || '{}'),
+            tasks: JSON.parse(localStorage.getItem('air1_tasks') || '{}')
+        };
+
+        function saveState() {
+            localStorage.setItem('air1_syllabus', JSON.stringify(state.syllabus));
+            localStorage.setItem('air1_tests', JSON.stringify(state.tests));
+            localStorage.setItem('air1_mistakes', JSON.stringify(state.mistakes));
+            localStorage.setItem('air1_notes', JSON.stringify(state.notes));
+            localStorage.setItem('air1_tasks', JSON.stringify(state.tasks));
+        }
+
+        // Navigation Builder
+        function buildNav() {
+            const nl = document.getElementById('navlist');
+            nl.innerHTML = NAV.map(item => {
+                if (item.sec) return `<div class="nav-group-label">${item.sec}</div>`;
+                return `<li>
+                    <a class="navlink ${state.view === item.id ? 'active' : ''}" onclick="switchView('${item.id}')">
+                        <span class="navcode">${item.code}</span>
+                        <span>${item.label}</span>
+                    </a>
+                </li>`;
+            }).join('');
+        }
+
+        function switchView(viewId) {
+            state.view = viewId;
+            document.getElementById('hudTitle').textContent = TITLES[viewId] || 'Command Center';
+            buildNav();
+            renderView();
+            window.scrollTo(0, 0);
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // HUD Updater
+        function updateHud() {
+            const now = new Date();
+            const diffMs = EXAM_DATE - now;
+            const daysLeft = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+            
+            document.getElementById('hudDate').textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+            document.getElementById('hudDday').textContent = daysLeft + ' Days';
+            document.getElementById('brandDaysLeft').textContent = daysLeft + ' Days to Exam';
+
+            let phase = 'Phase 1: Foundation';
+            if (daysLeft < 30) phase = 'Phase 4: Final Taper';
+            else if (daysLeft < 75) phase = 'Phase 3: FLT Marathon';
+            else if (daysLeft < 120) phase = 'Phase 2: Core Mastery';
+            document.getElementById('hudPhase').textContent = phase;
+
+            const completedCount = Object.keys(state.syllabus).filter(k => state.syllabus[k]?.REV).length;
+            let tier = 'Recruit';
+            if (completedCount > 80) tier = 'AIR 1 Contender';
+            else if (completedCount > 50) tier = 'Mastery';
+            else if (completedCount > 25) tier = 'Scholar';
+            else if (completedCount > 10) tier = 'Contender';
+            document.getElementById('rankLabel').textContent = tier;
+        }
+
+        // View Renderers Router
+        function renderView() {
+            const vp = document.getElementById('viewport');
+            switch (state.view) {
+                case 'dashboard': vp.innerHTML = renderDashboard(); break;
+                case 'timetable': vp.innerHTML = renderTimetable(); break;
+                case 'strategy': vp.innerHTML = renderStrategy(); break;
+                case 'revision': vp.innerHTML = renderRevision(); break;
+                case 'syllabus': vp.innerHTML = renderSyllabus(); break;
+                case 'tests': vp.innerHTML = renderTests(); break;
+                case 'mistakes': vp.innerHTML = renderMistakes(); break;
+                case 'notes': vp.innerHTML = renderNotes(); break;
+                case 'resources': vp.innerHTML = renderResources(); break;
+                case 'examday': vp.innerHTML = renderExamDay(); break;
+                default: vp.innerHTML = renderDashboard();
+            }
+        }
+
+        // 1. Dashboard Renderer
+        function renderDashboard() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const todayTasks = state.tasks[todayStr] || {};
+
+            return `
+                <div class="hero-banner">
+                    <span class="badge badge-cyan">TOP 0.01% MINDSET DECLARED</span>
+                    <h1 class="hero-title">GATE CS 2027 · AIR 1 GOD-LEVEL PLAN</h1>
+                    <p class="hero-desc">
+                        "Top 0.01% achievers are human, Shiv is human. What they can do, Shiv WILL do."<br>
+                        Primary Stack: <strong>Go Classes 26k Course</strong> + <strong>Made Easy 35-Yr PYQs Book</strong>. Strict <strong>4:30 AM Wake Up</strong> routine.
+                    </p>
+                </div>
+
+                <div class="grid-4" style="margin-bottom: 28px;">
+                    <div class="card">
+                        <div class="hud-stat-label">Exam Target</div>
+                        <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:#FFF; margin-top:4px;">6 FEB 2027</div>
+                        <div style="font-size:12px; color:var(--cyan); margin-top:4px;">AIR 1 Target · Old IITs CSE</div>
+                    </div>
+                    <div class="card">
+                        <div class="hud-stat-label">Syllabus Mastered</div>
+                        <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:var(--emerald); margin-top:4px;">
+                            ${getSyllabusProgress()}%
+                        </div>
+                        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Across 12 GATE Subjects</div>
+                    </div>
+                    <div class="card">
+                        <div class="hud-stat-label">Tests Logged</div>
+                        <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:var(--amber); margin-top:4px;">
+                            ${state.tests.length} Tests
+                        </div>
+                        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Avg Score: ${getAverageTestScore()}%</div>
+                    </div>
+                    <div class="card">
+                        <div class="hud-stat-label">Mistakes Logged</div>
+                        <div style="font-family:var(--font-display); font-size:22px; font-weight:800; color:var(--violet); margin-top:4px;">
+                            ${state.mistakes.length} Errors
+                        </div>
+                        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">${state.mistakes.filter(m => m.resolved).length} Resolved</div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">⚡ Daily AIR 1 Power Checklist</div>
+                            <span class="badge badge-amber">${todayStr}</span>
+                        </div>
+                        <div id="dailyChecklist">
+                            ${[
+                                '04:30 AM Wake Up & Hydration Reset',
+                                'Go Classes Morning Lecture Block (3.25h)',
+                                'Made Easy 35-Yr PYQs Solving (30+ Qs)',
+                                'Daily Topic Test Execution & Analysis',
+                                'Mistake Copy Documentation (Log Silly Errors)',
+                                '30-Min Active Recall Daily Revision Sweep'
+                            ].map((task, idx) => `
+                                <div class="task-item ${todayTasks[idx] ? 'completed' : ''}" onclick="toggleDailyTask('${todayStr}', ${idx})">
+                                    <input type="checkbox" ${todayTasks[idx] ? 'checked' : ''} onclick="event.stopPropagation(); toggleDailyTask('${todayStr}', ${idx});">
+                                    <span>${task}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">🔥 Topper Truths & Inspiring Lessons</div>
+                            <span class="badge badge-cyan">From Transcript</span>
+                        </div>
+                        <ul style="list-style:none; line-height:1.8; font-size:13.5px; color:var(--text-muted);">
+                            <li style="margin-bottom:10px;"><strong style="color:#FFF;">• The 30 to 68 Marks Miracle:</strong> In December/January, scoring 30-35 in FLTs is common. Keep fighting till the end—one aspirant scored 30 in mock tests but 68 in final GATE and reached IIT KGP!</li>
+                            <li style="margin-bottom:10px;"><strong style="color:#FFF;">• Dalpat Patil Strategy (AIR 1 in <6 Months):</strong> Quit low-paying placement, borrowed notes, used NPTEL playlists, and solved PYQs from Day 1.</li>
+                            <li style="margin-bottom:10px;"><strong style="color:#FFF;">• Reading is Brain Food:</strong> Just as protein builds muscles, continuous reading and active note-making build analytical brainpower.</li>
+                            <li style="margin-bottom:10px;"><strong style="color:#FFF;">• 20-25 Marks Silly Error Lie:</strong> If you lose 20-25 marks to "silly errors", you lack practice! Real silly errors are under 5 marks.</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getSyllabusProgress() {
+            let total = 0, done = 0;
+            SYLLABUS.forEach(s => {
+                s.topics.forEach((t, idx) => {
+                    total += 6;
+                    const k = s.code + '_' + idx;
+                    const st = state.syllabus[k] || {};
+                    if (st.Lec) done++;
+                    if (st.Not) done++;
+                    if (st.DPP) done++;
+                    if (st.PYQ) done++;
+                    if (st.TST) done++;
+                    if (st.REV) done++;
+                });
+            });
+            return total > 0 ? ((done / total) * 100).toFixed(1) : 0;
+        }
+
+        function getAverageTestScore() {
+            if (state.tests.length === 0) return 0;
+            const sum = state.tests.reduce((acc, t) => acc + (t.score / t.maxScore) * 100, 0);
+            return (sum / state.tests.length).toFixed(1);
+        }
+
+        function toggleDailyTask(dateStr, idx) {
+            if (!state.tasks[dateStr]) state.tasks[dateStr] = {};
+            state.tasks[dateStr][idx] = !state.tasks[dateStr][idx];
+            saveState();
+            renderView();
+        }
+
+        // 2. Timetable Renderer
+        function renderTimetable() {
+            const isCollege = state.timetableType === 'college';
+            return `
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header">
+                        <div class="card-title">🕒 Daily Timetable (4:30 AM Routine)</div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn ${isCollege ? 'btn-primary' : 'btn-outline'}" onclick="setTimetableType('college')">College Day</button>
+                            <button class="btn ${!isCollege ? 'btn-primary' : 'btn-outline'}" onclick="setTimetableType('noncollege')">Non-College / Holiday</button>
+                        </div>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:14px;">
+                        ${isCollege ? 'College Day Routine (Optimized for maximum hours: 4:30 AM Wake Up, 9:00 AM College, 4:30 PM Home, Night Sweep).' : 'Non-College Day Routine (14+ Hours High Intensity Full Execution Marathon).'}'
+                    </p>
+                </div>
+
+                <div class="card">
+                    ${isCollege ? `
+                        <div class="timeline-item">
+                            <div class="timeline-time">04:30 – 05:00 AM</div>
+                            <div class="timeline-content">
+                                <h4>Morning Ignition & Hydration</h4>
+                                <p>Wake up at 4:30 AM sharply. Hydrate, mental prep, quick 15-min flashcard sweep of yesterday short notes.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">05:00 – 08:15 AM</div>
+                            <div class="timeline-content">
+                                <h4>Morning Deep Study Block (3.25 Hours)</h4>
+                                <p>Heavy conceptual learning using <strong>Go Classes 26k Course</strong> lectures. High focus, zero distractions, zero phone.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">08:15 – 08:30 AM</div>
+                            <div class="timeline-content">
+                                <h4>College Prep & Breakfast</h4>
+                                <p>Get ready for college, eat nutritious breakfast.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">08:30 – 09:00 AM</div>
+                            <div class="timeline-content">
+                                <h4>Commute to College (Walk)</h4>
+                                <p>Walk to college. Use walk time for mental formula recall or listening to revision notes audio.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">09:00 AM – 04:30 PM</div>
+                            <div class="timeline-content">
+                                <h4>College Hours & Micro-Slots</h4>
+                                <p>Attend college. Use free library slots / breaks to solve Made Easy 35-Yr PYQs or review short notes.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">04:30 – 05:00 PM</div>
+                            <div class="timeline-content">
+                                <h4>Commute Home & Reset</h4>
+                                <p>Walk back home, wash up, take light power snack & hydration reset.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">05:00 – 07:30 PM</div>
+                            <div class="timeline-content">
+                                <h4>Evening Practice Block (2.5 Hours)</h4>
+                                <p>Solve <strong>Made Easy 35-Yr PYQs</strong> & DPP problem sets on virtual calculator. Categorize mistakes.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">07:30 – 08:15 PM</div>
+                            <div class="timeline-content">
+                                <h4>Topic Test & Mistake Logging</h4>
+                                <p>30-minute timed topic test. Log all errors into the <strong>Digital Mistake Copy</strong>.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">08:15 – 08:45 PM</div>
+                            <div class="timeline-content">
+                                <h4>Dinner Break</h4>
+                                <p>Healthy dinner & mental relaxation.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">08:45 – 10:15 PM</div>
+                            <div class="timeline-content">
+                                <h4>Night Revision Sweep (1.5 Hours)</h4>
+                                <p>Daily same-day concept revision + short notes creation in the Vault.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">10:15 – 10:30 PM</div>
+                            <div class="timeline-content">
+                                <h4>Daily Audit & Sleep Reset</h4>
+                                <p>Check off daily checklist, audit total study hours, sleep sharply by 10:30 PM for 4:30 AM wake up.</p>
+                            </div>
+                        </div>
+                    ` : `
+                        <div class="timeline-item">
+                            <div class="timeline-time">04:30 – 05:00 AM</div>
+                            <div class="timeline-content">
+                                <h4>Morning Ignition & Target Setup</h4>
+                                <p>Wake up at 4:30 AM. Review target topics for the day.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">05:00 – 08:30 AM</div>
+                            <div class="timeline-content">
+                                <h4>Block 1 (3.5 Hours): Go Classes Lectures</h4>
+                                <p>Watch lectures and take detailed handwritten concept notes.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">08:30 – 09:15 AM</div>
+                            <div class="timeline-content">
+                                <h4>Breakfast & Rest Break</h4>
+                                <p>Breakfast and mental recharge.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">09:15 AM – 12:30 PM</div>
+                            <div class="timeline-content">
+                                <h4>Block 2 (3.25 Hours): Made Easy PYQ Marathon</h4>
+                                <p>Solve 50+ PYQs independently from Made Easy book using virtual calculator.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">12:30 – 01:30 PM</div>
+                            <div class="timeline-content">
+                                <h4>Lunch & Power Nap</h4>
+                                <p>Lunch + 20 minute power nap for cognitive reset.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">01:30 – 04:30 PM</div>
+                            <div class="timeline-content">
+                                <h4>Block 3 (3.0 Hours): Test Series Execution</h4>
+                                <p>Take Full-Length Test or Subject Test in strict exam environment.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">04:30 – 05:00 PM</div>
+                            <div class="timeline-content">
+                                <h4>Walk & Refreshment</h4>
+                                <p>Outdoor walk and snack reset.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">05:00 – 07:30 PM</div>
+                            <div class="timeline-content">
+                                <h4>Block 4 (2.5 Hours): Test Analysis & Mistake Ledger</h4>
+                                <p>Analyze every incorrect and unattempted question. Log errors into Mistake Copy.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">07:30 – 08:15 PM</div>
+                            <div class="timeline-content">
+                                <h4>General Aptitude & Engg Math Drills</h4>
+                                <p>Solve 20 speed drill questions for Aptitude / Math.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">08:15 – 09:00 PM</div>
+                            <div class="timeline-content">
+                                <h4>Dinner Break</h4>
+                                <p>Dinner and rest.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">09:00 – 10:30 PM</div>
+                            <div class="timeline-content">
+                                <h4>Block 5 (1.5 Hours): Master Revision & Sleep</h4>
+                                <p>Active recall flashcards review and sleep sharply at 10:30 PM.</p>
+                            </div>
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        function setTimetableType(type) {
+            state.timetableType = type;
+            renderView();
+        }
+
+        // 3. Strategy Renderer
+        function renderStrategy() {
+            return `
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header">
+                        <div class="card-title">🎯 Master AIR 1 Strategy & 5 Pillars</div>
+                        <span class="badge badge-cyan">Topper Blueprint</span>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:14px; line-height:1.6;">
+                        Synthesized directly from toppers transcripts and GATE CSE syllabus rules. Designed for maximum concept retention, zero silly errors, and exam hall mastery.
+                    </p>
+                </div>
+
+                <div class="grid-2" style="margin-bottom: 24px;">
+                    <div class="card">
+                        <h3 style="font-family:var(--font-display); font-size:18px; color:var(--cyan); margin-bottom:16px;">🏛️ The 5 Pillars of GATE Success</h3>
+                        <ol style="padding-left:20px; line-height:1.8; color:var(--text-muted); font-size:14px;">
+                            <li><strong style="color:#FFF;">Pillar 1: PYQs from Day 1:</strong> Solve PYQs immediately after completing each topic—never wait for syllabus completion!</li>
+                            <li><strong style="color:#FFF;">Pillar 2: R-N-P Daily Rule:</strong> Revise (10% time), New (70% time), Practice (20% time).</li>
+                            <li><strong style="color:#FFF;">Pillar 3: Test Series & Analysis:</strong> Topic → Subject → Full-Length. Analysis is more important than test score.</li>
+                            <li><strong style="color:#FFF;">Pillar 4: Digital Mistake Copy:</strong> Maintain error notebook categorized into 4 slip types. Review before every exam.</li>
+                            <li><strong style="color:#FFF;">Pillar 5: Mindset & Consistency:</strong> Fight till the last second. 6 months of pure execution beats intelligence.</li>
+                        </ol>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="font-family:var(--font-display); font-size:18px; color:var(--amber); margin-bottom:16px;">🔄 The 7-Step Preparation Loop</h3>
+                        <ol style="padding-left:20px; line-height:1.8; color:var(--text-muted); font-size:14px;">
+                            <li><strong style="color:#FFF;">1. Lecture:</strong> Watch Go Classes lectures carefully. Focus on core logic and standard proofs.</li>
+                            <li><strong style="color:#FFF;">2. Notes:</strong> Write neat, comprehensive handwritten notes during/after lecture.</li>
+                            <li><strong style="color:#FFF;">3. Examples:</strong> Solve in-lecture examples & DPPs independently.</li>
+                            <li><strong style="color:#FFF;">4. PYQs:</strong> Solve Made Easy 35-Yr PYQs. Star 2-star & 3-star hard questions.</li>
+                            <li><strong style="color:#FFF;">5. Test:</strong> Take a 30-minute timed topic test on GATE Overflow / GO Classes test series.</li>
+                            <li><strong style="color:#FFF;">6. Mistake Entry:</strong> Log every wrong question into the Digital Mistake Notebook.</li>
+                            <li><strong style="color:#FFF;">7. Revision:</strong> Conduct 30-minute active recall daily + weekly Sunday cyclic revision.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <h3 style="font-family:var(--font-display); font-size:18px; color:var(--violet); margin-bottom:16px;">📅 Master Timeline Breakdown (Jul 2026 – Feb 2027)</h3>
+                    <div class="grid-3">
+                        ${TIMELINE_PHASES.map(p => `
+                            <div style="background:rgba(255,255,255,0.02); padding:16px; border-radius:8px; border:1px solid var(--border-card);">
+                                <span class="badge badge-cyan" style="margin-bottom:6px;">${p.code}</span>
+                                <h4 style="color:#FFF; margin-bottom:4px; font-size:15px;">${p.title}</h4>
+                                <div style="font-size:12px; color:var(--amber); font-family:var(--font-code); margin-bottom:8px;">${p.dates}</div>
+                                <p style="font-size:13px; color:var(--text-muted);">${p.desc}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 4. Revision Protocol Renderer
+        function renderRevision() {
+            return `
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header">
+                        <div class="card-title">🔁 Systematic Revision & Active Recall System</div>
+                        <span class="badge badge-emerald">Retention Engine</span>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:14px; line-height:1.6;">
+                        "Without revision, 70% of concepts fade within 14 days." Revision turns concepts into rapid marks under pressure.
+                    </p>
+                </div>
+
+                <div class="grid-2" style="margin-bottom: 24px;">
+                    <div class="card">
+                        <h3 style="font-family:var(--font-display); font-size:18px; color:var(--cyan); margin-bottom:16px;">☀️ 3-Tier Revision Cadence</h3>
+                        <ul style="list-style:none; line-height:1.8; color:var(--text-muted); font-size:14px;">
+                            <li style="margin-bottom:12px;">
+                                <strong style="color:#FFF;">1. Daily 30-Min Active Recall Sweep:</strong><br>
+                                Start every morning session by reading yesterday's short notes. Do not force cram—just build familiarity.
+                            </li>
+                            <li style="margin-bottom:12px;">
+                                <strong style="color:#FFF;">2. Weekly Sunday Cyclic Revision:</strong><br>
+                                Reserve Sundays exclusively for revising previously completed subjects using short notes. Rotate 1 subject every week.
+                            </li>
+                            <li style="margin-bottom:12px;">
+                                <strong style="color:#FFF;">3. Pre-Test Mistake Ledger Review:</strong><br>
+                                Read through all logged mistakes in your Digital Mistake Copy 30 minutes before starting any test.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="font-family:var(--font-display); font-size:18px; color:var(--amber); margin-bottom:16px;">🎯 The 20/80 High-Yield Topic Rule</h3>
+                        <p style="color:var(--text-muted); font-size:14px; line-height:1.6; margin-bottom:12px;">
+                            20% of topics contribute to 80% of GATE marks every year. Never skip a subject completely—always master its high-yield core!
+                        </p>
+                        <ul style="list-style:none; line-height:1.6; color:var(--text-muted); font-size:13.5px;">
+                            <li style="margin-bottom:6px;"><strong style="color:#FFF;">• Computer Networks:</strong> IP Addressing & Subnetting, TCP Flow/Congestion Control.</li>
+                            <li style="margin-bottom:6px;"><strong style="color:#FFF;">• Operating Systems:</strong> Paging & Virtual Memory Numerical, CPU Scheduling, Banker Algorithm.</li>
+                            <li style="margin-bottom:6px;"><strong style="color:#FFF;">• DBMS:</strong> Normal Forms (3NF/BCNF), Relational Algebra & SQL Joins, B+ Trees.</li>
+                            <li style="margin-bottom:6px;"><strong style="color:#FFF;">• TOC & Compiler:</strong> DFA State Minimization, Pumping Lemma, LL(1) / LR Parsing.</li>
+                            <li style="margin-bottom:6px;"><strong style="color:#FFF;">• Engg Math:</strong> Eigenvalues & Determinants, L'Hôpital Limits, Bayes Theorem.</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 5. Syllabus Tracker Renderer
+        function renderSyllabus() {
+            return `
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header">
+                        <div class="card-title">📖 Complete Syllabus Mastery Tracker</div>
+                        <span class="badge badge-emerald">${getSyllabusProgress()}% Completed</span>
+                    </div>
+                    <div class="progress-bar-bg" style="margin-bottom: 12px;">
+                        <div class="progress-bar-fill" style="width: ${getSyllabusProgress()}%;"></div>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:13px;">
+                        Check off each stage for every topic: <strong>Lec</strong> (Lecture), <strong>Not</strong> (Notes), <strong>DPP</strong> (Daily Practice), <strong>PYQ</strong> (Made Easy PYQs), <strong>TST</strong> (Topic Test), <strong>REV</strong> (Revision Sweep).
+                    </p>
+                </div>
+
+                ${SYLLABUS.map(subj => `
+                    <div class="card" style="margin-bottom: 20px;">
+                        <div class="card-header" style="margin-bottom:14px;">
+                            <div>
+                                <span class="badge badge-cyan" style="margin-right:8px;">${subj.code}</span>
+                                <strong style="font-size:16px; color:#FFF;">${subj.name}</strong>
+                                <span style="font-size:12px; color:var(--text-muted); margin-left:10px;">(${subj.level} · ${subj.weight})</span>
+                            </div>
+                        </div>
+                        <div>
+                            ${subj.topics.map((t, idx) => {
+                                const k = subj.code + '_' + idx;
+                                const st = state.syllabus[k] || {};
+                                return `
+                                    <div class="topic-row-card">
+                                        <div class="topic-name">${t}</div>
+                                        <div class="topic-stages">
+                                            <button class="stage-btn ${st.Lec ? 'active' : ''}" onclick="toggleSyllabusStage('${subj.code}', ${idx}, 'Lec')">Lec</button>
+                                            <button class="stage-btn ${st.Not ? 'active' : ''}" onclick="toggleSyllabusStage('${subj.code}', ${idx}, 'Not')">Not</button>
+                                            <button class="stage-btn ${st.DPP ? 'active' : ''}" onclick="toggleSyllabusStage('${subj.code}', ${idx}, 'DPP')">DPP</button>
+                                            <button class="stage-btn ${st.PYQ ? 'active' : ''}" onclick="toggleSyllabusStage('${subj.code}', ${idx}, 'PYQ')">PYQ</button>
+                                            <button class="stage-btn ${st.TST ? 'active' : ''}" onclick="toggleSyllabusStage('${subj.code}', ${idx}, 'TST')">TST</button>
+                                            <button class="stage-btn ${st.REV ? 'active' : ''}" onclick="toggleSyllabusStage('${subj.code}', ${idx}, 'REV')">REV</button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function toggleSyllabusStage(subjCode, idx, stage) {
+            const k = subjCode + '_' + idx;
+            if (!state.syllabus[k]) state.syllabus[k] = {};
+            state.syllabus[k][stage] = !state.syllabus[k][stage];
+            saveState();
+            renderView();
+            updateHud();
+        }
+
+        // 6. Test Log Renderer
+        function renderTests() {
+            return `
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header">
+                        <div class="card-title">📊 Test Log & Performance Analytics</div>
+                    </div>
+                    <div class="form-group grid-4">
+                        <div>
+                            <label class="form-label">Test Title / Name</label>
+                            <input type="text" id="testName" class="form-control" placeholder="e.g. OS Topic Test 1 or FLT 3">
+                        </div>
+                        <div>
+                            <label class="form-label">Score Secured</label>
+                            <input type="number" id="testScore" class="form-control" placeholder="e.g. 45">
+                        </div>
+                        <div>
+                            <label class="form-label">Max Marks</label>
+                            <input type="number" id="testMax" class="form-control" value="100">
+                        </div>
+                        <div>
+                            <label class="form-label">Test Type</label>
+                            <select id="testType" class="form-control">
+                                <option value="Topic Test">Topic Test</option>
+                                <option value="Subject Test">Subject Test</option>
+                                <option value="Multi-Subject Test">Multi-Subject Test</option>
+                                <option value="Full-Length Mock">Full-Length Mock</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group grid-2">
+                        <div>
+                            <label class="form-label">Silly Mistakes Count</label>
+                            <input type="number" id="testSilly" class="form-control" placeholder="e.g. 2">
+                        </div>
+                        <div>
+                            <label class="form-label">Conceptual Errors Count</label>
+                            <input type="number" id="testConcept" class="form-control" placeholder="e.g. 3">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveTestEntry()">Log Test Performance</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📈 History of Logged Tests</div>
+                    </div>
+                    ${state.tests.length === 0 ? '<p style="color:var(--text-muted); font-size:14px;">No tests logged yet. Log your first test above!</p>' : `
+                        <table class="dtable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Score</th>
+                                    <th>% Accuracy</th>
+                                    <th>Silly / Concept</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${state.tests.slice().reverse().map((t, idx) => {
+                                    const pct = ((t.score / t.maxScore) * 100).toFixed(1);
+                                    return `
+                                        <tr>
+                                            <td>${t.date}</td>
+                                            <td style="font-weight:600; color:#FFF;">${t.name}</td>
+                                            <td><span class="badge badge-cyan">${t.type}</span></td>
+                                            <td style="font-family:var(--font-code); font-weight:700; color:var(--amber);">${t.score} / ${t.maxScore}</td>
+                                            <td style="font-family:var(--font-code); font-weight:700; color:${pct >= 70 ? 'var(--emerald)' : 'var(--crimson)'};">${pct}%</td>
+                                            <td>${t.silly || 0} Slips / ${t.concept || 0} Conceptual</td>
+                                            <td><button class="btn btn-danger btn-sm" onclick="deleteTest(${state.tests.length - 1 - idx})">Delete</button></td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    `}
+                </div>
+            `;
+        }
+
+        function saveTestEntry() {
+            const name = document.getElementById('testName').value.trim();
+            const score = parseFloat(document.getElementById('testScore').value);
+            const maxScore = parseFloat(document.getElementById('testMax').value) || 100;
+            const type = document.getElementById('testType').value;
+            const silly = parseInt(document.getElementById('testSilly').value) || 0;
+            const concept = parseInt(document.getElementById('testConcept').value) || 0;
+
+            if (!name || isNaN(score)) {
+                alert('Please fill in Test Name and Score.');
+                return;
+            }
+
+            state.tests.push({
+                date: new Date().toISOString().split('T')[0],
+                name, score, maxScore, type, silly, concept
+            });
+            saveState();
+            renderView();
+        }
+
+        function deleteTest(index) {
+            state.tests.splice(index, 1);
+            saveState();
+            renderView();
+        }
+
+        // 7. Mistake Ledger Renderer
+        function renderMistakes() {
+            return `
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header">
+                        <div class="card-title">📕 Digital Mistake Copy (Error Notebook)</div>
+                    </div>
+                    <div class="form-group grid-3">
+                        <div>
+                            <label class="form-label">Subject</label>
+                            <select id="mSub" class="form-control">
+                                ${SYLLABUS.map(s => `<option value="${s.code}">${s.code} · ${s.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Error Category</label>
+                            <select id="mCat" class="form-control">
+                                <option value="Silly Slip">Silly Slip (Calc / Unit / Misread)</option>
+                                <option value="Conceptual Gap">Conceptual Gap (Theory / Boundary)</option>
+                                <option value="Formula / Trick Miss">Formula / Trick Miss</option>
+                                <option value="Time Panic / Guess">Time Panic / Guess</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Question / Topic Reference</label>
+                            <input type="text" id="mRef" class="form-control" placeholder="e.g. GATE 2021 OS Paging NAT Q34">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Wrong Logic Made</label>
+                        <textarea id="mWrong" class="form-control" rows="2" placeholder="What wrong assumption or calculation error did you make?"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Correct Prevention Rule / Key Takeaway</label>
+                        <textarea id="mRight" class="form-control" rows="2" placeholder="What is the golden rule to never repeat this mistake again?"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveMistakeEntry()">Log Mistake Entry</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📋 Logged Mistakes Notebook</div>
+                    </div>
+                    ${state.mistakes.length === 0 ? '<p style="color:var(--text-muted); font-size:14px;">No mistakes logged yet. Every logged mistake is a step closer to AIR 1!</p>' : `
+                        <div style="display:flex; flex-direction:column; gap:14px;">
+                            ${state.mistakes.slice().reverse().map((m, idx) => {
+                                const realIdx = state.mistakes.length - 1 - idx;
+                                return `
+                                    <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border-card); padding:16px; border-radius:var(--radius-sm);">
+                                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                            <div>
+                                                <span class="badge badge-cyan" style="margin-right:8px;">${m.sub}</span>
+                                                <span class="badge ${m.cat === 'Silly Slip' ? 'badge-crimson' : m.cat === 'Conceptual Gap' ? 'badge-amber' : 'badge-violet'}">${m.cat}</span>
+                                                <strong style="color:#FFF; font-size:14px; margin-left:10px;">${m.ref}</strong>
+                                            </div>
+                                            <div style="display:flex; gap:8px;">
+                                                <button class="btn ${m.resolved ? 'btn-outline' : 'btn-primary'} btn-sm" onclick="toggleMistakeResolved(${realIdx})">
+                                                    ${m.resolved ? '✓ Resolved' : 'Mark Resolved'}
+                                                </button>
+                                                <button class="btn btn-danger btn-sm" onclick="deleteMistake(${realIdx})">Delete</button>
+                                            </div>
+                                        </div>
+                                        <p style="color:var(--crimson); font-size:13px; margin-bottom:4px;"><strong>❌ Wrong Logic:</strong> ${m.wrong}</p>
+                                        <p style="color:var(--emerald); font-size:13px;"><strong>✅ Prevention Rule:</strong> ${m.right}</p>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        function saveMistakeEntry() {
+            const sub = document.getElementById('mSub').value;
+            const cat = document.getElementById('mCat').value;
+            const ref = document.getElementById('mRef').value.trim();
+            const wrong = document.getElementById('mWrong').value.trim();
+            const right = document.getElementById('mRight').value.trim();
+
+            if (!ref || !wrong || !right) {
+                alert('Please fill in reference, wrong logic, and prevention rule.');
+                return;
+            }
+
+            state.mistakes.push({
+                sub, cat, ref, wrong, right, resolved: false, date: new Date().toISOString().split('T')[0]
+            });
+            saveState();
+            renderView();
+            updateHud();
+        }
+
+        function toggleMistakeResolved(index) {
+            state.mistakes[index].resolved = !state.mistakes[index].resolved;
+            saveState();
+            renderView();
+            updateHud();
+        }
+
+        function deleteMistake(index) {
+            state.mistakes.splice(index, 1);
+            saveState();
+            renderView();
+            updateHud();
+        }
+
+        // 8. Short Notes Renderer
+        function renderNotes() {
+            return `
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header">
+                        <div class="card-title">📝 Short Notes Vault & Active Recall Hub</div>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:14px;">
+                        "Short notes must be written in your own words AFTER completing PYQs." Keep 1-2 pages per subject for final revision sweeps.
+                    </p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <h3 style="font-family:var(--font-display); font-size:16px; color:var(--cyan); margin-bottom:16px;">💡 Subject Cheatsheet Editor</h3>
+                        <div class="form-group">
+                            <label class="form-label">Select Subject</label>
+                            <select id="noteSubSelect" class="form-control" onchange="loadSubjectNote()">
+                                ${SYLLABUS.map(s => `<option value="${s.code}">${s.code} · ${s.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Key Formulas & Triggers</label>
+                            <textarea id="noteContent" class="form-control" rows="12" placeholder="Write key formulas, theorems, standard traps for this subject..."></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveSubjectNote()">Save Subject Note</button>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="font-family:var(--font-display); font-size:16px; color:var(--violet); margin-bottom:16px;">⚡ Active Recall Flashcards</h3>
+                        <p style="color:var(--text-muted); font-size:13px; margin-bottom:16px;">Click card to reveal standard GATE core formula/answer.</p>
+                        
+                        <div class="flashcard-box" id="flashcardBox" onclick="toggleCardAnswer()">
+                            <div class="flashcard-sub" id="cardSub">Discrete Math</div>
+                            <div class="flashcard-q" id="cardQ">Number of Handshakes / Sum of Degrees in Graph?</div>
+                            <div class="flashcard-a" id="cardA">Sum of Degrees = 2 * |E| (Handshaking Lemma)</div>
+                        </div>
+
+                        <div style="margin-top:16px; text-align:center;">
+                            <button class="btn btn-outline" onclick="nextFlashcard()">Next Card →</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        const FLASHCARDS = [
+            { sub: 'Discrete Math', q: 'Number of Handshakes / Sum of Degrees in Graph?', a: 'Sum of Degrees = 2 * |E| (Handshaking Lemma)' },
+            { sub: 'Algorithms', q: 'Master Theorem condition for T(n) = a T(n/b) + f(n)?', a: 'Compare f(n) with n^(log_b(a))' },
+            { sub: 'Operating Systems', q: 'Banker Algorithm Safety Condition?', a: 'Need <= Available (where Need = Max - Allocation)' },
+            { sub: 'Computer Networks', q: 'TCP Head Size Range?', a: '20 Bytes (minimum without options) to 60 Bytes (with options)' },
+            { sub: 'Databases', q: 'Lossless Join Condition for R decomposed into R1 and R2?', a: '(R1 ∩ R2) -> R1 OR (R1 ∩ R2) -> R2' },
+            { sub: 'COA', q: 'Cache Tag Bit Formula for Direct Mapping?', a: 'Tag = Main Memory Address Bits - (Index Bits + Offset Bits)' }
+        ];
+        let cardIdx = 0;
+
+        function loadSubjectNote() {
+            const sub = document.getElementById('noteSubSelect').value;
+            document.getElementById('noteContent').value = state.notes[sub] || '';
+        }
+
+        function saveSubjectNote() {
+            const sub = document.getElementById('noteSubSelect').value;
+            const content = document.getElementById('noteContent').value;
+            state.notes[sub] = content;
+            saveState();
+            alert('Saved short notes for ' + sub + '!');
+        }
+
+        function toggleCardAnswer() {
+            const a = document.getElementById('cardA');
+            a.style.display = (a.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function nextFlashcard() {
+            cardIdx = (cardIdx + 1) % FLASHCARDS.length;
+            const c = FLASHCARDS[cardIdx];
+            document.getElementById('cardSub').textContent = c.sub;
+            document.getElementById('cardQ').textContent = c.q;
+            document.getElementById('cardA').textContent = c.a;
+            document.getElementById('cardA').style.display = 'none';
+        }
+
+        // 9. Resources Renderer
+        function renderResources() {
+            return `
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header">
+                        <div class="card-title">📚 Curated Resource Curation & Textbooks Stack</div>
+                        <span class="badge badge-amber">Primary Sources</span>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:14px; line-height:1.6;">
+                        Strict adherence to your core materials. Avoid resource hopping — toppers complete one primary source 100% rather than 5 sources partially.
+                    </p>
+                </div>
+
+                <div class="grid-2" style="margin-bottom:24px;">
+                    <div class="card">
+                        <span class="badge badge-cyan" style="margin-bottom:8px;">Primary Course</span>
+                        <h3 style="color:#FFF; font-size:18px; margin-bottom:8px;">🌟 Go Classes GATE CSE 2027 Course</h3>
+                        <p style="color:var(--text-muted); font-size:13.5px; line-height:1.6;">
+                            ₹26,000 Complete Course (Purchased). Serves as your absolute primary lecture spine for deep conceptual clarity, mathematical proofs, and topic-wise illustrations.
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <span class="badge badge-emerald" style="margin-bottom:8px;">Primary Practice Book</span>
+                        <h3 style="color:#FFF; font-size:18px; margin-bottom:8px;">📖 Made Easy GATE CSE 35-Yr PYQ Book</h3>
+                        <p style="color:var(--text-muted); font-size:13.5px; line-height:1.6;">
+                            Contains 35+ years of solved GATE previous year questions. Solve every question independently. Star tricky questions for Pass 2 revision.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom:24px;">
+                    <h3 style="font-family:var(--font-display); font-size:18px; color:var(--violet); margin-bottom:16px;">📚 Recommended Reference Textbooks (Topper Standard)</h3>
+                    <table class="dtable">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Standard Reference Book</th>
+                                <th>Usage Guidance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Algorithms</strong></td>
+                                <td style="color:#FFF;">Introduction to Algorithms (CLRS) — Cormen et al.</td>
+                                <td>Use for algorithm proofs, Recurrences, Graph algorithms.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Operating Systems</strong></td>
+                                <td style="color:#FFF;">Operating System Concepts — Silberschatz & Galvin</td>
+                                <td>Paging, Virtual Memory, Process Synchronization.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Databases</strong></td>
+                                <td style="color:#FFF;">Database System Concepts — Korth & Sudarshan</td>
+                                <td>Relational Algebra, Normalization, B+ Trees.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Computer Networks</strong></td>
+                                <td style="color:#FFF;">Computer Networking: A Top-Down Approach — Kurose & Ross</td>
+                                <td>TCP/IP protocol stack details, IPv4/IPv6, Congestion.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Theory of Computation</strong></td>
+                                <td style="color:#FFF;">Introduction to Automata Theory — Hopcroft & Ullman</td>
+                                <td>DFA/NFA equivalence, Turing Machines, Undecidability.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Digital Logic</strong></td>
+                                <td style="color:#FFF;">Digital Logic and Computer Design — M. Morris Mano</td>
+                                <td>Combinational/Sequential circuits & K-Maps.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h3 style="font-family:var(--font-display); font-size:18px; color:var(--cyan); margin-bottom:16px;">🌐 Essential Digital Ecosystem</h3>
+                    <div class="grid-3">
+                        <div style="background:rgba(255,255,255,0.02); padding:16px; border-radius:8px; border:1px solid var(--border-card);">
+                            <h4 style="color:#FFF; margin-bottom:6px;">GATE Overflow</h4>
+                            <p style="font-size:13px; color:var(--text-muted);">Community answers, discussion on ambiguous questions, and PDF test downloads.</p>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.02); padding:16px; border-radius:8px; border:1px solid var(--border-card);">
+                            <h4 style="color:#FFF; margin-bottom:6px;">GO Classes / GO Test Series</h4>
+                            <p style="font-size:13px; color:var(--text-muted);">Highest quality topic-wise and full-length test series matching real GATE difficulty.</p>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.02); padding:16px; border-radius:8px; border:1px solid var(--border-card);">
+                            <h4 style="color:#FFF; margin-bottom:6px;">NPTEL Video Lectures</h4>
+                            <p style="font-size:13px; color:var(--text-muted);">IIT faculty lectures for secondary clarification on sticky OS/DBMS/CN concepts.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 10. Exam Day Protocol Renderer
+        function renderExamDay() {
+            return `
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header">
+                        <div class="card-title">⚔️ Exam Hall 3-Pass Attempt Algorithm</div>
+                        <span class="badge badge-crimson">Feb 6, 2027 Execution</span>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:14px; line-height:1.6;">
+                        How you execute during the 3 hours inside the exam hall determines whether you convert your preparation into AIR 1.
+                    </p>
+                </div>
+
+                <div class="grid-3" style="margin-bottom:24px;">
+                    <div class="card">
+                        <span class="badge badge-cyan" style="margin-bottom:8px;">Pass 1: 0 – 60 Mins</span>
+                        <h3 style="color:#FFF; font-size:16px; margin-bottom:8px;">Fast & Easy Questions</h3>
+                        <p style="font-size:13px; color:var(--text-muted); line-height:1.6;">
+                            Scan Q1 to Q65. Solve all easy 1-mark questions and direct 2-mark questions. If a question takes >2 mins, SKIP IMMEDIATELY. Target: Secure 35-40 marks in Pass 1.
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <span class="badge badge-amber" style="margin-bottom:8px;">Pass 2: 60 – 140 Mins</span>
+                        <h3 style="color:#FFF; font-size:16px; margin-bottom:8px;">Medium Conceptual Items</h3>
+                        <p style="font-size:13px; color:var(--text-muted); line-height:1.6;">
+                            Tackle multi-step conceptual problems in Algo, DBMS, OS, COA. Verify NAT calculations carefully on the virtual calculator.
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <span class="badge badge-violet" style="margin-bottom:8px;">Pass 3: 140 – 180 Mins</span>
+                        <h3 style="color:#FFF; font-size:16px; margin-bottom:8px;">MSQs, Hard NATs & Audit</h3>
+                        <p style="font-size:13px; color:var(--text-muted); line-height:1.6;">
+                            Carefully audit MSQ options (all correct options must be chosen). Check NAT rounding limits. Ensure zero silly mistakes.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="font-family:var(--font-display); font-size:18px; color:var(--emerald); margin-bottom:16px;">🛡️ Virtual Calculator & MSQ Rules</h3>
+                    <ul style="list-style:none; line-height:1.8; color:var(--text-muted); font-size:14px;">
+                        <li style="margin-bottom:8px;"><strong style="color:#FFF;">• NAT Decimal Precision:</strong> Read whether 2 decimal places or integer is asked. Round off ONLY at the final step.</li>
+                        <li style="margin-bottom:8px;"><strong style="color:#FFF;">• MSQ No Negative Marking:</strong> MSQs have ZERO negative marking, but require ALL correct options selected for full marks (partial marking is zero).</li>
+                        <li style="margin-bottom:8px;"><strong style="color:#FFF;">• Virtual Calculator Keys:</strong> Use mouse clicks smoothly; never use keyboard numpad during test series so exam hall feels identical.</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            buildNav();
+            updateHud();
+            renderView();
+            setInterval(updateHud, 60000);
+        });
+    </script>
+</body>
+</html>
